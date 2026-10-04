@@ -6,4 +6,4 @@ __pycache__/
 .ipynb_checkpoints/
 
 # Publisher PDFs are not redistributed; data/files.csv identifies them by SHA-256.
-data/articles/
+data/articles/*/*.pdf
