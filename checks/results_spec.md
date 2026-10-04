@@ -8,8 +8,8 @@ one alone.
 ## 1. Format
 
 - CSV: UTF-8, comma separator, header row, `.` as decimal point, no index
-  column, empty field for a missing value. JSON: UTF-8, `null` for a
-  missing value.
+  column, empty field for a missing value.
+- JSON: UTF-8, `null` for a missing value.
 - `series_id` is `<article_id>-s<k>`, series of one article numbered from 1
   in order of their smallest `experiment_id`.
 
