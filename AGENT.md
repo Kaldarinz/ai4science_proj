@@ -24,15 +24,15 @@ At the end the project will contain:
 ## 1. Readiness criterion
 
 ```
-python -m pytest tests/ -q && python checks/check.py
+.venv/bin/python -m pytest -p no:cacheprovider tests/ -q && .venv/bin/python checks/check.py
 ```
 
 Both exit with 0. The check finds every quote on its page, recomputes the
 comparison and summary, and checks reference article 80094: Au in water
 `increase` agrees with its series; AuSi `no_effect` disagrees under the
 primary error model and agrees under the lenient one. Run it yourself before
-answering. For one article, `python checks/check.py --article <id>` checks
-only its claims.
+answering. For one article, `.venv/bin/python checks/check.py --article <id>`
+checks only its claims.
 
 ## 2. Project map and sources
 
@@ -50,20 +50,31 @@ only its claims.
 
 ## 3. Tools and limits
 
-- Python 3.10+, numpy, scipy, pandas, pytest. Do not install anything else.
-- Run from the project root: `python -m src.<module>`, then the check.
+- You run as the user `aiagent`. You can write only in `results/`, `src/`,
+  `tests/`, `memory/` and `diary.md`; everything else is read-only for you.
+  A "Permission denied" outside those is intended: do not work around it,
+  report it.
+- Python: `.venv/bin/python`, with numpy, scipy, pandas, pytest and pypdf.
+  It cannot be changed, so nothing can be installed.
+- Run from the project root: `.venv/bin/python -m src.<module>`, then the
+  check.
 - Network and Lean are not needed:
   `AI4SCIENCE_WEB_DISABLED=1 ai4science --no-lean`.
 
 ## 4. Bans
 
-1. Do not change any files in `data/`.
-2. Do not change any files `checks/` or `tools/`.
+1. Do not change `data/`, `checks/`, `tools/`. `[env]` — read-only for `aiagent`.
 3. While extracting claims, do not call the database tools or read
-   `results/comparison.csv`.
-4. Do not connect to a database except through `tools/`, and do not read
-   `~/dev/ablation_db`, `~/.config/ai4science_proj` or `.env` files.
-5. No `git push`, `rm -rf` or `sudo`.
+   `results/comparison.csv`. `[window]`
+4. Do not read other users' files. `[env]` — `/home/anton` is closed to
+   `aiagent`.
+5. Do not connect to a database except through `tools/`, and do not read
+   `~/.config/ai4science_proj` or `.env` files. `[windwo]` — `aiagent`'s own
+   processes need them.
+6. No `git push` or `sudo`. `[env]` — `aiagent` has no keys or tokens and
+   is not in sudoers.
+7. No `rm -rf`. `[env]` — it can reach only the writable folders, and git
+   restores what was committed.
 
 ## 5. Working protocol
 
