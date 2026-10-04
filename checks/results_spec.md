@@ -1,19 +1,19 @@
 # Results specification
 
-Defines the three files in `results/` and how every value in them is
-derived. `checks/check.py` enforces it. Change this file and `check.py`
-together, never one alone.
+Defines the database tools' output, `results/comparison.csv` and
+`results/summary.json`, and what `checks/check.py` verifies. Claims are
+defined in `claims_spec.md`. Change this file and `check.py` together, never
+one alone.
 
 ## 1. Format
 
 - CSV: UTF-8, comma separator, header row, `.` as decimal point, no index
-  column, empty field for a missing value. JSON: UTF-8, `null` for a missing
-  value.
-- Rows are sorted by `series_id`, then by `x` in `points.csv`.
-- `series_id` is `<article_id>-<k>`, where series of one article are numbered
-  from 1 in order of their smallest `experiment_id`.
+  column, empty field for a missing value. JSON: UTF-8, `null` for a
+  missing value.
+- `series_id` is `<article_id>-s<k>`, series of one article numbered from 1
+  in order of their smallest `experiment_id`.
 
-## 2. Series
+## 2. Series (produced by `tools/`)
 
 A series is the set of experiments of one article that share all of:
 
@@ -23,42 +23,40 @@ A series is the set of experiments of one article that share all of:
 - centrifugation protocol (or its absence);
 - size measurement: quantity, statistic, technique;
 
-and differ in fluence or pulse energy. A series has at least 2 points, and
-its `x` values are distinct. Two experiments with the same `x` in one series
-mean the series is not well defined: stop and ask the human.
+and differ in fluence or pulse energy. A series has at least 2 points with
+distinct `x`. All points use the same colloid storage duration: the shortest
+at which every experiment of the series has a size.
 
-All points of a series use the same colloid storage duration: the shortest
-one at which every experiment of the series has a size. If there is none,
-stop and ask the human.
+**x.** Fluence (J/cm²) when every point has it; otherwise pulse energy (µJ),
+when the spot diameter is equal for all points or missing for all.
 
-## 3. Derivations
+**size.** The stored scalar for the series' statistic; if only a size
+distribution is stored, its number-weighted mean `Σ nᵢ·cᵢ / Σ nᵢ`, with `cᵢ`
+the centre of bin `i` from its stored bar edges.
 
-**x.** Fluence (J/cm²) when every point of the series has it. Otherwise
-pulse energy (µJ), only if the spot diameter is equal for all points or
-missing for all points; in the second case write `spot unknown` in `notes`.
-Mixed spot diameters: stop and ask the human.
+**size_err**, the first that applies: a stored standard error
+(`reported_se`); a standard deviation divided by √N, N the number of
+particles measured (`sd_over_sqrt_n`); otherwise `fallback`, whose value
+depends on the error model (§3).
 
-**size.** The stored scalar for the series' statistic. If the experiment
-stores only a size distribution, compute it from the distribution: the
-number-weighted mean `Σ nᵢ·cᵢ / Σ nᵢ`, with `cᵢ` the centre of bin `i` taken
-from its stored bar edges. A distribution not weighted by number: stop and
-ask the human.
+**medium_class**, the first that applies: `colloid` (contains a feedstock
+colloid), `water` (no additives), `aqueous` (water with additives),
+`organic` (one organic liquid), `other`.
 
-**size_err**, the standard error of `size`, the first that applies:
+**pulse_duration_class.** `fs` below 1e3 fs, `ps` below 1e6 fs, else `ns`.
 
-| `err_source` | Rule |
-|---|---|
-| `reported_se` | A standard error stored with the size. |
-| `sd_over_sqrt_n` | A stored standard deviation, or one computed from a distribution with absolute counts, divided by √N, where N is the number of particles measured. |
-| `fallback` | 0.10 × `size`. Also when only an SD is known and N is not. |
+## 3. Shape
 
-**shape.** Take the points in order of increasing `x`. Set the anchor to the
-first point. For each next point, a change is counted when
-`|size − anchor_size| > √(size_err² + anchor_err²)`; the counted change's
-sign is recorded only if it differs from the last recorded sign, and the
-point becomes the new anchor. The recorded signs give the shape:
+Two error models differ only in the fallback error: `primary` uses
+0.10 × `size`, `lenient` uses 0.20 × `size`. Each series gets a shape under
+each model.
 
-| Recorded signs | `shape` |
+Take the points in order of increasing `x`; the anchor is the first point.
+For each next point, a change is counted when
+`|size − anchor_size| > √(size_err² + anchor_err²)`; its sign is recorded if
+it differs from the last recorded sign, and the point becomes the anchor.
+
+| Recorded signs | Shape |
 |---|---|
 | none | `flat` |
 | + | `increasing` |
@@ -67,82 +65,84 @@ point becomes the new anchor. The recorded signs give the shape:
 | −, + | `valley` |
 | three or more | `irregular` |
 
-**spearman_rho.** `scipy.stats.spearmanr(x, size)`; empty when undefined
-(all sizes equal).
+## 4. Tool contract
 
-**pulse_duration_class.** `fs` below 1e3 fs, `ps` from 1e3 to below 1e6 fs,
-`ns` from 1e6 fs.
+`tools/ablation_db.py` is the only access to the database. It reads through
+the read-only account and returns plain Python data:
 
-**medium_class**, the first that applies:
-
-| Value | Medium |
+| Function | Returns |
 |---|---|
-| `colloid` | Contains a feedstock colloid. |
-| `water` | Water with no additives. |
-| `aqueous` | Water with additives (salts, surfactants, ligands). |
-| `organic` | One organic liquid, with or without additives. |
-| `other` | Anything else, such as liquid mixtures. |
+| `find_articles(material="Au")` | list of `{article_id, doi, title, year, n_experiments}` |
+| `list_series(article_id)` | list of series rows, columns as in the table below |
+| `get_series(series_id)` | `{"series": <row>, "points": [{experiment_id, x, size, size_err, err_source}]}` |
 
-## 4. `results/points.csv`
+Series row: `article_id, series_id, n_points, x_quantity, size_quantity,
+size_statistic, size_technique, size_source, storage_duration_h,
+pulse_duration_fs, pulse_duration_class, wavelength_nm, medium_class,
+shape_primary, shape_lenient, spearman_rho, notes`.
 
-One row per point of every series.
+## 5. `results/comparison.csv`
 
-| Column | Type | Unit | Rule |
-|---|---|---|---|
-| `series_id` | str | — | §1 |
-| `experiment_id` | int | — | as in `data/` |
-| `x` | float > 0 | J/cm² or µJ | §3, unit given by `x_quantity` of the series |
-| `size` | float > 0 | nm | §3 |
-| `size_err` | float > 0 | nm | §3 |
-| `err_source` | str | — | `reported_se`, `sd_over_sqrt_n`, `fallback` |
+One row per pair of an `own_data` claim and a series of the same article
+whose `medium_class` equals the claim's, or any series of the article when
+the claim's is `unspecified`. A claim with no such series gets one row with
+an empty `series_id` and the reason in `note`.
 
-## 5. `results/series.csv`
+| Column | Type | Rule |
+|---|---|---|
+| `claim_id` | str | from `results/claims.csv` |
+| `series_id` | str | §1; empty when unmatched |
+| `direction` | str | the claim's |
+| `shape_primary`, `shape_lenient` | str | the series' (§3) |
+| `agree_primary`, `agree_lenient` | bool | by the table below; empty when unmatched |
+| `note` | str | e.g. `article has no curated experiments` |
 
-One row per series.
+| `direction` | Agrees with shape |
+|---|---|
+| `increase` | `increasing` |
+| `decrease` | `decreasing` |
+| `no_effect` | `flat` |
+| `non_monotonic` | `peak`, `valley`, `irregular` |
+| `affects` | any shape but `flat` |
 
-| Column | Type | Unit | Rule |
-|---|---|---|---|
-| `article_id` | int | — | as in `data/` |
-| `series_id` | str | — | §1 |
-| `n_points` | int ≥ 2 | — | rows of this series in `points.csv` |
-| `x_quantity` | str | — | `fluence_j_per_cm2` or `pulse_energy_uj` |
-| `size_quantity` | str | — | as stored, e.g. `geometric_diameter` |
-| `size_statistic` | str | — | as stored, e.g. `mean`, `median`, `mode` |
-| `size_technique` | str | — | as stored, e.g. `TEM`, `DLS` |
-| `size_source` | str | — | `stored`, `computed` (from a distribution), `mixed` |
-| `storage_duration_h` | float ≥ 0 | h | §2; empty when not stated |
-| `shape` | str | — | §3 |
-| `spearman_rho` | float in [−1, 1] | — | §3 |
-| `pulse_duration_fs` | float > 0 | fs | as stored |
-| `pulse_duration_class` | str | — | §3 |
-| `wavelength_nm` | float > 0 | nm | as stored |
-| `medium_class` | str | — | §3 |
-| `notes` | str | — | excluded experiments with reasons; `spot unknown`; sizes stored as a range midpoint |
-
-## 6. `results/sign_test.json`
+## 6. `results/summary.json`
 
 ```json
 {
-  "overall": {"counts": {...}, "n_test": 0, "p_value": null},
-  "by_pulse_duration_class": {"fs": {...}, "ps": {...}, "ns": {...}},
-  "by_medium_class": {"water": {...}, "...": {...}}
+  "claims": {"by_basis_and_direction": {"own_data": {"increase": 0, "...": 0}, "cited": {}, "general": {}}},
+  "agreement": {"primary": {"n": 0, "agree": 0}, "lenient": {"n": 0, "agree": 0}},
+  "series": {
+    "primary": {"counts": {}, "n_test": 0, "p_value": null},
+    "lenient": {"counts": {}, "n_test": 0, "p_value": null}
+  }
 }
 ```
 
-Every group has the same three keys:
-
-- `counts`: the number of series of each of the six shapes, all six present;
-- `n_test`: `increasing + decreasing`;
-- `p_value`: `scipy.stats.binomtest(increasing, n_test, 0.5,
-  alternative="greater").pvalue`; `null` when `n_test` is 0.
-
-Groups with no series are omitted.
+- `by_basis_and_direction`: claim counts, all five directions under each
+  basis.
+- `agreement`: over matched comparison rows; `n` rows, `agree` of them true.
+- `series`: counts of the six shapes over all series; `n_test` is
+  `increasing + decreasing`; `p_value` is
+  `scipy.stats.binomtest(increasing, n_test, 0.5, alternative="greater").pvalue`,
+  `null` when `n_test` is 0.
 
 ## 7. What `check.py` verifies
 
-1. The files exist, parse, and have exactly the columns and keys above.
-2. Every value meets its type, unit range and allowed values.
-3. `series_id` sets of the two CSV files are equal; `n_points` matches.
-4. `shape`, `spearman_rho` and the sign test recomputed from `points.csv`
-   equal the stored values.
-5. The reference series in `checks/expected_series.csv` match.
+1. Every file parses and has exactly the columns, keys and allowed values
+   of the specs.
+2. Every PDF in `data/articles/` matches its SHA-256 in `data/files.csv`,
+   and every claim's quote is found on its page of its file
+   (`claims_spec.md` §4).
+3. `comparison.csv` holds exactly the pairs of §5, and its agreement columns
+   follow the table.
+4. `summary.json` recomputed from the CSV files equals the stored one.
+5. Reference article 80094:
+
+| Claim | Series | Shape primary / lenient | Agrees primary / lenient |
+|---|---|---|---|
+| Au in water, `increase`, `own_data` | `80094-s1` | `increasing` / `increasing` | yes / yes |
+| AuSi in Si colloid, `no_effect`, `own_data` | `80094-s2` | `peak` / `flat` | no / yes |
+
+6. It prints, and does not fail on, precision and recall of the claims
+   against the hand-labelled `checks/claims_gold.csv`, matching on
+   `(article_id, variable, direction, basis, medium_class)`.
