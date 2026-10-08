@@ -19,6 +19,7 @@ import json
 import logging
 import math
 import re
+import subprocess
 import sys
 import unicodedata
 from collections import Counter
@@ -1093,6 +1094,36 @@ def compare_json(expected: object, actual: object, where: str) -> list[str]:
     return []
 
 
+def check_committed(report: Report) -> None:
+    """Check the agent's folders have no uncommitted changes.
+
+    Only the folders the agent writes are checked, so the human's
+    uncommitted edits to the specs or diary.md do not fail it.
+
+    Parameters
+    ----------
+    report : Report
+        Receives the failure.
+    """
+    folders = ("results/", "memory/", "src/", "tests/")
+    status = subprocess.run(
+        ["git", "status", "--porcelain", "--", *folders],
+        cwd=ROOT, capture_output=True, text=True, check=False,
+    )
+    if status.returncode != 0:
+        report.fail("commit", f"git status failed: {status.stderr.strip()}")
+    elif status.stdout:
+        changed = sorted({line[3:].split("/")[0] + "/"
+                          for line in status.stdout.splitlines()})
+        report.fail(
+            "commit",
+            f"uncommitted changes in {' '.join(changed)}: "
+            f"git add {' '.join(changed)} && git commit -m \"<what>\"",
+        )
+    else:
+        report.ok("commit: agent folders committed")
+
+
 def main() -> int:
     """Run the check selected on the command line.
 
@@ -1116,12 +1147,18 @@ def main() -> int:
     check_no_claims(report, ids, roles, claims)
     report_gold(claims, article)
 
-    if article is None:
-        tools = load_tools(report)
-        if tools is not None:
-            rows = check_comparison(report, claims, ids, tools)
-            if rows is not None:
-                check_summary(report, claims, rows, tools)
+    # Comparison and summary (results_spec §4–§7) wait for
+    # tools/ablation_db.py; enable them together with it.
+    # if article is None:
+    #     tools = load_tools(report)
+    #     if tools is not None:
+    #         rows = check_comparison(report, claims, ids, tools)
+    #         if rows is not None:
+    #             check_summary(report, claims, rows, tools)
+
+    # Last, so that the agent commits only work that passed every rule.
+    if not report.failures:
+        check_committed(report)
 
     verdict = "FAILED" if report.failures else "PASSED"
     print(f"\n{verdict}: {report.failures} failure(s)")

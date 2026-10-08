@@ -22,15 +22,16 @@ At the end the project will contain:
 ## 1. Readiness criterion
 
 ```
-.venv/bin/python -m pytest -p no:cacheprovider tests/ -q && .venv/bin/python checks/check.py
+.venv/bin/python checks/check.py --article <id>
 ```
 
-Both exit with 0. The check finds every quote on its page, recomputes the
-comparison and summary, and checks reference article 80094: Au in water
-`increase` agrees with its series; AuSi `no_effect` disagrees under the
-primary error model and agrees under the lenient one. Run it yourself before
-answering. For one article, `.venv/bin/python checks/check.py --article <id>`
-checks only its claims.
+Exits with 0. The check finds every quote on its page, requires claims or
+one `no_claims.csv` row for the article, and, once all that passes, that
+`results/`, `memory/`, `src/` and `tests/` are committed. Run it yourself
+before answering; without `--article` it checks every article.
+
+The comparison part (tests in `tests/`, `tools/ablation_db.py`, the
+comparison and summary checks) is not implemented yet and is not checked.
 
 ## 2. Project map and sources
 
@@ -54,6 +55,7 @@ checks only its claims.
   report it.
 - Python: `.venv/bin/python`, with numpy, scipy, pandas, pytest and pypdf.
   It cannot be changed, so nothing can be installed.
+- Read text files with `cat` in `shell`; `read_image` is for images only.
 - Run from the project root: `.venv/bin/python -m src.<module>`, then the
   check.
 - Network and Lean are not needed:
@@ -112,7 +114,7 @@ over. Read the relevant files at the start, update them before finishing.
 
 ## 7. Stopping and escalation
 
-- Budget: 15 steps per article, 30 per code task. At the limit, stop and
+- Budget: 40 steps per article, 30 per code task. At the limit, stop and
   write in `diary.md` what is done and what is left.
 - If the check fails twice in a row for the same reason, stop and report why.
 - When you would ask the human (scanned page, unclear claim, undecidable
