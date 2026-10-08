@@ -240,6 +240,9 @@ def read_csv(
     if not path.exists():
         report.fail(rule, f"{name} does not exist")
         return None
+    if not path.read_bytes().endswith(b"\n"):
+        # An appended row would merge into the last one.
+        report.fail("results §1", f"{name} does not end with a newline")
     with path.open(newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         if reader.fieldnames != list(columns):
