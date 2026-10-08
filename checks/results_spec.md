@@ -9,7 +9,8 @@ one alone.
 
 - CSV: UTF-8, comma separator, header row, `.` as decimal point, no index
   column, empty field for a missing value, every line ending with a
-  newline (the last one too).
+  newline (the last one too). Fields containing a comma, quote or newline
+  are double-quoted (RFC 4180); every row has as many fields as the header.
 - JSON: UTF-8, `null` for a missing value.
 - `series_id` is `<article_id>-s<k>`, series of one article numbered from 1
   in order of their smallest `experiment_id`.

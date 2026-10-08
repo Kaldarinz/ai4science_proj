@@ -252,7 +252,19 @@ def read_csv(
                 f"expected {list(columns)}",
             )
             return None
-        return list(reader)
+        rows = []
+        for row in reader:
+            # DictReader puts extra fields under None and fills missing
+            # ones with None: an unquoted comma shifts the columns.
+            if None in row or None in row.values():
+                report.fail(
+                    "results §1",
+                    f"{name} line {reader.line_num}: field count differs "
+                    f"from the header",
+                )
+                continue
+            rows.append(row)
+        return rows
 
 
 def as_int(value: str, minimum: int | None = None) -> int | None:
