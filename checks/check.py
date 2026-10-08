@@ -16,6 +16,7 @@ import csv
 import hashlib
 import importlib
 import json
+import logging
 import math
 import re
 import sys
@@ -30,6 +31,10 @@ DATA: Final[Path] = ROOT / "data"
 RESULTS: Final[Path] = ROOT / "results"
 GOLD: Final[Path] = ROOT / "checks" / "claims_gold.csv"
 
+# Font warnings for some PDFs run to ~90 lines per read and would flood
+# the agent's context; text extraction works without fontTools.
+logging.getLogger("pypdf").setLevel(logging.ERROR)
+
 CORPUS_COLUMNS: Final[tuple[str, ...]] = (
     "article_id", "doi", "title", "year",
 )
@@ -40,6 +45,9 @@ CLAIMS_COLUMNS: Final[tuple[str, ...]] = (
     "claim_id", "article_id", "file", "page", "quote",
     "variable_written", "variable", "direction", "basis", "material",
     "medium_class", "conditions",
+)
+NO_CLAIMS_COLUMNS: Final[tuple[str, ...]] = (
+    "article_id", "file", "page", "quote", "reason",
 )
 COMPARISON_COLUMNS: Final[tuple[str, ...]] = (
     "claim_id", "series_id", "direction", "shape_primary",
@@ -477,38 +485,10 @@ def check_claims(
             if not row[column].strip():
                 report.fail("claims §3", f"{where}: {column} is empty")
 
-        role = roles.get((aid, row["file"]))
-        page = as_int(row["page"], 1)
-        if role is None:
-            report.fail(
-                "claims §3",
-                f"{where}: file {row['file']!r} is not listed for "
-                f"article {aid}",
-            )
+        found = find_quote(report, where, aid, row, roles, pages, "claims §3")
+        if found is None:
             continue
-        if page is None:
-            report.fail(
-                "claims §3",
-                f"{where}: page {row['page']!r} is not an integer ≥ 1",
-            )
-            continue
-        texts = pages.get(aid, row["file"])
-        if page > len(texts):
-            report.fail(
-                "claims §3",
-                f"{where}: page {page} beyond the {len(texts)} pages of "
-                f"{row['file']}",
-            )
-            continue
-        quote = normalize(row["quote"])
-        offset = texts[page - 1].find(quote)
-        if not quote or offset < 0:
-            report.fail(
-                "claims §4",
-                f"{where}: quote not found on page {page} of "
-                f"{row['file']}",
-            )
-            continue
+        role, page, offset = found
         positions[cid] = QuotePosition(
             aid, number, role, row["file"], page, offset)
         claims.append(row)
@@ -517,6 +497,128 @@ def check_claims(
     check_duplicates(report, claims)
     report.ok(f"claims: {len(claims)} claim(s) checked")
     return claims
+
+
+def find_quote(
+    report: Report,
+    where: str,
+    aid: int,
+    row: Row,
+    roles: dict[FileKey, str],
+    pages: Pages,
+    rule: str,
+) -> tuple[str, int, int] | None:
+    """Locate a row's quote on its page (claims_spec §4).
+
+    Parameters
+    ----------
+    report : Report
+        Receives every failure.
+    where : str
+        Names the row in failure messages.
+    aid : int
+        Article id of the row.
+    row : Row
+        A row with `file`, `page` and `quote`.
+    roles : dict[FileKey, str]
+        Role of each listed PDF, keyed by (article id, file name).
+    pages : Pages
+        Page texts, read once per PDF.
+    rule : str
+        Spec section to cite for a bad `file` or `page`.
+
+    Returns
+    -------
+    tuple[str, int, int] | None
+        Role of the file, page and offset of the quote on it, or None
+        when the quote cannot be located.
+    """
+    role = roles.get((aid, row["file"]))
+    page = as_int(row["page"], 1)
+    if role is None:
+        report.fail(
+            rule,
+            f"{where}: file {row['file']!r} is not listed for article {aid}",
+        )
+        return None
+    if page is None:
+        report.fail(
+            rule, f"{where}: page {row['page']!r} is not an integer ≥ 1")
+        return None
+    texts = pages.get(aid, row["file"])
+    if page > len(texts):
+        report.fail(
+            rule,
+            f"{where}: page {page} beyond the {len(texts)} pages of "
+            f"{row['file']}",
+        )
+        return None
+    quote = normalize(row["quote"])
+    offset = texts[page - 1].find(quote)
+    if not quote or offset < 0:
+        report.fail(
+            "claims §4",
+            f"{where}: quote not found on page {page} of {row['file']}",
+        )
+        return None
+    return role, page, offset
+
+
+def check_no_claims(
+    report: Report,
+    ids: set[int],
+    roles: dict[FileKey, str],
+    claims: list[Row],
+) -> None:
+    """Check every article has claims or one no-claims row (claims_spec §8).
+
+    Parameters
+    ----------
+    report : Report
+        Receives every failure.
+    ids : set[int]
+        Article ids of the corpus that are being checked.
+    roles : dict[FileKey, str]
+        Role of each listed PDF, keyed by (article id, file name).
+    claims : list[Row]
+        Claims that passed `check_claims`.
+    """
+    path = RESULTS / "no_claims.csv"
+    rows: list[Row] = []
+    if path.exists():
+        read = read_csv(path, NO_CLAIMS_COLUMNS, report, "claims §8")
+        rows = read if read is not None else []
+    pages = Pages()
+    explained: Counter[int] = Counter()
+
+    for row in rows:
+        aid = as_int(row["article_id"])
+        if aid is not None and aid not in ids:
+            continue
+        where = f"no_claims row for article {row['article_id']!r}"
+        if aid is None:
+            report.fail("claims §8", f"{where}: article_id is not an integer")
+            continue
+        explained[aid] += 1
+        if not row["reason"].strip():
+            report.fail("claims §8", f"{where}: reason is empty")
+        find_quote(report, where, aid, row, roles, pages, "claims §8")
+
+    with_claims = {int(c["article_id"]) for c in claims}
+    for aid in sorted(ids):
+        n = explained[aid]
+        if aid in with_claims and n:
+            report.fail(
+                "claims §8",
+                f"article {aid} has claims and a no_claims row",
+            )
+        elif aid not in with_claims and n != 1:
+            report.fail(
+                "claims §8",
+                f"article {aid}: no valid claims, so no_claims.csv needs "
+                f"exactly one row for it, found {n}",
+            )
+    report.ok(f"no_claims: {sum(explained.values())} row(s) checked")
 
 
 def check_numbering(
@@ -1011,6 +1113,7 @@ def main() -> int:
     report = Report()
     ids, roles = check_data(report, article)
     claims = check_claims(report, ids, roles, article)
+    check_no_claims(report, ids, roles, claims)
     report_gold(claims, article)
 
     if article is None:

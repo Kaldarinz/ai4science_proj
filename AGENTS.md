@@ -12,6 +12,8 @@ Your tasks are of two kinds:
 
 At the end the project will contain:
 - `results/claims.csv` — the claims of every article in `data/corpus.csv`;
+- `results/no_claims.csv` — for an article with no claim, the closest
+  sentence and why it is not one;
 - `results/comparison.csv` — each `own_data` claim against its series;
 - `results/summary.json` — claim counts, agreement rates, series shapes;
 - `src/` — the code producing the last two from `results/claims.csv` and
@@ -84,8 +86,9 @@ checks only its claims.
   `AI4SCIENCE_WEB_DISABLED=1 ai4science --no-lean run "Extract the claims of article <id>."`. Follow
   `checks/claims_spec.md` (what counts as a claim, columns, quote rules).
   Read every PDF of the article with `pdf_read`, 2 pages per call; copy
-  quotes from that output. Append the rows to `results/claims.csv`, run the
-  check for that article, commit.
+  quotes from that output. Append the rows to `results/claims.csv`, or one
+  row to `results/no_claims.csv` if the article has no claim (spec §8); run
+  the check for that article, commit.
 - **Code:** ReAct, following `checks/results_spec.md` — each function in `src/` with a test in `tests/`; run the
   tests after each change. Commit before and after each task.
 - The specs change only by the human, with a `diary.md` entry giving the

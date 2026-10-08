@@ -2,7 +2,8 @@
 
 Defines `results/claims.csv`: the claims an article's text makes about how
 the size of gold nanoparticles depends on the laser pulse fluence, energy,
-power or intensity. `checks/check.py` enforces it. Change this file and
+power or intensity, and `results/no_claims.csv` for articles with none (§8).
+`checks/check.py` enforces it. Change this file and
 `check.py` together, never one alone.
 
 ## 1. Input
@@ -92,3 +93,16 @@ name: authors often call pulse energy "fluence".
 Claims are extracted from the text alone. Do not consult the database, the
 series, or the figures' data while extracting: the claims must be recorded
 before they can be compared with the data.
+
+## 8. Articles without claims
+
+An article with no claim gets exactly one row in `results/no_claims.csv`
+instead: `article_id, file, page, quote, reason`.
+
+- `quote` is the sentence that comes closest to a claim, e.g. a size
+  reported at one fluence only, or a fluence change with no size stated.
+  `file`, `page` and the quote follow §3 and §4.
+- `reason` says why that sentence is not a claim under §2.
+
+Every article in `data/corpus.csv` has claims or a `no_claims.csv` row,
+never both.
