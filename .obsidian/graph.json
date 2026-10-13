@@ -1,8 +1,58 @@
-{"showAttachments": true, "showOrphans": true, "showArrow": true,
- "colorGroups": [
-  {"query": "path:ontology", "color": {"a": 1, "rgb": 9474192}},
-  {"query": "[status:открыта OR \"в работе\" OR заблокирована]", "color": {"a": 1, "rgb": 14254635}},
-  {"query": "path:tasks", "color": {"a": 1, "rgb": 16761685}},
-  {"query": "[type:Эксперимент OR Проверка]", "color": {"a": 1, "rgb": 1153422}},
-  {"query": "path:notes OR path:reports", "color": {"a": 1, "rgb": 5987296}}
- ]}
+{
+  "collapse-filter": true,
+  "search": "",
+  "showTags": false,
+  "showAttachments": true,
+  "hideUnresolved": false,
+  "showOrphans": true,
+  "collapse-color-groups": true,
+  "colorGroups": [
+    {
+      "query": "path:ontology",
+      "color": {
+        "a": 1,
+        "rgb": 9474192
+      }
+    },
+    {
+      "query": "[status:открыта OR \"в работе\" OR заблокирована]",
+      "color": {
+        "a": 1,
+        "rgb": 14254635
+      }
+    },
+    {
+      "query": "path:tasks",
+      "color": {
+        "a": 1,
+        "rgb": 16761685
+      }
+    },
+    {
+      "query": "[type:Эксперимент OR Проверка]",
+      "color": {
+        "a": 1,
+        "rgb": 1153422
+      }
+    },
+    {
+      "query": "path:notes OR path:reports",
+      "color": {
+        "a": 1,
+        "rgb": 5987296
+      }
+    }
+  ],
+  "collapse-display": true,
+  "showArrow": true,
+  "textFadeMultiplier": 0,
+  "nodeSizeMultiplier": 1,
+  "lineSizeMultiplier": 1,
+  "collapse-forces": true,
+  "centerStrength": 0.518713248970312,
+  "repelStrength": 10,
+  "linkStrength": 1,
+  "linkDistance": 250,
+  "scale": 1,
+  "close": false
+}
