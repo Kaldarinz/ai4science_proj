@@ -38,7 +38,7 @@ properties:
   reportedIn: { domain: Series, range: Article }
   comparedWith: { domain: Claim, range: Series }
   checks: { domain: Check, range: Claim }
-  storedIn: { domain: [Article, Claim, Check], range: File } # Article -> PDF, Claim -> results/claims.csv, Check -> checks/claims_gold.csv
+  storedIn: { domain: [Article, Claim, Check], range: File } # Article -> PDF, Claim -> results/claims.csv, Check -> checks/claim_checks.csv
   noClaimReasonIn: { domain: Article, range: File } # -> results/no_claims.csv
   computedBy: { domain: Series, range: File } # -> tools/, src/
   resolvedBy: { domain: Task, range: [Article, Claim, Series, Check, File] } # written in the task note
@@ -66,7 +66,7 @@ attributes:
       domain: Series,
       values: [flat, increasing, decreasing, peak, valley, irregular],
     }
-  reason: { domain: Check, values: [gold_sample, mismatch, runs_disagree] }
+  reason: { domain: Check, values: [gold_sample, mismatch, runs_disagree, review] } # review: non-blind, not used for error rates
 
 rules:
   - id: R1
