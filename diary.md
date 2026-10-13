@@ -38,3 +38,7 @@ Run in /home/aiagent/week2, outside this project; not project data.
 * Check: `.venv/bin/python checks/check.py --article 534569` → exit 0.
 * Check result: accepted — no textual size–fluence claim; closest sentence and reason correct. Committed by hand.
 * Lessons → AGENTS.md: extraction criterion = `--article` check + clean `git status`; explicit commit command; budget 15 is unreachable (PDF reading alone ≈ 10 steps for 11 pages); read text with `cat`, not `read_image`.
+
+## 2026-10-13 - first gold label, claims_spec §2 extended
+* Article 534494 (10.1038/srep30478) added to the corpus and labelled by hand before any agent run: `checks/claims_gold.csv`, and `checks/gold_articles.csv` (which articles are labelled, so an article with no gold claim still counts as labelled).
+* Spec change (claims_spec §2): a rule for a dependence on unnamed "laser properties" or "laser parameters". The case that prompted it is in the gold label and is not repeated here, so that extraction stays blind.

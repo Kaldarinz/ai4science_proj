@@ -27,6 +27,9 @@ not change, when the laser pulse fluence, energy, power or intensity changes.
 - Exclude claims about other materials; explanations of a mechanism that
   state no dependence ("this indicates a stronger interaction"). Figure axis
   labels, captions alone and the reference list.
+- A dependence on unnamed "laser properties" or "laser parameters" is a
+  claim when the article varies only fluence, energy, power or intensity;
+  `variable` then follows §5 (no unit: `unspecified`).
 - One claim per article for each distinct `(material, medium_class,
   variable, direction, basis)`. A dependence restated in the abstract, the
   results and the conclusions is one claim; quote the results section if it
