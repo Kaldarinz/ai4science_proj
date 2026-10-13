@@ -11,7 +11,7 @@ competency_questions:
   - Which articles have no claim, and why - no claim in the text, or no matching series?
   - Which claims were checked by a curator, and why - gold sample, claim-data mismatch, or disagreement between runs?
   - Which file holds each article's PDF, its claims, and the code that compares them?
-  - Which tasks were set, what subtasks do they consist of, what status are they in, and which articles, claims, series or checks resolve them?
+  - Which tasks were set, what subtasks do they consist of, what status are they in, and which articles, claims, series, checks or files resolve them?
 
 classes:
   Article:
@@ -41,7 +41,7 @@ properties:
   storedIn: { domain: [Article, Claim, Check], range: File } # Article -> PDF, Claim -> results/claims.csv, Check -> checks/claims_gold.csv
   noClaimReasonIn: { domain: Article, range: File } # -> results/no_claims.csv
   computedBy: { domain: Series, range: File } # -> tools/, src/
-  resolves: { domain: [Article, Claim, Series, Check], range: Task }
+  resolvedBy: { domain: Task, range: [Article, Claim, Series, Check, File] } # written in the task note
   subtaskOf: { domain: Task, range: Task, characteristics: [transitive] }
 
 attributes:
@@ -132,14 +132,9 @@ rules:
         values: [done, accepted],
       }
   - id: R8
-    text: A done task is resolved by an object or has subtasks.
-    dl: "DoneTask ⊑ ∃resolves⁻.⊤ ⊔ ∃subtaskOf⁻.⊤"
-    check:
-      {
-        kind: some_inverse_any,
-        class: DoneTask,
-        properties: [resolves, subtaskOf],
-      }
+    text: A done task is resolved by an object or a file, or has subtasks.
+    dl: "DoneTask ⊑ ∃resolvedBy.⊤ ⊔ ∃subtaskOf⁻.⊤"
+    # no check: the template's kinds cannot mix an outgoing and an incoming link
   - id: R9
     text: A task is done only if all its subtasks are done.
     dl: "DoneTask ⊑ ∀subtaskOf⁻.DoneTask"
