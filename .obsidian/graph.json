@@ -1,0 +1,8 @@
+{"showAttachments": true, "showOrphans": true, "showArrow": true,
+ "colorGroups": [
+  {"query": "path:ontology", "color": {"a": 1, "rgb": 9474192}},
+  {"query": "[status:открыта OR \"в работе\" OR заблокирована]", "color": {"a": 1, "rgb": 14254635}},
+  {"query": "path:tasks", "color": {"a": 1, "rgb": 16761685}},
+  {"query": "[type:Эксперимент OR Проверка]", "color": {"a": 1, "rgb": 1153422}},
+  {"query": "path:notes OR path:reports", "color": {"a": 1, "rgb": 5987296}}
+ ]}
