@@ -11,27 +11,23 @@ The project root is an Obsidian vault: every file is a node, every `[[…]]`
 link an edge. `.obsidian/app.json` and `.obsidian/graph.json` are set by the
 human.
 
-## 2. Generated notes
+## 2. Notes and their check
 
-`src/graph_notes.py` writes all notes in `ontology/` and `notes/`, from
-scratch on every run. Nobody writes or edits them by hand. Run it after any
-of its sources changes:
+The agent writes all notes in `ontology/`, `notes/` and `tasks/` by the
+rules below. `checks/graph_check.py` checks them against `ontology.yaml` and
+the result tables; it is the readiness criterion of the graph:
 
 ```
-.venv/bin/python -m src.graph_notes
+.venv/bin/python checks/graph_check.py
 ```
 
-| Note | Source |
+| Note | Must match |
 |---|---|
-| `ontology/<Class>.md` | `ontology.yaml` |
-| `notes/Article <article_id>.md` | `data/corpus.csv`, `data/files.csv`, `results/no_claims.csv`, `checks/claims_gold.csv`, `checks/gold_articles.csv` |
-| `notes/Claim <claim_id>.md` | `results/claims.csv`, `results/comparison.csv` |
-| `notes/Series <series_id>.md` | `tools/ablation_db.py` (once it exists) |
-| `notes/Check <claim_id> <reason>.md` | `checks/claim_checks.csv`; `checks/claims_gold.csv` (§2.4) |
-
-The script exits with 1 if a note would break `ontology.yaml` (unknown class,
-relation or attribute value; a link against domain or range) or if the
-Claim notes and the `claim_id`s of `results/claims.csv` differ.
+| `ontology/<Class>.md` | one per class of `ontology.yaml` |
+| `notes/Article <article_id>.md` | an `article_id` of `data/corpus.csv` |
+| `notes/Claim <claim_id>.md` | a `claim_id` of `results/claims.csv`, one to one; its `direction` and `basis` |
+| `notes/Series <series_id>.md` | the output of `tools/ablation_db.py` (none until it exists) |
+| `notes/Check <claim_id> <reason>.md` | a row of `checks/claim_checks.csv`, one to one; its `outcome` |
 
 ### 2.1. Class note
 
@@ -72,10 +68,10 @@ to a file is its path from the root, e.g. `[[results/claims.csv]]`.
 
 | Class | Attributes | Links | Body |
 |---|---|---|---|
-| Article | – | `storedIn` each PDF; `noClaimReasonIn: [[results/no_claims.csv]]` if it has a row there | title, year, DOI; for a gold article, the number of gold claims and how many the agent found |
+| Article | – | `storedIn` each PDF; `noClaimReasonIn: [[results/no_claims.csv]]` if it has a row there | title, year, DOI |
 | Claim | `direction`, `basis`; `verdict` for `own_data` (§2.3) | `extractedFrom: [[Article <id>]]`; `comparedWith` each series of its `comparison.csv` rows; `storedIn: [[results/claims.csv]]` | `variable`, `material`, `medium_class`, `page`; never the quote |
 | Series | `shape_primary`, `shape_lenient` | `reportedIn: [[Article <id>]]`; `computedBy: [[tools/ablation_db.py]]` | `n_points`, `x_quantity`, `medium_class` |
-| Check | `reason` | `checks: [[Claim <claim_id>]]`; `storedIn` its source file | `outcome`, `wrong_fields`, `curator`, `date` |
+| Check | `reason` | `checks: [[Claim <claim_id>]]`; `storedIn: [[checks/claim_checks.csv]]` | `Outcome: <outcome>` on its own line; `wrong_fields`, curator, date |
 
 ### 2.3. Verdict
 
@@ -94,11 +90,11 @@ other.
 
 ### 2.4. Gold checks
 
-For an article in `checks/gold_articles.csv`, each agent claim gets a Check
-with `reason: gold_sample`: `outcome: correct` if a gold row has the same
-`(article_id, variable, direction, basis, medium_class)`, otherwise `wrong`
-(the key of `results_spec.md` §7.6). Gold claims the agent missed have no
-Claim note; the Article note states them (§2.2).
+The curator compares the agent's claims of a gold article with the hand
+labels after the agent's run and records each verdict in
+`checks/claim_checks.csv` with `reason: gold_sample`; the agent then writes
+the Check note like any other. Neither the agent nor `graph_check.py` reads
+the hand labels (`AGENTS.md` ban 3).
 
 ## 3. Tasks
 
@@ -157,7 +153,7 @@ Not included: <what not to do>
 
 ## 4. End of each user message
 
-1. `.venv/bin/python -m src.graph_notes` exits with 0 (once the script exists).
+1. `.venv/bin/python checks/graph_check.py` exits with 0.
 2. Statuses and Summaries are up to date.
 3. `diary.md` gets an entry: date, the message in short, tasks and every
    status change, what appeared in the graph, the check commands and their

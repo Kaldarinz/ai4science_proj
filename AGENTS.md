@@ -9,8 +9,8 @@ about this dependence with what their **data** show.
 Your tasks are of three kinds:
 - **Claim extraction.**
 - **Comparison.**
-- **Project graph:** tasks in `tasks/`, generated notes in `notes/` and
-  `ontology/`, per `checks/graph_spec.md`.
+- **Project graph:** notes in `tasks/`, `notes/` and `ontology/` that you
+  write per `checks/graph_spec.md`.
 
 At the end the project will contain:
 - `results/claims.csv` — the claims of every article in `data/corpus.csv`;
@@ -35,9 +35,12 @@ before answering; without `--article` it checks every article.
 The comparison part (tests in `tests/`, `tools/ablation_db.py`, the
 comparison and summary checks) is not implemented yet and is not checked.
 
-In a session, also: every task in `tasks/` is `done`, `blocked` or `accepted`,
-and `.venv/bin/python -m src.graph_notes` exits with 0 once it exists
-(`checks/graph_spec.md` §4).
+In a session, also: every task in `tasks/` is `done`, `blocked` or
+`accepted`, and the graph passes its check:
+
+```
+.venv/bin/python checks/graph_check.py
+```
 
 ## 2. Project map and sources
 
@@ -81,8 +84,9 @@ and `.venv/bin/python -m src.graph_notes` exits with 0 once it exists
 3. While extracting claims, do not call the database tools or read
    `results/comparison.csv`, `notes/` (Claim notes hold verdicts),
    `checks/claims_gold.csv`, `checks/gold_articles.csv` or
-   `checks/claim_checks.csv` in any form, including their git history (hand
-   labels: reading them voids the gold test). `[window]`
+   `checks/claim_checks.csv` in any form, including their git history and
+   `check.py --gold` (hand labels: reading them voids the gold test).
+   `[window]`
 4. Do not read other users' files. `[env]` — `/home/anton` is closed to
    `aiagent`.
 5. Do not connect to a database except through `tools/`, and do not read
@@ -95,10 +99,8 @@ and `.venv/bin/python -m src.graph_notes` exits with 0 once it exists
 8. No network: no `web_search`, `web_fetch`, `pdf_download`, or `read_image`
    on URLs. `[call]` for the web tools when launched as in §5; `[window]`
    for `read_image`.
-9. Do not write or edit notes in `notes/` or `ontology/` by hand: only
-   `src/graph_notes.py` writes them. `[window]`
-10. Do not set a task `accepted` without the user's words, and do not change
-    its "Done when" after work starts. `[window]`
+9. Do not set a task `accepted` without the user's words, and do not change
+   its "Done when" after work starts. `[window]`
 
 ## 5. Working protocol
 

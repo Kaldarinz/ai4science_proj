@@ -145,6 +145,8 @@ an empty `series_id` and the reason in `note`.
 | Au in water, `increase`, `own_data` | `80094-s1` | `increasing` / `increasing` | yes / yes |
 | AuSi in Si colloid, `no_effect`, `own_data` | `80094-s2` | `peak` / `flat` | no / yes |
 
-6. It prints, and does not fail on, precision and recall of the claims
-   against the hand-labelled `checks/claims_gold.csv`, matching on
-   `(article_id, variable, direction, basis, medium_class)`.
+6. With `--gold` only, it prints, and does not fail on, precision and
+   recall of the claims against the hand-labelled `checks/claims_gold.csv`,
+   matching on `(article_id, variable, direction, basis, medium_class)`.
+   The human runs it with `--gold` after the agent's run; the agent never
+   does, so its own check cannot tell it how it scored.
