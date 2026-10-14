@@ -4,11 +4,12 @@ Usage::
 
     .venv/bin/python checks/check.py                  # everything
     .venv/bin/python checks/check.py --article 80094  # one article
+    .venv/bin/python checks/check.py --gold           # + gold scores (human)
 
 Exits with 0 when every rule holds and 1 otherwise; each failure is
-printed with the spec section it breaks. Precision and recall against
-checks/claims_gold.csv are printed and never fail the check
-(results_spec.md §7.6).
+printed with the spec section it breaks. With --gold, precision and
+recall against checks/claims_gold.csv are printed and never fail the
+check (results_spec.md §7.6); the agent never passes --gold.
 """
 
 import argparse
@@ -1138,6 +1139,11 @@ def main() -> int:
         "--article", type=int,
         help="check only this article's claims",
     )
+    parser.add_argument(
+        "--gold", action="store_true",
+        help="also print precision and recall against the hand labels; "
+             "for the human only, never for the agent",
+    )
     args = parser.parse_args()
     article = cast(int | None, args.article)
 
@@ -1145,7 +1151,8 @@ def main() -> int:
     ids, roles = check_data(report, article)
     claims = check_claims(report, ids, roles, article)
     check_no_claims(report, ids, roles, claims)
-    report_gold(claims, article)
+    if args.gold:
+        report_gold(claims, article)
 
     # Comparison and summary (results_spec §4–§7) wait for
     # tools/ablation_db.py; enable them together with it.
