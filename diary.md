@@ -42,3 +42,11 @@ Run in /home/aiagent/week2, outside this project; not project data.
 ## 2026-10-13 - week 4: first gold label, claims_spec §2 extended
 * Article 534494 (10.1038/srep30478) added to the corpus and labelled by hand before any agent run: `checks/claims_gold.csv`, and `checks/gold_articles.csv` (which articles are labelled, so an article with no gold claim still counts as labelled).
 * Spec change (claims_spec §2): a rule for a dependence on unnamed "laser properties" or "laser parameters". The case that prompted it is in the gold label and is not repeated here, so that extraction stays blind.
+
+## 2026-10-14 - claim extraction, article 534494
+* Prompt: "Please extract the size–fluence claims from article 534494, following the usual extraction rules, commit the result, and update the project graph."
+* Agent: read all 9 pages of 10.1038_srep30478.pdf via `pdf_read`; identified one size-fluence claim — the density filter experiment (water at ~0.25 J/cm² → 6 nm, vs 26 nm at ~1 J/cm²), i.e. size increases with fluence (own_data, Au, water, fs pulses). Appended row 534494-c1 to results/claims.csv. Wrote memory/534494.md, class notes in ontology/, object notes in notes/ (Article 534494, Claim 534494-c1), and task notes in tasks/. Also created the missing graph notes for article 80094 (Article, Claim 80094-c1/c2, Check 80094-c1/c2 review) that the graph check required.
+* Result: 1 claim (534494-c1), 0 no_claims rows.
+* Check: `.venv/bin/python checks/check.py --article 534494` → exit 0; `.venv/bin/python checks/graph_check.py` → exit 0.
+* Check result: accepted — the density filter experiment is a genuine size-fluence dependence from the article's own data.
+* Notes: the graph check initially failed because the previous session's notes for article 80094 (claims and checks) were missing; created them. Also renamed a task note that had a `/` in its name (from "results/claims.csv").
