@@ -99,8 +99,10 @@ In a session, also: every task in `tasks/` is `done`, `blocked` or
 8. No network: no `web_search`, `web_fetch`, `pdf_download`, or `read_image`
    on URLs. `[call]` for the web tools when launched as in §5; `[window]`
    for `read_image`.
-9. Do not set a task `accepted` without the user's words, and do not change
-   its "Done when" after work starts. `[window]`
+9. Do not set a task `accepted`, or write a check result ("accepted",
+   "rejected") in `diary.md`, without the user's words: both are the
+   user's verdict. Do not change a task's "Done when" after work starts.
+   `[window]`
 
 ## 5. Working protocol
 
@@ -115,7 +117,9 @@ In a session, also: every task in `tasks/` is `done`, `blocked` or
   tests after each change. Commit before and after each task.
 - **Session** (`ai4science --no-lean`, the user sets tasks in words): read
   `tasks/` first; a message that accepts work → statuses first; new work →
-  record the task and subtasks before anything else and show the plan; then
+  write the task and its subtasks to `tasks/` and commit them
+  (`tasks: <task name>`) before you read or run anything else, then show
+  the plan; then
   each subtask by the rules above for its kind, statuses at the moment of the
   event, and `checks/graph_spec.md` §4 at the end.
 - The specs change only by the human, with a `diary.md` entry giving the

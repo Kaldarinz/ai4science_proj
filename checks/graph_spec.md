@@ -131,6 +131,9 @@ Not included: <what not to do>
 - Record the task and its 2–5 subtasks with status `open` before any other
   work, and show the plan to the user, one line per subtask. A task is split
   only if it needs several closing objects.
+- "Done when" names a command and the result it must give. The top-level
+  task's "Done when" also includes `checks/graph_check.py` exiting with 0.
+  Running a check is part of every subtask, not a subtask of its own.
 - "Done when" never changes after work starts; if it cannot be met, the
   status is `blocked`.
 

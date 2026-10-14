@@ -27,6 +27,11 @@ not change, when the laser pulse fluence, energy, power or intensity changes.
 - Exclude claims about other materials; explanations of a mechanism that
   state no dependence ("this indicates a stronger interaction"). Figure axis
   labels, captions alone and the reference list.
+- A dependence the reader infers by comparing reported values (e.g. a size
+  at one fluence with a size at another) is data, not a claim: the
+  quoted sentence must itself state that size changes, or does not change,
+  with the laser variable. Such values belong to the series
+  (`results_spec.md` §2).
 - A dependence on unnamed "laser properties" or "laser parameters" is a
   claim when the article varies only fluence, energy, power or intensity;
   `variable` then follows §5 (no unit: `unspecified`).
