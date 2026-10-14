@@ -42,3 +42,6 @@ Run in /home/aiagent/week2, outside this project; not project data.
 ## 2026-10-13 - first gold label, claims_spec §2 extended
 * Article 534494 (10.1038/srep30478) added to the corpus and labelled by hand before any agent run: `checks/claims_gold.csv`, and `checks/gold_articles.csv` (which articles are labelled, so an article with no gold claim still counts as labelled).
 * Spec change (claims_spec §2): a rule for a dependence on unnamed "laser properties" or "laser parameters". The case that prompted it is in the gold label and is not repeated here, so that extraction stays blind.
+
+## 2026-10-14 - claims_spec §2: values compared by the reader are not a claim
+* Spec change (claims_spec §2): a dependence inferred by comparing reported values (a size at one fluence with a size at another) is data, not a claim; the quoted sentence must itself state the dependence. Reason: in the week-4 practice the agent recorded such a comparison as a claim, quoting a sentence that only reports a size.
