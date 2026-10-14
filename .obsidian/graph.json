@@ -1,0 +1,9 @@
+{"showAttachments": true, "showOrphans": true, "showArrow": true,
+ "colorGroups": [
+  {"query": "path:ontology", "color": {"a": 1, "rgb": 9474192}},
+  {"query": "[status:open OR \"in progress\" OR blocked]", "color": {"a": 1, "rgb": 14254635}},
+  {"query": "path:tasks", "color": {"a": 1, "rgb": 16761685}},
+  {"query": "[verdict:disagrees OR model_dependent]", "color": {"a": 1, "rgb": 14701138}},
+  {"query": "[type:Check]", "color": {"a": 1, "rgb": 1153422}},
+  {"query": "path:notes", "color": {"a": 1, "rgb": 5987296}}
+ ]}
