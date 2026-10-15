@@ -49,12 +49,17 @@ Screening look-ups of works already in `sources.csv` get none.
 Every value comes from a tool response: never from memory or from the
 article PDFs. No line breaks and no `[[`/`]]` in any field.
 
+Write and change the tables only with Python's `csv` module (`csv.reader`,
+`csv.writer`), never with `echo`, `cat` or a text editor: it quotes fields
+that contain commas and ends every row with a line break.
+
 ## 4. Screening
 
 `relevant` if the abstract reports the size of Au nanoparticles made by
 pulsed laser ablation in liquid at more than one fluence, pulse energy,
-laser power or intensity; otherwise `excluded`. Unsure, or no abstract:
-`relevant`. Screen honestly also a work that is already a corpus article.
+laser power or intensity; otherwise `excluded`. No abstract: judge by the
+title. Unsure: `relevant`. Screen honestly also a work that is already a
+corpus article.
 `screening_reason` never says which way size changes (no "increase",
 "decrease", "grow", "larger", "smaller"): claim extraction must stay blind
 to an earlier reading.
@@ -68,5 +73,6 @@ for `cited_by`). Only links returned by `openalex_links`.
 ## 6. Done
 
 At most five new works per message: if asked for more, record the first
-five and say what is left. Then commit `results/` and run
-`.venv/bin/python tools/graph.py --validate`; it must exit with 0.
+five and say what is left. Then add the `diary.md` entry, commit
+`results/` and `diary.md`, and run `.venv/bin/python tools/graph.py
+--validate`; it must exit with 0.

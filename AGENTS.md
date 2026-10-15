@@ -38,7 +38,8 @@ The comparison part (tests in `tests/`, `tools/ablation_db.py`, the
 comparison and summary checks) is not implemented yet and is not checked.
 
 A literature task is ready when `.venv/bin/python tools/graph.py --validate`
-exits with 0: it checks the three tables and that `results/` is committed.
+exits with 0: it checks the three tables and that `results/` and
+`diary.md` are committed.
 
 ## 2. Project map and sources
 
@@ -115,8 +116,9 @@ exits with 0: it checks the three tables and that `results/` is committed.
   tests after each change. Commit before and after each task.
 - **Literature:** follow `checks/literature_spec.md`. Every row comes from a
   tool response, never from memory. At most five new works per message.
-  Commit `results/`, run `tools/graph.py --validate`, and add a `diary.md`
-  entry: the queries made, works found and recorded, what is left.
+  Add a `diary.md` entry (the queries made, works found and recorded, what
+  is left), commit `results/` and `diary.md`, then run
+  `tools/graph.py --validate`.
 - The specs change only by the human, with a `diary.md` entry giving the
   reason. No entry names which articles are hand-labelled or their gold
   set (results_spec §7.6).

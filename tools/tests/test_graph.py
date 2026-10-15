@@ -79,6 +79,42 @@ def test_valid_tables_pass(tmp_path: Path) -> None:
     assert "PASSED" in result.stdout
 
 
+def test_no_final_line_break_fails(tmp_path: Path) -> None:
+    run(tmp_path, valid_tables())
+    sources = tmp_path / "results" / "sources.csv"
+    sources.write_bytes(sources.read_bytes().rstrip(b"\r\n"))
+    result = subprocess.run(
+        [sys.executable, str(GRAPH), "--root", str(tmp_path), "--validate"],
+        capture_output=True, text=True, check=False)
+    assert result.returncode == 1, result.stdout
+    assert "no line break after the last row" in result.stdout
+
+
+def git(tmp: Path, *args: str) -> None:
+    """Run git in the fixture tree, as a throwaway user."""
+    subprocess.run(["git", "-c", "user.name=t", "-c", "user.email=t@t",
+                    *args], cwd=tmp, check=True, capture_output=True)
+
+
+@pytest.mark.parametrize("dirty, ok", [
+    (None, True), ("diary.md", False), ("results/sources.csv", False)])
+def test_check_committed(tmp_path: Path, dirty: str | None, ok: bool) -> None:
+    sys.path.insert(0, str(GRAPH.parent))
+    import graph
+    run(tmp_path, valid_tables())
+    (tmp_path / "diary.md").write_text("# Diary\n")
+    git(tmp_path, "init", "-q")
+    git(tmp_path, "add", "-A")
+    git(tmp_path, "commit", "-q", "-m", "fixture")
+    if dirty:
+        with (tmp_path / dirty).open("a") as f:
+            f.write("x\n")
+    graph.use_root(tmp_path)
+    report = graph.Report()
+    graph.check_committed(report)
+    assert (report.failures == 0) == ok
+
+
 def test_notes_written_then_checked(tmp_path: Path) -> None:
     assert run(tmp_path, valid_tables()).returncode == 0
     source = (tmp_path / "notes" / "Source W100.md").read_text()

@@ -21,8 +21,8 @@ row checks, among them R8 and R9. On any failure nothing is written and
 the exit code is 1. With --check nothing is written either; the exit code
 is 1 when the notes on disk differ from the generated ones. --validate is
 the agent's check after a literature task: tables, rules and a committed
-results/, no comparison with the notes on disk. --root runs on another
-project tree (test fixtures); it skips the commit check.
+results/ and diary.md, no comparison with the notes on disk. --root runs
+on another project tree (test fixtures); it skips the commit check.
 """
 
 import argparse
@@ -527,7 +527,9 @@ def read_literature(
     """Read the literature tables and check their shape.
 
     A table with a wrong header or a row with a wrong number of fields is
-    reported and treated as missing, so no note is built from it.
+    reported and treated as missing, so no note is built from it. A table
+    that does not end with a line break is reported too: the next row
+    appended to it would merge with its last row.
 
     Parameters
     ----------
@@ -545,10 +547,13 @@ def read_literature(
         lit[path] = rows
         if rows is None:
             continue
-        with (ROOT / path).open(newline="", encoding="utf-8") as f:
-            header = tuple(next(csv.reader(f), []))
+        text = (ROOT / path).read_text(encoding="utf-8")
+        header = tuple(next(csv.reader(text.splitlines()), []))
         bad = [i for i, r in enumerate(rows, 2)
                if None in r or None in r.values()]
+        if text and not text.endswith("\n"):
+            report.fail("table", f"{path}: no line break after the last "
+                        "row; write tables with Python's csv module")
         if header != columns:
             report.fail("table", f"{path}: header {list(header)}, expected "
                         f"{list(columns)}")
@@ -711,8 +716,12 @@ def check_literature(
                   "rules R8, R9")
 
 
+#: What a literature task writes and must commit.
+COMMITTED: Final[tuple[str, ...]] = ("results/", "diary.md")
+
+
 def check_committed(report: Report) -> None:
-    """Check that results/ has no uncommitted changes.
+    """Check that results/ and diary.md have no uncommitted changes.
 
     Parameters
     ----------
@@ -720,15 +729,18 @@ def check_committed(report: Report) -> None:
         Receives the failure.
     """
     status = subprocess.run(
-        ["git", "status", "--porcelain", "--", "results/"],
+        ["git", "status", "--porcelain", "--", *COMMITTED],
         cwd=ROOT, capture_output=True, text=True, check=False)
     if status.returncode != 0:
         report.fail("commit", f"git status failed: {status.stderr.strip()}")
     elif status.stdout:
-        report.fail("commit", "uncommitted changes in results/: git add "
-                    "results/ && git commit -m \"<what>\"")
+        changed = sorted({line[3:].split("/")[0] for line in
+                          status.stdout.splitlines()})
+        report.fail("commit", f"uncommitted changes in {' '.join(changed)}: "
+                    f"git add {' '.join(COMMITTED)} && git commit -m "
+                    "\"<what>\"")
     else:
-        report.ok("commit: results/ committed")
+        report.ok(f"commit: {' and '.join(COMMITTED)} committed")
 
 
 def owned_notes() -> dict[Path, str]:
