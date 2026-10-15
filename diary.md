@@ -48,3 +48,7 @@ Run in /home/aiagent/week2, outside this project; not project data.
 
 ## 2026-10-15 - claims_spec §2: "laser properties" rule clarified
 * Spec change (claims_spec §2): the rule now reads "of the laser parameters, the article varies only fluence, energy, power or intensity", and other factors (medium, additives, target) may vary and be named in the same sentence. Reason: "the article varies only fluence…" could be read as "fluence is the only variable in the whole article", which wrongly excludes articles that also vary the medium.
+
+## 2026-10-15 - gold set split into dev and test; bans 3 and 9
+* Spec change (results_spec §7.6, `checks/gold_articles.csv`, `check.py --gold`): each labelled article is `test` (labelled before any agent run, scored on its first run that writes rows) or `dev` (a spec or memory change was prompted by its errors); `--gold` prints raw hits per set, and only `test` counts for error rates. An article now counts as labelled by its row in `gold_articles.csv`, even with no gold claim. 534494 is `dev`. Every scored run is recorded here with the spec commit and the model.
+* AGENTS.md: ban 3 now also covers `notes/`, the gold files, `claim_checks.csv`, their git history and `--gold`; §2 no longer points to the gold file; new ban 9: no check result in this diary without the user's words.

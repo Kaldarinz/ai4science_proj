@@ -145,8 +145,13 @@ an empty `series_id` and the reason in `note`.
 | Au in water, `increase`, `own_data` | `80094-s1` | `increasing` / `increasing` | yes / yes |
 | AuSi in Si colloid, `no_effect`, `own_data` | `80094-s2` | `peak` / `flat` | no / yes |
 
-6. With `--gold` only, it prints, and does not fail on, precision and
-   recall of the claims against the hand-labelled `checks/claims_gold.csv`,
-   matching on `(article_id, variable, direction, basis, medium_class)`.
-   The human runs it with `--gold` after the agent's run; the agent never
-   does, so its own check cannot tell it how it scored.
+6. With `--gold` only, it prints, and does not fail on, the hits of the
+   claims against the hand-labelled `checks/claims_gold.csv`, matching on
+   `(article_id, variable, direction, basis, medium_class)`, as raw
+   precision and recall k/n for each set of `checks/gold_articles.csv`:
+   `test` (labelled before any agent run, scored on its first run that
+   writes `claims.csv` or `no_claims.csv` rows; aborted runs are not
+   scored) and `dev` (a spec or memory change was prompted by its errors).
+   Only `test` counts for error rates. The human runs it with `--gold`
+   after the agent's run; the agent never does, so its own check cannot
+   tell it how it scored.
