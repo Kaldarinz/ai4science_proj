@@ -201,8 +201,38 @@ def q5(notes: dict[str, Note]) -> str:
                  sorted(rows), "No articles yet.")
 
 
+def q6(notes: dict[str, Note]) -> str:
+    """Sources: admitted or candidate, found by which query, and their
+    citation links to corpus articles (through the Sources that describe
+    them)."""
+    article_of = {s.name: s.targets("describes")[0]
+                  for s in of(notes, "Source") if s.targets("describes")}
+    tool_of = {q.name: next((b.split(";")[0].removeprefix("tool: ")
+                             for b in q.body if b.startswith("tool: ")), "")
+               for q in of(notes, "Query")}
+    rows = []
+    for s in of(notes, "Source"):
+        cites = [f"cites {article_of[t]}" for t in s.targets("cites")
+                 if t in article_of]
+        cites += [f"cited by {article_of[o.name]}" for o in of(notes, "Source")
+                  if s.name in o.targets("cites") and o.name in article_of]
+        title = s.body[0] if s.body else ""
+        rows.append([
+            article_of.get(s.name, "candidate"), s.attrs.get("screening", ""),
+            s.name.removeprefix("Source "),
+            title if len(title) <= 70 else title[:69] + "…",
+            ", ".join(f"{q.removeprefix('Query ')} ({tool_of.get(q, '')})"
+                      for q in s.targets("foundBy")),
+            ", ".join(cites) or "–"])
+    rows.sort(key=lambda r: (r[0] != "candidate", r[1] != "relevant", r[0],
+                             r[2]))
+    return table(["Status", "screening", "Source", "Title, venue, year, DOI",
+                  "Found by", "Corpus links"], rows,
+                 "No Source notes yet: they come with results/sources.csv.")
+
+
 QUERIES: Final[dict[str, Callable[[dict[str, Note]], str]]] = {
-    "q1": q1, "q2": q2, "q3": q3, "q4": q4, "q5": q5,
+    "q1": q1, "q2": q2, "q3": q3, "q4": q4, "q5": q5, "q6": q6,
 }
 
 
