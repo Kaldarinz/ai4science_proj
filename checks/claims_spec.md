@@ -33,7 +33,9 @@ not change, when the laser pulse fluence, energy, power or intensity changes.
   with the laser variable. Such values belong to the series
   (`results_spec.md` §2).
 - A dependence on unnamed "laser properties" or "laser parameters" is a
-  claim when the article varies only fluence, energy, power or intensity;
+  claim when, of the laser parameters, the article varies only fluence,
+  energy, power or intensity. Other factors (medium, additives, target) may
+  vary as well, and the sentence may name them next to the laser.
   `variable` then follows §5 (no unit: `unspecified`).
 - One claim per article for each distinct `(material, medium_class,
   variable, direction, basis)`. A dependence restated in the abstract, the

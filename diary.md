@@ -45,3 +45,6 @@ Run in /home/aiagent/week2, outside this project; not project data.
 
 ## 2026-10-14 - claims_spec §2: values compared by the reader are not a claim
 * Spec change (claims_spec §2): a dependence inferred by comparing reported values (a size at one fluence with a size at another) is data, not a claim; the quoted sentence must itself state the dependence. Reason: in the week-4 practice the agent recorded such a comparison as a claim, quoting a sentence that only reports a size.
+
+## 2026-10-15 - claims_spec §2: "laser properties" rule clarified
+* Spec change (claims_spec §2): the rule now reads "of the laser parameters, the article varies only fluence, energy, power or intensity", and other factors (medium, additives, target) may vary and be named in the same sentence. Reason: "the article varies only fluence…" could be read as "fluence is the only variable in the whole article", which wrongly excludes articles that also vary the medium.
