@@ -56,3 +56,7 @@ Run in /home/aiagent/week2, outside this project; not project data.
 ## 2026-10-15 - ontology.yaml and claim_checks.csv on main
 * `ontology.yaml`: the week-4 practice ontology without the Task class, its relations, attribute `status`, rules R7–R10 and the task question; added attributes `variable` and `medium_class` with the values `check.py` accepts. 5 classes, 7 relations, 8 attributes, rules R1–R6, 5 competency questions.
 * `checks/claim_checks.csv`: curator checks of claims (the two 80094 reviews of 2026-10-04); Check notes are built from it.
+
+## 2026-10-15 - check.py reads the vocabulary from ontology.yaml
+* `check.py` takes the values of `variable`, `direction`, `basis`, `medium_class` and the shapes from `ontology.yaml` instead of constants, and fails when the lists in claims_spec §3, §5 or results_spec §2, §3 differ from it; `AGREES` is checked against the ontology. The specs keep their lists, so extraction reads the same text as before. Spec headers: change the spec, `check.py` and `ontology.yaml` together. Same check results before and after, plus one `ok vocabulary` line.
+* `ops/isolation.sh` installs PyYAML in `.venv` and checks the import.

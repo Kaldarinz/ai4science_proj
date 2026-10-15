@@ -2,8 +2,9 @@
 
 Defines the database tools' output, `results/comparison.csv` and
 `results/summary.json`, and what `checks/check.py` verifies. Claims are
-defined in `claims_spec.md`. Change this file and `check.py` together, never
-one alone.
+defined in `claims_spec.md`. Change this file, `check.py` and
+`ontology.yaml` together, never one alone; `check.py` fails when a value
+list here differs from `ontology.yaml`.
 
 ## 1. Format
 

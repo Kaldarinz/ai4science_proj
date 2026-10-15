@@ -3,8 +3,9 @@
 Defines `results/claims.csv`: the claims an article's text makes about how
 the size of gold nanoparticles depends on the laser pulse fluence, energy,
 power or intensity, and `results/no_claims.csv` for articles with none (§8).
-`checks/check.py` enforces it. Change this file and
-`check.py` together, never one alone.
+`checks/check.py` enforces it. Change this file, `check.py` and
+`ontology.yaml` together, never one alone; `check.py` fails when a value
+list here differs from `ontology.yaml`.
 
 ## 1. Input
 

@@ -28,10 +28,13 @@ from collections.abc import Sequence
 from pathlib import Path
 from typing import Final, NamedTuple, Protocol, TypeAlias, TypedDict, cast
 
+import yaml
+
 ROOT: Final[Path] = Path(__file__).resolve().parent.parent
 DATA: Final[Path] = ROOT / "data"
 RESULTS: Final[Path] = ROOT / "results"
 GOLD: Final[Path] = ROOT / "checks" / "claims_gold.csv"
+ONTOLOGY: Final[Path] = ROOT / "ontology.yaml"
 GOLD_ARTICLES: Final[Path] = ROOT / "checks" / "gold_articles.csv"
 GOLD_SETS: Final[tuple[str, ...]] = ("dev", "test")
 
@@ -62,17 +65,32 @@ GOLD_KEY: Final[tuple[str, ...]] = (
 )
 
 ROLES: Final[frozenset[str]] = frozenset({"main", "supplement"})
-VARIABLES: Final[frozenset[str]] = frozenset(
-    {"fluence", "energy", "power", "intensity", "unspecified"})
-DIRECTIONS: Final[tuple[str, ...]] = (
-    "increase", "decrease", "no_effect", "non_monotonic", "affects",
-)
-BASES: Final[tuple[str, ...]] = ("own_data", "cited", "general")
-MEDIUM_CLASSES: Final[frozenset[str]] = frozenset(
-    {"colloid", "water", "aqueous", "organic", "other"})
-SHAPES: Final[tuple[str, ...]] = (
-    "increasing", "decreasing", "flat", "peak", "valley", "irregular",
-)
+
+
+def load_vocabulary() -> dict[str, tuple[str, ...]]:
+    """Read the attribute values of ontology.yaml.
+
+    Returns
+    -------
+    dict[str, tuple[str, ...]]
+        Values of each attribute, in the ontology's order.
+    """
+    try:
+        with ONTOLOGY.open(encoding="utf-8") as f:
+            attributes = yaml.safe_load(f)["attributes"]
+        return {name: tuple(spec["values"])
+                for name, spec in attributes.items()}
+    except (OSError, yaml.YAMLError, KeyError, TypeError) as e:
+        sys.exit(f"FAIL [ontology] cannot read attributes of "
+                 f"{ONTOLOGY.name}: {e}")
+
+
+VOCABULARY: Final[dict[str, tuple[str, ...]]] = load_vocabulary()
+VARIABLES: Final[frozenset[str]] = frozenset(VOCABULARY["variable"])
+DIRECTIONS: Final[tuple[str, ...]] = VOCABULARY["direction"]
+BASES: Final[tuple[str, ...]] = VOCABULARY["basis"]
+MEDIUM_CLASSES: Final[frozenset[str]] = frozenset(VOCABULARY["medium_class"])
+SHAPES: Final[tuple[str, ...]] = VOCABULARY["shape_primary"]
 MODELS: Final[tuple[str, ...]] = ("primary", "lenient")
 
 AGREES: Final[dict[str, frozenset[str]]] = {
@@ -190,6 +208,101 @@ class Report:
             What was checked.
         """
         print(f"ok   {message}")
+
+
+def backticked(text: str) -> set[str]:
+    """Return the `code` spans of a piece of Markdown.
+
+    Parameters
+    ----------
+    text : str
+        Markdown text.
+
+    Returns
+    -------
+    set[str]
+        Contents of the backtick spans.
+    """
+    return set(re.findall(r"`([^`]+)`", text))
+
+
+def table_cells(
+    lines: list[str], start: str, column: int, rows: bool = False,
+) -> str:
+    """Join cells of one column of a Markdown table.
+
+    Parameters
+    ----------
+    lines : list[str]
+        Lines of the spec.
+    start : str
+        Start of the first line to read.
+    column : int
+        Column index, 0 for the first.
+    rows : bool
+        False: only the line that starts with `start`. True: that line is
+        the header; read the rows below it.
+
+    Returns
+    -------
+    str
+        The cells joined by newlines; empty if `start` is not found.
+    """
+    found = [i for i, line in enumerate(lines) if line.startswith(start)]
+    if not found:
+        return ""
+    if not rows:
+        return lines[found[0]].strip("|").split("|")[column]
+    cells = []
+    for line in lines[found[0] + 2:]:
+        if not line.startswith("|"):
+            break
+        cells.append(line.strip("|").split("|")[column])
+    return "\n".join(cells)
+
+
+def check_vocabulary(report: Report) -> None:
+    """Compare the value lists in the specs with ontology.yaml.
+
+    The specs keep their lists so the agent reads the same text as before;
+    ontology.yaml is the source, so a list that differs from it fails.
+
+    Parameters
+    ----------
+    report : Report
+        Collects failures.
+    """
+    failures = report.failures
+    checks = ROOT / "checks"
+    claims = (checks / "claims_spec.md").read_text(encoding="utf-8")
+    results = (checks / "results_spec.md").read_text(encoding="utf-8")
+    claim_lines = claims.splitlines()
+    result_lines = results.splitlines()
+    medium = re.search(r"\*\*medium_class\*\*(.*?)\n\n", results, re.S)
+    stated = {
+        ("claims §3", "direction"):
+            table_cells(claim_lines, "| `direction` |", 2),
+        ("claims §3", "basis"): table_cells(claim_lines, "| `basis` |", 2),
+        ("claims §5", "variable"):
+            table_cells(claim_lines, "| Unit | `variable` |", 1, rows=True),
+        ("results §2", "medium_class"): medium.group(1) if medium else "",
+        ("results §3", "shape_primary"):
+            table_cells(
+                result_lines, "| Recorded signs | Shape |", 1, rows=True),
+    }
+    for (rule, name), text in stated.items():
+        values = backticked(text) - {name}
+        if values != set(VOCABULARY[name]):
+            report.fail(rule, f"{name} values {sorted(values)} differ from "
+                        f"ontology.yaml {sorted(VOCABULARY[name])}")
+    if VOCABULARY["shape_primary"] != VOCABULARY["shape_lenient"]:
+        report.fail("ontology", "shape_primary and shape_lenient differ")
+    if set(AGREES) != set(DIRECTIONS) or not all(
+            v <= set(SHAPES) for v in AGREES.values()):
+        report.fail("results §5", "AGREES in check.py does not match the "
+                    "directions and shapes of ontology.yaml")
+    if report.failures == failures:
+        report.ok("vocabulary: specs and check.py match ontology.yaml")
 
 
 class Pages:
@@ -1162,6 +1275,7 @@ def main() -> int:
     article = cast(int | None, args.article)
 
     report = Report()
+    check_vocabulary(report)
     ids, roles = check_data(report, article)
     claims = check_claims(report, ids, roles, article)
     check_no_claims(report, ids, roles, claims)

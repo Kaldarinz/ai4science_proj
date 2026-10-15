@@ -19,7 +19,7 @@ PROJ=/srv/ai4science_proj
 OLD=/home/$OWNER/dev/shad/ai4science_proj      # becomes a symlink to $PROJ
 STORE=/home/$OWNER/dev/ablation_db/data/files/open
 WRITABLE=(results src tests memory)            # plus diary.md
-PY_PKGS=(numpy scipy pandas pytest pypdf)
+PY_PKGS=(numpy scipy pandas pytest pypdf pyyaml)
 
 [[ $EUID -eq 0 ]] || { echo "Run with sudo." >&2; exit 1; }
 as() { local u=$1; shift; sudo -u "$u" -H "$@"; }
@@ -103,7 +103,7 @@ check "writes checks/: no"            "touch $PROJ/checks/.iso"                 
 check "writes data/: no"              "touch $PROJ/data/.iso"                    no
 check "writes project root: no"       "touch $PROJ/.iso"                         no
 check "installs into .venv: no"       "touch $PROJ/.venv/.iso"                   no
-check "runs project Python: yes"      "$PROJ/.venv/bin/python -c 'import numpy, scipy, pandas, pypdf, pytest'" yes
+check "runs project Python: yes"      "$PROJ/.venv/bin/python -c 'import numpy, scipy, pandas, pypdf, pytest, yaml'" yes
 check "writes git objects: yes"       "test -w $PROJ/.git/objects && git -C $PROJ status" yes
 check "uses sudo: no"                 "sudo -n true"                             no
 rm -f "$PROJ"/{checks,data,.venv}/.iso "$PROJ/.iso"
