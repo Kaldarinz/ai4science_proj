@@ -1,6 +1,10 @@
 source_id,found_by,doi,title,venue,year,cited_by_count,screening,screening_reason,article_id
 W2091838176,q1,10.1063/1.1626793,Synthesis of colloidal nanoparticles during femtosecond laser ablation of gold in water,Journal of Applied Physics,2003,567,relevant,,
-W2088885603,q1,10.1088/0957-4484/23/13/135603,Dependence of gold nanoparticle production on pulse duration by laser ablation in liquid media,Nanotechnology,2012,77,relevant,,
+W2088885603,q1;q2,10.1088/0957-4484/23/13/135603,Dependence of gold nanoparticle production on pulse duration by laser ablation in liquid media,Nanotechnology,2012,77,relevant,,
 W2065451665,q1,10.2961/jlmn.2013.02.0003,Size Control of Gold Nanoparticles During Laser Ablation In Liquids With Different Functional Molecules,Journal of Laser Micro/Nanoengineering,2013,19,excluded,abstract reports size dependence on surfactant concentration not on more than one fluence,
 W2322010143,q1,10.1088/0957-4484/27/20/205602,Pilot-scale synthesis of metal nanoparticles by high-speed pulsed laser ablation in liquids,Nanotechnology,2016,150,relevant,,
 W1991924652,q1,10.4236/snl.2013.34018,Dependence of Laser Ablation Produced Gold Nanoparticles Characteristics on the Fluence of Laser Pulse,Soft Nanoscience Letters,2013,27,relevant,,
+W2141858166,q2,10.2961/jlmn.2008.02.0003,Influences on Nanoparticle Production during Pulsed Laser Ablation,Journal of Laser Micro/Nanoengineering,2008,103,relevant,,
+W2520163364,q2,10.1016/j.jcis.2016.09.017,On the stability of gold nanoparticles synthesized by laser ablation in liquids,Journal of Colloid and Interface Science,2016,72,relevant,,
+W2793275023,q2,10.26739/2573-5616-2017-8-8-5,INFULENCE OF PULSE LASER ENERGY ON THE FORMATION OF GOLD NANOPARTICLES PREPARED BY LASER ABLATION IN LIQUID,American Journal of Research,2017,3,relevant,,
+W2990286150,q2,10.1088/1742-6596/1386/1/012062,"Ablation energy, water volume and ablation time: Gold nanoparticles obtained through by pulsed laser ablation in liquid",Journal of Physics Conference Series,2019,7,relevant,,
