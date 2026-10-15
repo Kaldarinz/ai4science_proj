@@ -90,3 +90,9 @@ Run in /home/aiagent/week2, outside this project; not project data.
 * Recorded 4 new sources: W2141858166 (Hahn 2008), W2520163364 (Palazzo 2016), W2793275023 (Shamsulddin 2017), W2990286150 (Hernandez-Maya 2019).
 * Screening: all 4 relevant (Hahn: size at multiple pulse energies; Palazzo: no abstract; Shamsulddin: size at 600-900 mJ; Hernandez-Maya: size vs ablation energy). No excluded.
 * No openalex_links calls; citations.csv empty. graph.py --validate exits 0.
+
+## 2026-10-15 - literature: Au NP size vs laser power (q3)
+* Query q3: openalex_search "gold nanoparticles laser ablation liquid size laser power", sort=relevance, limit=5. Found 33966, kept 1.
+* W2520163364 (Palazzo 2016) already in sources.csv (q2); q3 added to its found_by.
+* Recorded 4 new sources, all excluded: W1998864392 (Plech 2005, near-field ablation from Au NPs, not size vs power), W2344885033 (Kim 2016, review, no size at multiple powers), W2909388120 (Letzel 2019, size quenching by additives), W2495808985 (Torres-Mendieta 2016, size influenced by graphene oxide).
+* No openalex_links calls; citations.csv empty. graph.py --validate exits 0.
