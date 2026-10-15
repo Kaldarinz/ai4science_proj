@@ -52,3 +52,7 @@ Run in /home/aiagent/week2, outside this project; not project data.
 ## 2026-10-15 - gold set split into dev and test; bans 3 and 9
 * Spec change (results_spec §7.6, `checks/gold_articles.csv`, `check.py --gold`): each labelled article is `test` (labelled before any agent run, scored on its first run that writes rows) or `dev` (a spec or memory change was prompted by its errors); `--gold` prints raw hits per set, and only `test` counts for error rates. An article now counts as labelled by its row in `gold_articles.csv`, even with no gold claim. 534494 is `dev`. Every scored run is recorded here with the spec commit and the model.
 * AGENTS.md: ban 3 now also covers `notes/`, the gold files, `claim_checks.csv`, their git history and `--gold`; §2 no longer points to the gold file; new ban 9: no check result in this diary without the user's words.
+
+## 2026-10-15 - ontology.yaml and claim_checks.csv on main
+* `ontology.yaml`: the week-4 practice ontology without the Task class, its relations, attribute `status`, rules R7–R10 and the task question; added attributes `variable` and `medium_class` with the values `check.py` accepts. 5 classes, 7 relations, 8 attributes, rules R1–R6, 5 competency questions.
+* `checks/claim_checks.csv`: curator checks of claims (the two 80094 reviews of 2026-10-04); Check notes are built from it.

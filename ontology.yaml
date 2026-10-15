@@ -1,0 +1,120 @@
+ontology: au-size-vs-fluence
+goal: >
+  Record which articles claim that Au nanoparticle size depends on pulse fluence
+  or energy, which ablation_db series test each claim, whether they agree, which
+  results a curator has checked and why, and where every source, table and script
+  lies. Used by the agent and a curator.
+
+competency_questions:
+  - Which articles make a claim about size vs fluence or energy, and on what basis (own_data, cited, general)?
+  - Which series in ablation_db belong to each article, and what is their shape under the two error models?
+  - Which articles have no claim, and why - no claim in the text, or no matching series?
+  - Which claims were checked by a curator, and why - gold sample, claim-data mismatch, or disagreement between runs?
+  - Which file holds each article's PDF, its claims, and the code that compares them?
+
+classes:
+  Article:
+    parent: null
+    definition: a publication in data/corpus.csv; its PDF lies in data/articles/<id>/
+  Claim:
+    parent: null
+    definition: a row of results/claims.csv - a statement of an article about how size depends on fluence or energy
+  Series:
+    parent: null
+    definition: experiments of one article in ablation_db that differ only in fluence or energy (results_spec section 2)
+  Check:
+    parent: null
+    definition: a check of a claim by a curator
+  File:
+    parent: null
+    definition: a project file - PDF, table, code; the node is the file itself, it gets no note
+
+properties:
+  extractedFrom: { domain: Claim, range: Article }
+  reportedIn: { domain: Series, range: Article }
+  comparedWith: { domain: Claim, range: Series }
+  checks: { domain: Check, range: Claim }
+  storedIn: { domain: [Article, Claim, Check], range: File } # Article -> PDF, Claim -> results/claims.csv, Check -> checks/claim_checks.csv
+  noClaimReasonIn: { domain: Article, range: File } # -> results/no_claims.csv
+  computedBy: { domain: Series, range: File } # -> tools/, src/
+
+attributes:
+  variable:
+    { domain: Claim, values: [fluence, energy, power, intensity, unspecified] }
+  medium_class:
+    { domain: [Claim, Series], values: [colloid, water, aqueous, organic, other] }
+    # a Claim may also be `unspecified` (claims_spec §3)
+  direction:
+    {
+      domain: Claim,
+      values: [increase, decrease, no_effect, non_monotonic, affects],
+    }
+  basis: { domain: Claim, values: [own_data, cited, general] }
+  verdict: {
+      domain: Claim,
+      values: [agrees, disagrees, model_dependent, unmatched],
+    } # own_data claims only
+  shape_primary:
+    {
+      domain: Series,
+      values: [flat, increasing, decreasing, peak, valley, irregular],
+    }
+  shape_lenient:
+    {
+      domain: Series,
+      values: [flat, increasing, decreasing, peak, valley, irregular],
+    }
+  reason: { domain: Check, values: [gold_sample, mismatch, runs_disagree, review] } # review: non-blind, not used for error rates
+
+rules:
+  - id: R1
+    text: Every claim is extracted from an article.
+    dl: "Claim ⊑ ∃extractedFrom.Article"
+    check:
+      { kind: some, class: Claim, property: extractedFrom, target: Article }
+  - id: R2
+    text: Every series belongs to an article.
+    dl: "Series ⊑ ∃reportedIn.Article"
+    check: { kind: some, class: Series, property: reportedIn, target: Article }
+  - id: R3
+    text: A matched claim is a claim whose verdict compares it with data.
+    dl: "MatchedClaim ≡ Claim ⊓ ∃verdict.{agrees, disagrees, model_dependent}"
+    check:
+      {
+        kind: defined_value,
+        name: MatchedClaim,
+        class: Claim,
+        attribute: verdict,
+        values: [agrees, disagrees, model_dependent],
+      }
+  - id: R4
+    text: Every matched claim is compared with at least one series.
+    dl: "MatchedClaim ⊑ ∃comparedWith.Series"
+    check:
+      {
+        kind: some,
+        class: MatchedClaim,
+        property: comparedWith,
+        target: Series,
+      }
+  - id: R5
+    text: A disputed claim is a claim whose data disagree with it under at least one error model.
+    dl: "DisputedClaim ≡ Claim ⊓ ∃verdict.{disagrees, model_dependent}"
+    check:
+      {
+        kind: defined_value,
+        name: DisputedClaim,
+        class: Claim,
+        attribute: verdict,
+        values: [disagrees, model_dependent],
+      }
+  - id: R6
+    text: Every disputed claim is checked by a curator.
+    dl: "DisputedClaim ⊑ ∃checks⁻.Check"
+    check:
+      {
+        kind: some_inverse,
+        class: DisputedClaim,
+        property: checks,
+        source: Check,
+      }
