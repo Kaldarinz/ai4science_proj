@@ -71,3 +71,6 @@ Run in /home/aiagent/week2, outside this project; not project data.
 
 ## 2026-10-15 - gold articles are not named outside gold_articles.csv
 * Spec change (results_spec §7.6, AGENTS.md §5): which articles are hand-labelled, and their set, stand only in `checks/gold_articles.csv`; `diary.md`, `memory/` and commit messages never name them. Reason: the agent reads the diary at the start of a run, and an entry naming a labelled article tells it which run is being scored.
+
+## 2026-10-15 - tools/ask.py: competency questions as queries
+* `tools/ask.py [q1 … q5]` answers the competency questions of `ontology.yaml` from the notes in `notes/` and prints Markdown tables (examples of queries to the local context for HW1). q2 (series) and the "no matching series" part of q3 stay empty until `tools/ablation_db.py` and `results/comparison.csv` exist. It reads `notes/`, so it is not for the agent while extracting (ban 3).
