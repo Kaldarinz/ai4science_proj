@@ -42,8 +42,10 @@ attributes:
   variable:
     { domain: Claim, values: [fluence, energy, power, intensity, unspecified] }
   medium_class:
-    { domain: [Claim, Series], values: [colloid, water, aqueous, organic, other] }
-    # a Claim may also be `unspecified` (claims_spec §3)
+    {
+      domain: [Claim, Series],
+      values: [colloid, water, aqueous, organic, other, unspecified],
+    } # `unspecified` for a Claim only; a Series always has a class (results_spec §2)
   direction:
     {
       domain: Claim,

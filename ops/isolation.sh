@@ -101,12 +101,14 @@ check "writes results/: yes"          "touch $PROJ/results/.iso && rm $PROJ/resu
 check "writes diary.md: yes"          "test -w $PROJ/diary.md"                   yes
 check "writes checks/: no"            "touch $PROJ/checks/.iso"                  no
 check "writes data/: no"              "touch $PROJ/data/.iso"                    no
+check "writes notes/: no"             "touch $PROJ/notes/.iso"                   no
+check "writes ontology/: no"          "touch $PROJ/ontology/.iso"                no
 check "writes project root: no"       "touch $PROJ/.iso"                         no
 check "installs into .venv: no"       "touch $PROJ/.venv/.iso"                   no
 check "runs project Python: yes"      "$PROJ/.venv/bin/python -c 'import numpy, scipy, pandas, pypdf, pytest, yaml'" yes
 check "writes git objects: yes"       "test -w $PROJ/.git/objects && git -C $PROJ status" yes
 check "uses sudo: no"                 "sudo -n true"                             no
-rm -f "$PROJ"/{checks,data,.venv}/.iso "$PROJ/.iso"
+rm -f "$PROJ"/{checks,data,notes,ontology,.venv}/.iso "$PROJ/.iso"
 
 cat <<EOF
 

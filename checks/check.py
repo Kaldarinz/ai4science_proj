@@ -89,7 +89,9 @@ VOCABULARY: Final[dict[str, tuple[str, ...]]] = load_vocabulary()
 VARIABLES: Final[frozenset[str]] = frozenset(VOCABULARY["variable"])
 DIRECTIONS: Final[tuple[str, ...]] = VOCABULARY["direction"]
 BASES: Final[tuple[str, ...]] = VOCABULARY["basis"]
-MEDIUM_CLASSES: Final[frozenset[str]] = frozenset(VOCABULARY["medium_class"])
+#: Classes a series can have; a claim may also be `unspecified`.
+MEDIUM_CLASSES: Final[frozenset[str]] = (
+    frozenset(VOCABULARY["medium_class"]) - {"unspecified"})
 SHAPES: Final[tuple[str, ...]] = VOCABULARY["shape_primary"]
 MODELS: Final[tuple[str, ...]] = ("primary", "lenient")
 
@@ -290,11 +292,13 @@ def check_vocabulary(report: Report) -> None:
             table_cells(
                 result_lines, "| Recorded signs | Shape |", 1, rows=True),
     }
+    expected = {name: set(values) for name, values in VOCABULARY.items()}
+    expected["medium_class"] = set(MEDIUM_CLASSES)
     for (rule, name), text in stated.items():
         values = backticked(text) - {name}
-        if values != set(VOCABULARY[name]):
+        if values != expected[name]:
             report.fail(rule, f"{name} values {sorted(values)} differ from "
-                        f"ontology.yaml {sorted(VOCABULARY[name])}")
+                        f"ontology.yaml {sorted(expected[name])}")
     if VOCABULARY["shape_primary"] != VOCABULARY["shape_lenient"]:
         report.fail("ontology", "shape_primary and shape_lenient differ")
     if set(AGREES) != set(DIRECTIONS) or not all(
