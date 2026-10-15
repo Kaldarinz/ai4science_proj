@@ -16,8 +16,8 @@ Run the check for article 534494
 Update the project graph
 
 ## Summary
-Extracted one claim (534494-c1) from the density filter experiment: size increases with fluence (26 nm at ~1 J/cm² vs 6 nm at ~0.25 J/cm² in water). Wrote it to results/claims.csv. Ran checks/check.py --article 534494 (exit 0 after commit). Updated memory/534494.md, notes/, ontology/, and tasks/.
+Redone after user rejection (2026-10-15): the quote "The particles obtained using this procedure have an average size of 6 nm." reports a single value, not a dependence (claims_spec §2). The size-fluence dependence is reader-inferred by comparing 6 nm at ~0.25 J/cm² with 26 nm at ~1 J/cm². Removed claim 534494-c1 from results/claims.csv, added a no_claims.csv row for 534494, updated memory/534494.md and the graph. Ran checks/check.py --article 534494 (exit 0) and checks/graph_check.py (exit 0).
 
 ## Links
 - type: [[Task]]
-- resolvedBy: [[Claim 534494-c1]]
+- resolvedBy: [[results/no_claims.csv]]

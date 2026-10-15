@@ -8,9 +8,9 @@ Done when: the size-fluence claims of article 534494 are identified from the PDF
 Not included: comparison with data
 
 ## Summary
-Read all 9 pages of 10.1038_srep30478.pdf. Identified one size-fluence claim: the density filter experiment (water at ~0.25 J/cm² → 6 nm, vs 26 nm at ~1 J/cm²), i.e. size increases with fluence.
+Read all 9 pages of 10.1038_srep30478.pdf. No sentence states a size-fluence dependence: the dependence is reader-inferred by comparing 6 nm at ~0.25 J/cm² (page 6) with 26 nm at ~1 J/cm² (page 2). Redone after user rejection (2026-10-15).
 
 ## Links
 - type: [[Task]]
 - subtaskOf: [[Extract the claims of article 534494]]
-- resolvedBy: [[Claim 534494-c1]]
+- resolvedBy: [[results/no_claims.csv]]

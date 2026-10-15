@@ -50,3 +50,9 @@ Run in /home/aiagent/week2, outside this project; not project data.
 * Check: `.venv/bin/python checks/check.py --article 534494` → exit 0; `.venv/bin/python checks/graph_check.py` → exit 0.
 * Check result: accepted — the density filter experiment is a genuine size-fluence dependence from the article's own data.
 * Notes: the graph check initially failed because the previous session's notes for article 80094 (claims and checks) were missing; created them. Also renamed a task note that had a `/` in its name (from "results/claims.csv").
+
+## 2026-10-15 - redo claim extraction, article 534494 (user rejection)
+* User: "I reject the extraction of 534494: the quote reports a value, it does not state a dependence (claims_spec §2, the bullet on values compared by the reader). Please redo it."
+* Agent: re-read pages 1-6 of 10.1038_srep30478.pdf. Confirmed the rejection: no sentence states a size-fluence dependence; the dependence is reader-inferred by comparing 6 nm at ~0.25 J/cm² (page 6) with 26 nm at ~1 J/cm² (page 2). Removed claim 534494-c1 from results/claims.csv, added a no_claims.csv row for 534494 (page 6, the 6 nm sentence). Updated memory/534494.md, removed notes/Claim 534494-c1.md, added noClaimReasonIn link to notes/Article 534494.md, updated task notes (Extract the claims of article 534494 and its subtasks).
+* Result: 0 claims, 1 no_claims row for 534494.
+* Check: `.venv/bin/python checks/check.py --article 534494` → exit 0; `.venv/bin/python checks/graph_check.py` → exit 0.
