@@ -49,7 +49,6 @@ Run in /home/aiagent/week2, outside this project; not project data.
 * Result: 1 claim (534494-c1), 0 no_claims rows.
 * Check: `.venv/bin/python checks/check.py --article 534494` → exit 0; `.venv/bin/python checks/graph_check.py` → exit 0.
 * Check result: accepted — the density filter experiment is a genuine size-fluence dependence from the article's own data.
-* Check result: accepted — the density filter experiment is a genuine size-fluence dependence from the article's own data.
 * Notes: the graph check initially failed because the previous session's notes for article 80094 (claims and checks) were missing; created them. Also renamed a task note that had a `/` in its name (from "results/claims.csv").
 
 ## 2026-10-15 - redo claim extraction, article 534494 (user rejection)
@@ -60,6 +59,7 @@ Run in /home/aiagent/week2, outside this project; not project data.
 
 ## 2026-10-15 - extraction report (rejected, redone)
 * User: "I reject this: there is no task in tasks/ (graph_spec §3), no diary.md entry and no graph_check.py run (graph_spec §4), and the report says 80094 has 9 pages, but the PDF has 6. Please redo it by the protocol."
-* Agent: verified PDF page counts (80094=6, 534569=11, 534494=9). Created task `tasks/Write extraction report and update graph.md`. Fixed page count in `results/extraction_report.md` (6, not 9). Created missing `notes/Article 534569.md`. Appended entry to `diary.md`.
+* Agent: verified PDF page counts (80094=6, 534569=11, 534494=9). Created task `tasks/Write extraction report and update graph.md`. Fixed page count in `results/extraction_report.md` (6, not 9). Appended entry to `diary.md`.
 * Result: `results/extraction_report.md` corrected, all 3 Article notes present.
-* Check: `.venv/bin/python checks/graph_check.py` — pending.
+* Check: `.venv/bin/python checks/graph_check.py` → exit 0.
+* Check result: accepted — graph_check passed, task had Request+resolvedBy, diary entry present.
