@@ -1,4 +1,3 @@
 claim_id,article_id,file,page,quote,variable_written,variable,direction,basis,material,medium_class,conditions
 80094-c1,80094,10.1117_12.2217777.pdf,3,"Indeed, the mean size of nanoparticles increased from 8-10 to 30 nm under the increase of laser energy from 50 to 175 µJ/pulse",laser energy,energy,increase,own_data,Au,water,fs pulses
 80094-c2,80094,10.1117_12.2217777.pdf,3,"In contrast, the increase of laser energy did not affect the size of nanoparticles under the ablation in solutions of Si nanoparticles, as the mean size and size dispersion were always around 5-8 nm and 3-5 nm FWHM, respectively (Fig. 1c,d).",laser energy,energy,no_effect,own_data,AuSi,colloid,fs pulses
-534494-c1,534494,10.1038_srep30478.pdf,6,"The particles obtained using this procedure have an average size of 6 nm.",fluence,fluence,increase,own_data,Au,water,fs pulses
