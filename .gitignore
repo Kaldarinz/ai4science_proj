@@ -7,3 +7,8 @@ __pycache__/
 
 # Publisher PDFs are not redistributed; data/files.csv identifies them by SHA-256.
 data/articles/*/*.pdf
+
+# Obsidian: only the vault settings the graph view needs
+.obsidian/*
+!.obsidian/app.json
+!.obsidian/graph.json
