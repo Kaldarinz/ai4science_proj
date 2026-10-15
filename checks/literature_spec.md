@@ -9,6 +9,7 @@ add to the database.
 
 - `openalex_search`, `openalex_links`, `openalex_work` (extension
   `research`). Queries in English. `wikidata_*`: never.
+- Do not load the `literature` skill: this spec replaces it.
 - `openalex_links` needs a W id: a DOI is mangled. To follow a work known by
   its DOI, first `openalex_work` by DOI, then links by the returned
   `openalex_id`.
