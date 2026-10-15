@@ -80,3 +80,13 @@ Run in /home/aiagent/week2, outside this project; not project data.
 * Recorded 5 sources in results/sources.csv: W2091838176 (Kabashin 2003), W2088885603 (Riabinina 2012), W2065451665 (Essaidi 2013), W2322010143 (Streubel 2016), W1991924652 (Mirghassemzadeh 2013).
 * Screening: 4 relevant, 1 excluded (W2065451665 — abstract reports size vs surfactant concentration, not vs more than one fluence).
 * No openalex_links calls; citations.csv empty. graph.py --validate exits 0. Commit 331ccc0.
+
+## 2026-10-15 - user verdict: literature query q1 accepted
+* User's words: "I accept literature query q1 (commits 331ccc0 and c3919ef): the five source rows match OpenAlex, and the screening is acceptable."
+
+## 2026-10-15 - literature: Au NP size vs pulse energy (q2)
+* Query q2: openalex_search "gold nanoparticles laser ablation liquid size pulse energy", sort=relevance, limit=5. Found 22450, kept 5.
+* W2088885603 (Riabinina 2012) already in sources.csv (q1); q2 added to its found_by.
+* Recorded 4 new sources: W2141858166 (Hahn 2008), W2520163364 (Palazzo 2016), W2793275023 (Shamsulddin 2017), W2990286150 (Hernandez-Maya 2019).
+* Screening: all 4 relevant (Hahn: size at multiple pulse energies; Palazzo: no abstract; Shamsulddin: size at 600-900 mJ; Hernandez-Maya: size vs ablation energy). No excluded.
+* No openalex_links calls; citations.csv empty. graph.py --validate exits 0.
