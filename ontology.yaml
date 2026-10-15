@@ -3,7 +3,8 @@ goal: >
   Record which articles claim that Au nanoparticle size depends on pulse fluence
   or energy, which ablation_db series test each claim, whether they agree, which
   results a curator has checked and why, and where every source, table and script
-  lies. Used by the agent and a curator.
+  lies; also which OpenAlex records are candidates for ablation_db and by which
+  query they were found. Used by the agent and a curator.
 
 competency_questions:
   - Which articles make a claim about size vs fluence or energy, and on what basis (own_data, cited, general)?
@@ -11,11 +12,13 @@ competency_questions:
   - Which articles have no claim, and why - no claim in the text, or no matching series?
   - Which claims were checked by a curator, and why - gold sample, claim-data mismatch, or disagreement between runs?
   - Which file holds each article's PDF, its claims, and the code that compares them?
+  - Which candidate works were found, by which query, and which corpus articles do they cite or are they cited by?
+  - How many corpus articles does each topic query find (recall of the search)?
 
 classes:
   Article:
     parent: null
-    definition: a publication in data/corpus.csv; its PDF lies in data/articles/<id>/
+    definition: a publication in ablation_db, listed in data/corpus.csv; its PDF lies in data/articles/<id>/
   Claim:
     parent: null
     definition: a row of results/claims.csv - a statement of an article about how size depends on fluence or energy
@@ -28,15 +31,24 @@ classes:
   File:
     parent: null
     definition: a project file - PDF, table, code; the node is the file itself, it gets no note
+  Source:
+    parent: null
+    definition: a publication record returned by OpenAlex; a candidate for ablation_db until it describes an Article
+  Query:
+    parent: null
+    definition: one call to a database that found records - database, tool, request, date, records found and kept
 
 properties:
   extractedFrom: { domain: Claim, range: Article }
   reportedIn: { domain: Series, range: Article }
   comparedWith: { domain: Claim, range: Series }
   checks: { domain: Check, range: Claim }
-  storedIn: { domain: [Article, Claim, Check], range: File } # Article -> PDF, Claim -> results/claims.csv, Check -> checks/claim_checks.csv
+  storedIn: { domain: [Article, Claim, Check, Source, Query], range: File } # Article -> PDF, Claim -> results/claims.csv, Check -> checks/claim_checks.csv, Source -> results/sources.csv, Query -> results/queries.csv
   noClaimReasonIn: { domain: Article, range: File } # -> results/no_claims.csv
   computedBy: { domain: Series, range: File } # -> tools/, src/
+  foundBy: { domain: Source, range: Query }
+  describes: { domain: Source, range: Article } # set by DOI match only (R8, R9)
+  cites: { domain: Source, range: Source } # only as returned by openalex_links
 
 attributes:
   variable:
@@ -67,6 +79,8 @@ attributes:
       values: [flat, increasing, decreasing, peak, valley, irregular],
     }
   reason: { domain: Check, values: [gold_sample, mismatch, runs_disagree, review] } # review: non-blind, not used for error rates
+  database: { domain: Query, values: [openalex, ablation_db] } # ablation_db: no instances until tools/ablation_db.py exists
+  screening: { domain: Source, values: [relevant, excluded] } # from the abstract; admission is the describes link
 
 rules:
   - id: R1
@@ -120,3 +134,13 @@ rules:
         property: checks,
         source: Check,
       }
+  - id: R7
+    text: Every source is found by a query.
+    dl: "Source ⊑ ∃foundBy.Query"
+    check: { kind: some, class: Source, property: foundBy, target: Query }
+  - id: R8
+    text: A source describes at most one article, and both have the same DOI.
+    # checked on table rows by tools/graph.py; not a DL axiom
+  - id: R9
+    text: A source whose DOI is in data/corpus.csv describes that article.
+    # checked on table rows by tools/graph.py; not a DL axiom
