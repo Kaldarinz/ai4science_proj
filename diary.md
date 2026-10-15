@@ -76,23 +76,17 @@ Run in /home/aiagent/week2, outside this project; not project data.
 * `tools/ask.py [q1 … q5]` answers the competency questions of `ontology.yaml` from the notes in `notes/` and prints Markdown tables (examples of queries to the local context for HW1). q2 (series) and the "no matching series" part of q3 stay empty until `tools/ablation_db.py` and `results/comparison.csv` exist. It reads `notes/`, so it is not for the agent while extracting (ban 3).
 
 ## 2026-10-15 - literature: Au NP size vs fluence (q1)
-* Query q1: openalex_search "gold nanoparticles laser ablation liquid size fluence", sort=relevance, limit=5. Found 5339, kept 5.
-* Recorded 5 sources in results/sources.csv: W2091838176 (Kabashin 2003), W2088885603 (Riabinina 2012), W2065451665 (Essaidi 2013), W2322010143 (Streubel 2016), W1991924652 (Mirghassemzadeh 2013).
-* Screening: 4 relevant, 1 excluded (W2065451665 — abstract reports size vs surfactant concentration, not vs more than one fluence).
-* No openalex_links calls; citations.csv empty. graph.py --validate exits 0. Commit 331ccc0.
+* Query q1: openalex_search "gold nanoparticles laser ablation liquid size fluence", sort=relevance, limit=5. Found 5339; recorded 5, all new.
+* Screening: 4 relevant, 1 excluded. No citations. Commits 331ccc0, c3919ef.
 
 ## 2026-10-15 - user verdict: literature query q1 accepted
 * User's words: "I accept literature query q1 (commits 331ccc0 and c3919ef): the five source rows match OpenAlex, and the screening is acceptable."
 
 ## 2026-10-15 - literature: Au NP size vs pulse energy (q2)
-* Query q2: openalex_search "gold nanoparticles laser ablation liquid size pulse energy", sort=relevance, limit=5. Found 22450, kept 5.
-* W2088885603 (Riabinina 2012) already in sources.csv (q1); q2 added to its found_by.
-* Recorded 4 new sources: W2141858166 (Hahn 2008), W2520163364 (Palazzo 2016), W2793275023 (Shamsulddin 2017), W2990286150 (Hernandez-Maya 2019).
-* Screening: all 4 relevant (Hahn: size at multiple pulse energies; Palazzo: no abstract; Shamsulddin: size at 600-900 mJ; Hernandez-Maya: size vs ablation energy). No excluded.
-* No openalex_links calls; citations.csv empty. graph.py --validate exits 0.
+* Query q2: openalex_search "gold nanoparticles laser ablation liquid size pulse energy", sort=relevance, limit=5. Found 22450; recorded 5: 1 already in sources.csv (q2 added to its found_by), 4 new.
+* Screening of the new ones: 4 relevant, 0 excluded. No citations. Commits 83bb612, 892af01.
 
 ## 2026-10-15 - literature: Au NP size vs laser power (q3)
-* Query q3: openalex_search "gold nanoparticles laser ablation liquid size laser power", sort=relevance, limit=5. Found 33966, kept 1.
-* W2520163364 (Palazzo 2016) already in sources.csv (q2); q3 added to its found_by.
-* Recorded 4 new sources, all excluded: W1998864392 (Plech 2005, near-field ablation from Au NPs, not size vs power), W2344885033 (Kim 2016, review, no size at multiple powers), W2909388120 (Letzel 2019, size quenching by additives), W2495808985 (Torres-Mendieta 2016, size influenced by graphene oxide).
-* No openalex_links calls; citations.csv empty. graph.py --validate exits 0.
+* Query q3: openalex_search "gold nanoparticles laser ablation liquid size laser power", sort=relevance, limit=5. Found 33966; recorded 5: 1 already in sources.csv (q3 added to its found_by), 4 new.
+* Screening of the new ones: 0 relevant, 4 excluded; 1 describes a corpus article (R9). No citations. Commits d6fa6ee, fd0b086.
+* Entries q1-q3 cut to counts by the human: they named works and described abstracts, which a literature diary entry must not (checks/literature_spec.md §6).

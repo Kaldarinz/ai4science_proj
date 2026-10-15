@@ -116,9 +116,9 @@ exits with 0: it checks the three tables and that `results/` and
   tests after each change. Commit before and after each task.
 - **Literature:** follow `checks/literature_spec.md`. Every row comes from a
   tool response, never from memory. At most five new works per message.
-  Add a `diary.md` entry (the queries made, works found and recorded, what
-  is left), commit `results/` and `diary.md`, then run
-  `tools/graph.py --validate`.
+  Add a `diary.md` entry (query ids, counts and commit ids only: no
+  titles, authors, W ids or descriptions of works), commit `results/` and
+  `diary.md`, then run `tools/graph.py --validate`.
 - The specs change only by the human, with a `diary.md` entry giving the
   reason. No entry names which articles are hand-labelled or their gold
   set (results_spec §7.6).

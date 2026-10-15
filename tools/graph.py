@@ -710,6 +710,15 @@ def check_literature(
         elif c["outcome"] == "discrepancy" and not c["note"]:
             fail(SOURCE_CHECKS, i, "a discrepancy needs a note")
 
+    # Claim extraction reads the diary: it must not point to a work, least
+    # of all to the record of a corpus article (literature_spec §6).
+    diary = ROOT / "diary.md"
+    if diary.exists():
+        named = set(SOURCE_ID.findall(diary.read_text(encoding="utf-8")))
+        for sid in sorted(named & source_ids):
+            report.fail("diary", f"diary.md names {sid}: a literature entry "
+                        "holds query ids, counts and commit ids only")
+
     if report.failures == before:
         report.ok(f"literature tables: {len(queries)} queries, "
                   f"{len(sources)} sources, {len(citations)} citations; "

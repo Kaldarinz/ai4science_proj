@@ -90,6 +90,19 @@ def test_no_final_line_break_fails(tmp_path: Path) -> None:
     assert "no line break after the last row" in result.stdout
 
 
+@pytest.mark.parametrize("entry, ok", [
+    ("* Query q2: recorded 2, both new. Commit abc1234.\n", True),
+    ("* Recorded W200 (gold nanoparticle size and fluence).\n", False)])
+def test_diary_names_no_source(tmp_path: Path, entry: str, ok: bool) -> None:
+    run(tmp_path, valid_tables())
+    (tmp_path / "diary.md").write_text("# Diary\n\n" + entry)
+    result = subprocess.run(
+        [sys.executable, str(GRAPH), "--root", str(tmp_path), "--validate"],
+        capture_output=True, text=True, check=False)
+    assert (result.returncode == 0) == ok, result.stdout
+    assert ("diary.md names W200" in result.stdout) != ok
+
+
 def git(tmp: Path, *args: str) -> None:
     """Run git in the fixture tree, as a throwaway user."""
     subprocess.run(["git", "-c", "user.name=t", "-c", "user.email=t@t",

@@ -76,3 +76,10 @@ At most five new works per message: if asked for more, record the first
 five and say what is left. Then add the `diary.md` entry, commit
 `results/` and `diary.md`, and run `.venv/bin/python tools/graph.py
 --validate`; it must exit with 0.
+
+The `diary.md` entry holds only the query ids and their text, counts
+(found, recorded, new, relevant, excluded, linked to a corpus article)
+and commit ids: no titles, authors, W ids or descriptions of works.
+Claim extraction reads the diary and must stay blind to earlier readings
+of an abstract; `--validate` fails if the diary names the W id of any
+Source.
