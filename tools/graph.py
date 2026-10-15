@@ -2,27 +2,34 @@
 
 Usage::
 
-    .venv/bin/python tools/graph.py           # check, then write the notes
-    .venv/bin/python tools/graph.py --check   # compare the notes on disk
+    .venv/bin/python tools/graph.py              # check, then write the notes
+    .venv/bin/python tools/graph.py --check      # compare the notes on disk
+    .venv/bin/python tools/graph.py --validate   # check the tables only
 
 The project root is an Obsidian vault. This script writes one class note
 per class of ontology.yaml to ontology/ and one object note per row to
-notes/: Article (data/corpus.csv), Claim (results/claims.csv) and Check
-(checks/claim_checks.csv). Notes are never edited by hand: run the script
+notes/: Article (data/corpus.csv), Claim (results/claims.csv), Check
+(checks/claim_checks.csv), Source (results/sources.csv) and Query
+(results/queries.csv). Notes are never edited by hand: run the script
 again instead. Notes in notes/ of other types are left alone.
 
 Before writing, every attribute value, link target and link range is
 checked against ontology.yaml, and so are the rules with a ``check``
-(closed world: a link not written is a link that does not exist). On any
-failure nothing is written and the exit code is 1. With --check nothing is
-written either; the exit code is 1 when the notes on disk differ from the
-generated ones.
+(closed world: a link not written is a link that does not exist). The
+literature tables (queries, sources, citations, source checks) also get
+row checks, among them R8 and R9. On any failure nothing is written and
+the exit code is 1. With --check nothing is written either; the exit code
+is 1 when the notes on disk differ from the generated ones. --validate is
+the agent's check after a literature task: tables, rules and a committed
+results/, no comparison with the notes on disk. --root runs on another
+project tree (test fixtures); it skips the commit check.
 """
 
 import argparse
 import csv
 import json
 import re
+import subprocess
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -30,19 +37,49 @@ from typing import Final
 
 import yaml
 
-ROOT: Final[Path] = Path(__file__).resolve().parent.parent
-ONTOLOGY: Final[Path] = ROOT / "ontology.yaml"
-CLASS_DIR: Final[Path] = ROOT / "ontology"
-NOTE_DIR: Final[Path] = ROOT / "notes"
-VAULT: Final[Path] = ROOT / ".obsidian"
+ROOT: Path = Path(__file__).resolve().parent.parent
+ONTOLOGY: Path = ROOT / "ontology.yaml"
+CLASS_DIR: Path = ROOT / "ontology"
+NOTE_DIR: Path = ROOT / "notes"
+VAULT: Path = ROOT / ".obsidian"
 
 CLAIMS: Final[str] = "results/claims.csv"
 NO_CLAIMS: Final[str] = "results/no_claims.csv"
 CHECKS: Final[str] = "checks/claim_checks.csv"
 COMPARISON: Final[str] = "results/comparison.csv"
+QUERIES: Final[str] = "results/queries.csv"
+SOURCES: Final[str] = "results/sources.csv"
+CITATIONS: Final[str] = "results/citations.csv"
+SOURCE_CHECKS: Final[str] = "checks/source_checks.csv"
+
+#: Columns of the literature tables, in order.
+COLUMNS: Final[dict[str, tuple[str, ...]]] = {
+    QUERIES: ("query_id", "database", "tool", "work", "relation", "request",
+              "retrieved", "n_found", "n_kept"),
+    SOURCES: ("source_id", "found_by", "doi", "title", "venue", "year",
+              "cited_by_count", "screening", "screening_reason",
+              "article_id"),
+    CITATIONS: ("citing", "cited", "query_id"),
+    SOURCE_CHECKS: ("source_id", "checked", "outcome", "note"),
+}
+
+#: OpenAlex tools that may find Sources, and the relations of links.
+TOOLS: Final[frozenset[str]] = frozenset(
+    {"openalex_search", "openalex_links", "openalex_work"})
+RELATIONS: Final[frozenset[str]] = frozenset({"references", "cited_by"})
+
+SOURCE_ID: Final[re.Pattern[str]] = re.compile(r"W\d+")
+QUERY_ID: Final[re.Pattern[str]] = re.compile(r"q\d+")
+DATE: Final[re.Pattern[str]] = re.compile(r"\d{4}-\d{2}-\d{2}")
+#: A screening reason must not say which way size depends on the laser
+#: parameter: extraction must stay blind to an earlier reading.
+DIRECTION_WORDS: Final[re.Pattern[str]] = re.compile(
+    r"\b(increas\w*|decreas\w*|grow|grows|growing|grew|larger|smaller)\b",
+    re.I)
 
 #: Classes whose notes this script owns in notes/.
-GENERATED: Final[frozenset[str]] = frozenset({"Article", "Claim", "Check"})
+GENERATED: Final[frozenset[str]] = frozenset(
+    {"Article", "Claim", "Check", "Source", "Query"})
 
 TYPE_LINE: Final[re.Pattern[str]] = re.compile(r"^type: *(\S+)", re.M)
 
@@ -155,6 +192,57 @@ def as_list(value: str | list[str]) -> list[str]:
     return value if isinstance(value, list) else [value]
 
 
+def use_root(root: Path) -> None:
+    """Point the script at another project tree.
+
+    Parameters
+    ----------
+    root : Path
+        The project root, e.g. a test fixture.
+    """
+    global ROOT, ONTOLOGY, CLASS_DIR, NOTE_DIR, VAULT
+    ROOT = root.resolve()
+    ONTOLOGY = ROOT / "ontology.yaml"
+    CLASS_DIR = ROOT / "ontology"
+    NOTE_DIR = ROOT / "notes"
+    VAULT = ROOT / ".obsidian"
+
+
+def norm_doi(doi: str) -> str:
+    """Return a DOI in lower case without a resolver prefix.
+
+    Parameters
+    ----------
+    doi : str
+        A DOI as written in a table, possibly ``https://doi.org/…``.
+
+    Returns
+    -------
+    str
+        The bare DOI, e.g. ``10.1117/12.2217777``; empty for an empty one.
+    """
+    doi = doi.strip().lower()
+    for prefix in ("https://doi.org/", "http://doi.org/", "doi:"):
+        doi = doi.removeprefix(prefix)
+    return doi
+
+
+def split_ids(value: str) -> list[str]:
+    """Return the ids of a ``;``-separated cell.
+
+    Parameters
+    ----------
+    value : str
+        E.g. ``q1;q3``.
+
+    Returns
+    -------
+    list[str]
+        The ids, without blanks.
+    """
+    return [v.strip() for v in value.split(";") if v.strip()]
+
+
 def verdict(
     cid: str, row: dict[str, str], comparison: list[dict[str, str]] | None,
 ) -> str | None:
@@ -193,13 +281,18 @@ def verdict(
     return "model_dependent"
 
 
-def build_objects() -> list[Note]:
+def build_objects(lit: dict[str, list[dict[str, str]] | None]) -> list[Note]:
     """Build the object notes from the result tables.
+
+    Parameters
+    ----------
+    lit : dict[str, list[dict[str, str]] | None]
+        Rows of the literature tables by path, None for a missing table.
 
     Returns
     -------
     list[Note]
-        Article, Claim and Check notes, sorted by name within each class.
+        Article, Claim, Check, Source and Query notes, in table order.
     """
     corpus = read_rows("data/corpus.csv") or []
     files = read_rows("data/files.csv") or []
@@ -246,6 +339,58 @@ def build_objects() -> list[Note]:
                           f"{row['curator']}; date: {row['date']}"])
         note.links.append(("checks", f"Claim {row['claim_id']}"))
         note.links.append(("storedIn", CHECKS))
+        notes.append(note)
+    return notes + literature_objects(lit)
+
+
+def literature_objects(
+    lit: dict[str, list[dict[str, str]] | None],
+) -> list[Note]:
+    """Build the Source and Query notes from the literature tables.
+
+    Parameters
+    ----------
+    lit : dict[str, list[dict[str, str]] | None]
+        Rows of the literature tables by path, None for a missing table.
+
+    Returns
+    -------
+    list[Note]
+        Source notes, then Query notes, in table order.
+    """
+    citations = lit[CITATIONS] or []
+    checked = lit[SOURCE_CHECKS] or []
+    notes: list[Note] = []
+    for row in lit[SOURCES] or []:
+        sid = row["source_id"]
+        note = Note(
+            f"Source {sid}", "Source", attrs={"screening": row["screening"]},
+            body=[f"{row['title']}, {row['venue']}, {row['year']}, "
+                  f"{row['doi'] or 'no DOI'}",
+                  f"cited_by_count: {row['cited_by_count']}",
+                  f"screening_reason: {row['screening_reason']}"])
+        for c in checked:
+            if c["source_id"] == sid:
+                note.body.append(f"Checked {c['checked']}: {c['outcome']}"
+                                 + (f" - {c['note']}" if c["note"] else ""))
+        note.links += [("foundBy", f"Query {q}")
+                       for q in split_ids(row["found_by"])]
+        if row["article_id"]:
+            note.links.append(("describes", f"Article {row['article_id']}"))
+        note.links += [("cites", f"Source {c['cited']}")
+                       for c in citations if c["citing"] == sid]
+        note.links.append(("storedIn", SOURCES))
+        notes.append(note)
+    for row in lit[QUERIES] or []:
+        note = Note(
+            f"Query {row['query_id']}", "Query",
+            attrs={"database": row["database"]},
+            body=[f"tool: {row['tool']}; work: {row['work'] or '-'}; "
+                  f"relation: {row['relation'] or '-'}",
+                  f"request: {row['request']}",
+                  f"retrieved: {row['retrieved']}; found: {row['n_found']}; "
+                  f"kept: {row['n_kept']}"])
+        note.links.append(("storedIn", QUERIES))
         notes.append(note)
     return notes
 
@@ -376,6 +521,216 @@ def check_graph(report: Report, onto: dict, notes: dict[str, Note]) -> None:
             report.ok(f"rule {rule['id']}: {rule['text']}")
 
 
+def read_literature(
+    report: Report,
+) -> dict[str, list[dict[str, str]] | None]:
+    """Read the literature tables and check their shape.
+
+    A table with a wrong header or a row with a wrong number of fields is
+    reported and treated as missing, so no note is built from it.
+
+    Parameters
+    ----------
+    report : Report
+        Collects failures.
+
+    Returns
+    -------
+    dict[str, list[dict[str, str]] | None]
+        Rows by path, None for a missing or malformed table.
+    """
+    lit: dict[str, list[dict[str, str]] | None] = {}
+    for path, columns in COLUMNS.items():
+        rows = read_rows(path)
+        lit[path] = rows
+        if rows is None:
+            continue
+        with (ROOT / path).open(newline="", encoding="utf-8") as f:
+            header = tuple(next(csv.reader(f), []))
+        bad = [i for i, r in enumerate(rows, 2)
+               if None in r or None in r.values()]
+        if header != columns:
+            report.fail("table", f"{path}: header {list(header)}, expected "
+                        f"{list(columns)}")
+            lit[path] = None
+        elif bad:
+            report.fail("table", f"{path}: wrong number of fields in "
+                        f"line(s) {bad}")
+            lit[path] = None
+    return lit
+
+
+def check_literature(
+    report: Report, lit: dict[str, list[dict[str, str]] | None],
+) -> None:
+    """Check the rows of the literature tables, R8 and R9 among them.
+
+    Parameters
+    ----------
+    report : Report
+        Collects failures.
+    lit : dict[str, list[dict[str, str]] | None]
+        Rows of the literature tables by path, None for a missing table.
+    """
+    before = report.failures
+    queries = lit[QUERIES] or []
+    sources = lit[SOURCES] or []
+    citations = lit[CITATIONS] or []
+
+    def fail(path: str, line: int, message: str) -> None:
+        report.fail("table", f"{path}:{line}: {message}")
+
+    for path, rows in lit.items():
+        for i, row in enumerate(rows or [], 2):
+            for key, value in row.items():
+                if "\n" in value or "\r" in value or "[[" in value \
+                        or "]]" in value:
+                    fail(path, i, f"{key} holds a line break or [[ ]]")
+
+    seen: dict[tuple[str, ...], int] = {}
+    for path, key in ((QUERIES, ("query_id",)), (SOURCES, ("source_id",)),
+                      (CITATIONS, ("citing", "cited"))):
+        for i, row in enumerate(lit[path] or [], 2):
+            k = (path, *(row[c] for c in key))
+            if k in seen:
+                fail(path, i, f"{'/'.join(key)} {k[1:]} repeats line "
+                     f"{seen[k]}")
+            seen.setdefault(k, i)
+
+    query_rows = {q["query_id"]: q for q in queries}
+    for i, q in enumerate(queries, 2):
+        if not QUERY_ID.fullmatch(q["query_id"]):
+            fail(QUERIES, i, f"query_id «{q['query_id']}» is not q<number>")
+        if not DATE.fullmatch(q["retrieved"]):
+            fail(QUERIES, i, f"retrieved «{q['retrieved']}» is not a date")
+        if not (q["n_found"].isdigit() and q["n_kept"].isdigit()):
+            fail(QUERIES, i, "n_found and n_kept must be whole numbers")
+            continue
+        found, kept = int(q["n_found"]), int(q["n_kept"])
+        if kept < 1 or found < kept:
+            fail(QUERIES, i, f"need 1 <= n_kept <= n_found, got {kept} "
+                 f"and {found}")
+        if q["database"] != "openalex":
+            continue
+        tool, work, rel = q["tool"], q["work"], q["relation"]
+        if tool not in TOOLS:
+            fail(QUERIES, i, f"tool «{tool}» is not one of {sorted(TOOLS)}")
+        elif tool == "openalex_search" and (work or rel):
+            fail(QUERIES, i, "a search has no work and no relation")
+        elif tool == "openalex_work" and (not work or rel
+                                          or (found, kept) != (1, 1)):
+            fail(QUERIES, i, "openalex_work: work given, no relation, "
+                 "n_found = n_kept = 1")
+        elif tool == "openalex_links" and (
+                not SOURCE_ID.fullmatch(work) or rel not in RELATIONS):
+            fail(QUERIES, i, f"openalex_links needs a W id and a relation "
+                 f"in {sorted(RELATIONS)}")
+        n_sources = sum(q["query_id"] in split_ids(s["found_by"])
+                        for s in sources)
+        if n_sources != kept:
+            fail(QUERIES, i, f"n_kept {kept}, but {n_sources} source(s) "
+                 "name this query in found_by")
+        if tool == "openalex_links":
+            n_cites = sum(c["query_id"] == q["query_id"] for c in citations)
+            if n_cites != kept:
+                fail(QUERIES, i, f"n_kept {kept}, but {n_cites} citation "
+                     "row(s) name this query")
+
+    corpus = read_rows("data/corpus.csv") or []
+    by_doi = {norm_doi(r["doi"]): r for r in corpus if r["doi"].strip()}
+    by_id = {r["article_id"]: r for r in corpus}
+    source_ids = {s["source_id"] for s in sources}
+    for i, s in enumerate(sources, 2):
+        sid, doi, aid = s["source_id"], s["doi"], s["article_id"]
+        if not SOURCE_ID.fullmatch(sid):
+            fail(SOURCES, i, f"source_id «{sid}» is not W<number>")
+        if doi and (doi != norm_doi(doi) or not doi.startswith("10.")):
+            fail(SOURCES, i, f"doi «{doi}»: lower case, no prefix, 10.…")
+        for field_ in ("year", "cited_by_count"):
+            if s[field_] and not s[field_].isdigit():
+                fail(SOURCES, i, f"{field_} «{s[field_]}» is not a number")
+        found_by = split_ids(s["found_by"])
+        if not found_by:
+            fail(SOURCES, i, "found_by is empty")
+        for q in found_by:
+            if q not in query_rows:
+                fail(SOURCES, i, f"found_by names {q}, not in {QUERIES}")
+        if s["screening"] == "excluded" and not s["screening_reason"]:
+            fail(SOURCES, i, "an excluded source needs a screening_reason")
+        if m := DIRECTION_WORDS.search(s["screening_reason"]):
+            fail(SOURCES, i, f"screening_reason says «{m[0]}»: it must not "
+                 "state the direction of a dependence")
+        article = by_doi.get(norm_doi(doi)) if doi else None
+        if aid:
+            if aid not in by_id:
+                report.fail("rule R8", f"{SOURCES}:{i}: article_id {aid} "
+                            "is not in data/corpus.csv")
+            elif norm_doi(by_id[aid]["doi"]) != norm_doi(doi):
+                report.fail("rule R8", f"{SOURCES}:{i}: {sid} has DOI "
+                            f"«{doi}», Article {aid} has "
+                            f"«{by_id[aid]['doi']}»")
+            else:
+                a = by_id[aid]
+                if s["year"] != a["year"] or " ".join(
+                        s["title"].casefold().split()) != " ".join(
+                        a["title"].casefold().split()):
+                    print(f"info {sid} and Article {aid} differ in title "
+                          "or year")
+        if article and aid != article["article_id"]:
+            report.fail("rule R9", f"{SOURCES}:{i}: {sid} has the DOI of "
+                        f"Article {article['article_id']} but does not "
+                        "describe it")
+
+    for i, c in enumerate(citations, 2):
+        for end in ("citing", "cited"):
+            if c[end] not in source_ids:
+                fail(CITATIONS, i, f"{end} {c[end]} is not in {SOURCES}")
+        q = query_rows.get(c["query_id"])
+        if q is None or q["tool"] != "openalex_links":
+            fail(CITATIONS, i, f"query {c['query_id']} is not an "
+                 "openalex_links query")
+        elif q["work"] != c["citing" if q["relation"] == "references"
+                           else "cited"]:
+            fail(CITATIONS, i, f"query {c['query_id']} asked for the "
+                 f"{q['relation']} of {q['work']}, not of this work")
+
+    for i, c in enumerate(lit[SOURCE_CHECKS] or [], 2):
+        if c["source_id"] not in source_ids:
+            fail(SOURCE_CHECKS, i, f"{c['source_id']} is not in {SOURCES}")
+        if not DATE.fullmatch(c["checked"]):
+            fail(SOURCE_CHECKS, i, f"checked «{c['checked']}» is not a date")
+        if c["outcome"] not in ("ok", "discrepancy"):
+            fail(SOURCE_CHECKS, i, f"outcome «{c['outcome']}» is not ok or "
+                 "discrepancy")
+        elif c["outcome"] == "discrepancy" and not c["note"]:
+            fail(SOURCE_CHECKS, i, "a discrepancy needs a note")
+
+    if report.failures == before:
+        report.ok(f"literature tables: {len(queries)} queries, "
+                  f"{len(sources)} sources, {len(citations)} citations; "
+                  "rules R8, R9")
+
+
+def check_committed(report: Report) -> None:
+    """Check that results/ has no uncommitted changes.
+
+    Parameters
+    ----------
+    report : Report
+        Receives the failure.
+    """
+    status = subprocess.run(
+        ["git", "status", "--porcelain", "--", "results/"],
+        cwd=ROOT, capture_output=True, text=True, check=False)
+    if status.returncode != 0:
+        report.fail("commit", f"git status failed: {status.stderr.strip()}")
+    elif status.stdout:
+        report.fail("commit", "uncommitted changes in results/: git add "
+                    "results/ && git commit -m \"<what>\"")
+    else:
+        report.ok("commit: results/ committed")
+
+
 def owned_notes() -> dict[Path, str]:
     """Return the notes on disk that this script generates.
 
@@ -406,18 +761,35 @@ def main() -> int:
         notes on disk), 1 otherwise.
     """
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("--check", action="store_true",
-                        help="compare with the notes on disk, write nothing")
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--check", action="store_true",
+                      help="compare with the notes on disk, write nothing")
+    mode.add_argument("--validate", action="store_true",
+                      help="check the tables and rules only, write nothing")
+    parser.add_argument("--root", type=Path,
+                        help="project tree to run on (test fixtures)")
     args = parser.parse_args()
+    if args.root:
+        use_root(args.root)
 
     with ONTOLOGY.open(encoding="utf-8") as f:
         onto = yaml.safe_load(f)
     report = Report()
-    objects = build_objects()
+    lit = read_literature(report)
+    objects = build_objects(lit)
     notes = {n.name: n for n in objects}
     if len(notes) != len(objects):
         report.fail("graph", "two notes share a name")
     check_graph(report, onto, notes)
+    check_literature(report, lit)
+    if args.validate:
+        if not args.root:
+            check_committed(report)
+        if report.failures:
+            print(f"\nFAILED: {report.failures} failure(s)")
+            return 1
+        print("\nPASSED: tables and rules")
+        return 0
 
     wanted = {CLASS_DIR / f"{c}.md": class_note(c, onto)
               for c in onto["classes"]}
