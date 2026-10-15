@@ -74,3 +74,9 @@ Run in /home/aiagent/week2, outside this project; not project data.
 
 ## 2026-10-15 - tools/ask.py: competency questions as queries
 * `tools/ask.py [q1 … q5]` answers the competency questions of `ontology.yaml` from the notes in `notes/` and prints Markdown tables (examples of queries to the local context for HW1). q2 (series) and the "no matching series" part of q3 stay empty until `tools/ablation_db.py` and `results/comparison.csv` exist. It reads `notes/`, so it is not for the agent while extracting (ban 3).
+
+## 2026-10-15 - literature: Au NP size vs fluence (q1)
+* Query q1: openalex_search "gold nanoparticles laser ablation liquid size fluence", sort=relevance, limit=5. Found 5339, kept 5.
+* Recorded 5 sources in results/sources.csv: W2091838176 (Kabashin 2003), W2088885603 (Riabinina 2012), W2065451665 (Essaidi 2013), W2322010143 (Streubel 2016), W1991924652 (Mirghassemzadeh 2013).
+* Screening: 4 relevant, 1 excluded (W2065451665 — abstract reports size vs surfactant concentration, not vs more than one fluence).
+* No openalex_links calls; citations.csv empty. graph.py --validate exits 0. Commit 331ccc0.
