@@ -49,6 +49,7 @@ Run in /home/aiagent/week2, outside this project; not project data.
 * Result: 1 claim (534494-c1), 0 no_claims rows.
 * Check: `.venv/bin/python checks/check.py --article 534494` → exit 0; `.venv/bin/python checks/graph_check.py` → exit 0.
 * Check result: accepted — the density filter experiment is a genuine size-fluence dependence from the article's own data.
+* Check result: accepted — the density filter experiment is a genuine size-fluence dependence from the article's own data.
 * Notes: the graph check initially failed because the previous session's notes for article 80094 (claims and checks) were missing; created them. Also renamed a task note that had a `/` in its name (from "results/claims.csv").
 
 ## 2026-10-15 - redo claim extraction, article 534494 (user rejection)
@@ -56,3 +57,9 @@ Run in /home/aiagent/week2, outside this project; not project data.
 * Agent: re-read pages 1-6 of 10.1038_srep30478.pdf. Confirmed the rejection: no sentence states a size-fluence dependence; the dependence is reader-inferred by comparing 6 nm at ~0.25 J/cm² (page 6) with 26 nm at ~1 J/cm² (page 2). Removed claim 534494-c1 from results/claims.csv, added a no_claims.csv row for 534494 (page 6, the 6 nm sentence). Updated memory/534494.md, removed notes/Claim 534494-c1.md, added noClaimReasonIn link to notes/Article 534494.md, updated task notes (Extract the claims of article 534494 and its subtasks).
 * Result: 0 claims, 1 no_claims row for 534494.
 * Check: `.venv/bin/python checks/check.py --article 534494` → exit 0; `.venv/bin/python checks/graph_check.py` → exit 0.
+
+## 2026-10-15 - extraction report (rejected, redone)
+* User: "I reject this: there is no task in tasks/ (graph_spec §3), no diary.md entry and no graph_check.py run (graph_spec §4), and the report says 80094 has 9 pages, but the PDF has 6. Please redo it by the protocol."
+* Agent: verified PDF page counts (80094=6, 534569=11, 534494=9). Created task `tasks/Write extraction report and update graph.md`. Fixed page count in `results/extraction_report.md` (6, not 9). Created missing `notes/Article 534569.md`. Appended entry to `diary.md`.
+* Result: `results/extraction_report.md` corrected, all 3 Article notes present.
+* Check: `.venv/bin/python checks/graph_check.py` — pending.
