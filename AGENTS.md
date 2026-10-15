@@ -102,7 +102,8 @@ comparison and summary checks) is not implemented yet and is not checked.
 - **Code:** ReAct, following `checks/results_spec.md` — each function in `src/` with a test in `tests/`; run the
   tests after each change. Commit before and after each task.
 - The specs change only by the human, with a `diary.md` entry giving the
-  reason.
+  reason. No entry names which articles are hand-labelled or their gold
+  set (results_spec §7.6).
 
 ## 6. Memory
 

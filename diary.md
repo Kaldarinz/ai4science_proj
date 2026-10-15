@@ -65,3 +65,9 @@ Run in /home/aiagent/week2, outside this project; not project data.
 * `tools/graph.py` writes `ontology/<Class>.md` and the Article, Claim and Check notes in `notes/` from `data/corpus.csv`, `data/files.csv`, `results/claims.csv`, `results/no_claims.csv` and `checks/claim_checks.csv`, plus `.obsidian/` settings if absent. Before writing it checks attribute values, links and their ranges against `ontology.yaml`, and rules R1–R6; on a failure nothing is written. `--check` compares the notes on disk with the tables. Week 4 showed that the agent keeps graph notes only where a validator forces it; the notes are now generated, committed, and read-only for the agent.
 * `ontology.yaml`: `medium_class` includes `unspecified` (Claim only), so Claim notes carry `variable` and `medium_class` as attributes.
 * First run: 5 class notes; 3 Article, 2 Claim, 2 Check; 19 links.
+
+## 2026-10-15 - run: article 534494
+* Two runs, spec commit 000a8ea. First: qwen3.6-35b-a3b, aborted (PDF tools not loaded; output-token limit), nothing written, not scored. Second: deepseek-v4-flash, `no_claims` row, commit 6f14a51.
+
+## 2026-10-15 - gold articles are not named outside gold_articles.csv
+* Spec change (results_spec §7.6, AGENTS.md §5): which articles are hand-labelled, and their set, stand only in `checks/gold_articles.csv`; `diary.md`, `memory/` and commit messages never name them. Reason: the agent reads the diary at the start of a run, and an entry naming a labelled article tells it which run is being scored.

@@ -155,4 +155,6 @@ an empty `series_id` and the reason in `note`.
    scored) and `dev` (a spec or memory change was prompted by its errors).
    Only `test` counts for error rates. The human runs it with `--gold`
    after the agent's run; the agent never does, so its own check cannot
-   tell it how it scored.
+   tell it how it scored. Which articles are labelled, and their set,
+   stand only in `checks/gold_articles.csv`: `diary.md`, `memory/` and
+   commit messages never name them, since the agent reads those.
