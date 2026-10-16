@@ -8,6 +8,10 @@
 # The proxy variables are needed only where the network goes through a proxy
 # (lab machine: 127.0.0.1:2080); sudo drops them otherwise and pip times out.
 #
+# Known gap: .git is writable for the agent (it commits), so a hook or a
+# command in .git/config planted by the agent runs as anton on the next
+# git command. Closing it needs a separate clone for the agent.
+#
 # Safe to re-run. Afterwards: log out and in (anton joins aiproj), then install
 # the agent as aiagent; the script prints the commands at the end.
 set -euo pipefail
@@ -71,18 +75,12 @@ echo "== 6. Permissions"
 mkdir -p "${WRITABLE[@]}"
 touch diary.md
 chown -R $OWNER:$GROUP "$PROJ"
-chmod -R u+rwX,g=rX,o= "$PROJ"                 # baseline: read-only for the agent
-find "$PROJ" -type d -exec chmod g+s {} +      # new files land in $GROUP
-for d in "${WRITABLE[@]}"; do
-  chmod -R g+w "$d"
-  find "$d" -type d -exec setfacl -m d:u::rwX,d:g::rwX,d:o::--- {} +
-done
-chmod g+w diary.md
-find data -type d -exec setfacl -m d:u::rwX,d:g::r-X,d:o::--- {} +
+bash ops/perms.sh
 
 echo "== 7. git shared by the group"
 as $OWNER git -C "$PROJ" config core.sharedRepository group
-chmod -R g+rwX .git
+# the hook is not versioned: re-run this script after a fresh clone
+install -o $OWNER -g $GROUP -m 750 ops/perms.sh .git/hooks/post-checkout
 as $AGENT git config --global --replace-all safe.directory "$PROJ"
 as $AGENT git config --global user.name "ai4science agent"
 as $AGENT git config --global user.email "$AGENT@localhost"
@@ -97,6 +95,7 @@ check() {  # description, command, expected yes/no
 check "reads /home/$OWNER: no"        "ls /home/$OWNER"                          no
 check "reads AGENTS.md: yes"          "cat $PROJ/AGENTS.md"                      yes
 check "reads article PDFs: yes"       "cat $PROJ/data/articles/*/*.pdf"          yes
+check "reads README.md: no"           "cat $PROJ/README.md"                      no
 check "writes results/: yes"          "touch $PROJ/results/.iso && rm $PROJ/results/.iso" yes
 check "writes diary.md: yes"          "test -w $PROJ/diary.md"                   yes
 check "writes checks/: no"            "touch $PROJ/checks/.iso"                  no
