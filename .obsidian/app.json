@@ -1,3 +1,10 @@
 {
-  "showUnsupportedFiles": true
+  "showUnsupportedFiles": true,
+  "userIgnoreFilters": [
+    "README.md",
+    "/__pycache__/",
+    "/\\.pyc$/",
+    "tools/tests/",
+    "ops/"
+  ]
 }
