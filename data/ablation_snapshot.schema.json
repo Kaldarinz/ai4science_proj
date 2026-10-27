@@ -1,0 +1,1128 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "title": "ablation_db snapshot, format 1",
+ "description": "A snapshot of the ablation_db catalogue. Notes are not exported: where a description says a qualifier goes to notes, that qualifier is unknown here. Each number's unit: find its object's $defs name, read its route in field_units, then resolve a parameter through parameter_quantities and a quantity through units. Intervals are in interval_unit.",
+ "type": "object",
+ "properties": {
+  "format": {"const": 1},
+  "checkout_schema_change": {
+   "type": ["string", "null"]
+  },
+  "schema_metadata_hash": {
+   "type": ["string", "null"]
+  },
+  "exported_at": {"type": "string"},
+  "source": {
+   "enum": ["live", "test"]
+  },
+  "filter": {
+   "type": "object",
+   "properties": {
+    "sole_target_material": {
+     "type": ["string", "null"]
+    },
+    "completed_only": {"type": "boolean"}
+   },
+   "required": ["sole_target_material", "completed_only"],
+   "additionalProperties": false
+  },
+  "options": {
+   "type": "object",
+   "properties": {
+    "include_manufacturers": {"type": "boolean"},
+    "include_instrument_details": {"type": "boolean"},
+    "include_settings": {"type": "boolean"},
+    "compact_materials": {"type": "boolean"},
+    "include_provenance": {"type": "boolean"},
+    "omit_nulls": {"type": "boolean"}
+   },
+   "required": ["compact_materials", "include_instrument_details", "include_manufacturers", "include_provenance", "include_settings", "omit_nulls"],
+   "additionalProperties": false
+  },
+  "interval_unit": {"const": "h"},
+  "units": {
+   "type": "object",
+   "additionalProperties": {
+    "type": ["string", "null"]
+   }
+  },
+  "field_units": {
+   "type": "object",
+   "additionalProperties": {"type": "object"}
+  },
+  "parameter_quantities": {
+   "type": "object",
+   "additionalProperties": {
+    "type": ["string", "null"]
+   }
+  },
+  "articles": {
+   "type": "array",
+   "items": {"$ref": "#/$defs/article"}
+  },
+  "referenced_colloids": {
+   "type": "array",
+   "items": {"$ref": "#/$defs/colloids"}
+  },
+  "shared": {"$ref": "#/$defs/shared"}
+ },
+ "required": ["format", "checkout_schema_change", "schema_metadata_hash", "exported_at", "source", "filter", "options", "interval_unit", "units", "field_units", "parameter_quantities", "articles", "referenced_colloids", "shared"],
+ "additionalProperties": false,
+ "$defs": {
+  "ablation_batch_setups": {
+   "type": "object",
+   "properties": {
+    "volume": {
+     "type": "number",
+     "description": "Volume of liquid, in mL (quantity volume). For a setup circulating through a buffer volume, the total of cuvette, buffer and pipes. Must be greater than 0."
+    },
+    "duration": {
+     "type": "number",
+     "description": "Ablation duration for single run"
+    },
+    "stirring": {
+     "type": "boolean",
+     "description": "Whether liquid was stirred during ablation (e.g. by magnetic stirrer)"
+    }
+   },
+   "required": [],
+   "additionalProperties": false
+  },
+  "ablation_flow_setups": {
+   "type": "object",
+   "properties": {
+    "flow_rate": {
+     "type": "number",
+     "description": "Volumetric flow of the liquid through the ablation zone, in mL/min (quantity liquid_flow_rate). Must be greater than 0."
+    },
+    "flow_speed": {
+     "type": "number",
+     "description": "Speed of the liquid in the ablation zone, in m/s (quantity flow_speed). Must be greater than 0."
+    },
+    "duration": {
+     "type": "number",
+     "description": "Time the target was ablated while the liquid flowed through the ablation zone, if reported, e.g. \"ablated for 10 min at 5 mL/min\". The collected volume is this times flow_rate. Not the residence time of the liquid in the beam, and not pumping before or after the laser ran. Do not derive it from a collected volume and the flow. Must be greater than 0."
+    }
+   },
+   "required": [],
+   "additionalProperties": false
+  },
+  "ablations": {
+   "type": "object",
+   "properties": {
+    "target": {
+     "type": "integer",
+     "x-shared": "targets",
+     "description": "Parameters of ablation target."
+    },
+    "target_position": {"$ref": "#/$defs/target_positions"},
+    "liquid_layer_thickness": {
+     "type": "number",
+     "description": "Thickness, in mm (quantity liquid_layer_thickness), of the liquid the beam crosses before the target: the height of liquid above a target irradiated from above, or, in side irradiation, the distance from the inner face of the entrance wall to the target. Must be greater than 0."
+    },
+    "beam_movement_type": {
+     "type": "string",
+     "description": "Dominant mechanism producing relative motion between the beam and the target, e.g. target translation, galvanometer scanner, if reported. A setup combining two mechanisms records the dominant one here and the rest in notes."
+    },
+    "beam_movement_speed": {
+     "type": "number",
+     "description": "Speed, in mm/s (quantity scan_speed), of the beam spot relative to the target surface, if reported. This is the spot on the target, not the liquid -- for the liquid see ablation_flow_setups.flow_speed. For a rotating target this is the linear speed at the ablated radius; leave it null if the paper reports a rotation rate and no radius, or if a radial feed makes the radius vary during the run, and record the rate in notes -- but note that two experiments differing only in a rate recorded that way hash identically and the second is rejected as a duplicate. A beam that deliberately did not move is recorded as beam_movement_type stationary and no speed here. Must be greater than 0 and less than 10000000."
+    },
+    "beam_movement_pattern": {
+     "type": "string",
+     "description": "Path the spot traces over the target surface, e.g. snake, spiral, if reported."
+    },
+    "beam_movement_size_x": {
+     "type": "number",
+     "description": "Longer side, in mm (quantity scan_size), of the bounding box of the path traced by the spot centre, if reported. A one-dimensional scan records its length here and leaves beam_movement_size_y null; a spiral or a circle records its outer diameter in both; a helix on a rotating rod records the axial length of the ablated band here and leaves the other null. Must be greater than 0 and less than 1000."
+    },
+    "beam_movement_size_y": {
+     "type": "number",
+     "description": "Shorter side, in mm (quantity scan_size), of the bounding box of the path traced by the spot centre, if reported. Null for a one-dimensional scan or a helix. Must be greater than 0, not greater than beam_movement_size_x, and less than 1000."
+    },
+    "beam_movement_passes": {
+     "type": "integer",
+     "description": "Number of times the beam traced the whole path given by beam_movement_pattern and the two sizes, if reported: \"the area was scanned 20 times\" or \"the pattern was repeated 20 times\" is 20. One pass is the whole pattern, not one line of a raster; a line counts each one-way traverse, a helix each full axial traverse, and for a rotating target without radial feed this is the number of revolutions. Record 1 only when the article says the path was traced once. Not: replicate syntheses, sequential runs with fresh or re-irradiated liquid, passages of the liquid through a flow cell or jet, pulses per spot or in total, repeats of one line before stepping, or target positions -- record those in notes. Null for a stationary beam, a random or manual movement, repositioning between runs, and when the article does not state the count; do not derive it from a duration and a speed, which assumes the beam ran without pauses. Must be greater than 0."
+    },
+    "ablation_batch_setup": {"$ref": "#/$defs/ablation_batch_setups"},
+    "ablation_flow_setup": {"$ref": "#/$defs/ablation_flow_setups"}
+   },
+   "required": ["target"],
+   "additionalProperties": false,
+   "oneOf": [
+    {
+     "required": ["ablation_batch_setup"]
+    },
+    {
+     "required": ["ablation_flow_setup"]
+    }
+   ]
+  },
+  "article": {
+   "type": "object",
+   "properties": {
+    "id": {"type": "integer"},
+    "doi": {"type": "string"},
+    "title": {"type": "string"},
+    "year": {"type": "integer"},
+    "experiments": {
+     "type": "array",
+     "items": {"$ref": "#/$defs/experiments"}
+    }
+   },
+   "required": ["experiments", "id", "title"],
+   "additionalProperties": false
+  },
+  "base_gases": {
+   "type": "object",
+   "properties": {
+    "gas_name": {
+     "type": "string",
+     "description": "Name of the gas, e.g. Argon."
+    },
+    "formula": {
+     "type": "string",
+     "description": "Molecular formula, e.g. Ar, N2."
+    }
+   },
+   "required": ["gas_name"],
+   "additionalProperties": false
+  },
+  "base_liquids": {
+   "type": "object",
+   "properties": {
+    "liquid_name": {
+     "type": "string",
+     "description": "Name of the liquid, e.g. Water, Ethanol."
+    },
+    "variant": {
+     "type": "string",
+     "description": "Particular type of substance if relevant, e.g. deionized for water."
+    },
+    "formula": {
+     "type": "string",
+     "description": "Molecular formula, e.g. H2O, C2H6O, etc. As specified in CAS card."
+    }
+   },
+   "required": ["liquid_name", "formula"],
+   "additionalProperties": false
+  },
+  "base_materials": {
+   "type": "object",
+   "properties": {
+    "material": {
+     "type": "string",
+     "description": "Name of the material, e.g. Gold, Silicon dioxide."
+    },
+    "variant": {
+     "type": "string",
+     "description": "Particular type of substance if relevant, e.g. bk7 for glass or rutile/anatase for TiO2."
+    },
+    "formula": {
+     "type": "string",
+     "description": "Empirical formula of material or some other way of representing chemical composition."
+    }
+   },
+   "required": ["material"],
+   "additionalProperties": false
+  },
+  "beam_path_apertures": {
+   "type": "object",
+   "properties": {
+    "diameter": {
+     "type": "number",
+     "description": "Diameter, in mm (quantity aperture_diameter), the aperture is open to: the set opening of an adjustable iris during irradiation, or the nominal hole of a pinhole or fixed diaphragm. Not the iris's maximum clear aperture, and not the diameter of the beam reaching it, which is beam_diameter only when no optic before the aperture changes the beam's size. \"An iris of 6 mm of diameter placed before the focusing lens\" is 6, and so is \"the beam was cut to 6 mm with an iris\", since the stop's opening is the clipped beam's hard-edge diameter just after it. Recorded whether or not it is smaller than the beam. Must be greater than 0 and less than 1000."
+    }
+   },
+   "required": ["diameter"],
+   "additionalProperties": false
+  },
+  "beam_path_elements": {
+   "type": "object",
+   "properties": {
+    "path_order": {
+     "type": "integer",
+     "description": "Order along the beam, counted from the laser output (the exit of its harmonic module or of any other frequency-conversion stage after it; the collimator's exit, for a fiber-delivered laser): 1 is the first element the beam meets. An experiment's elements run 1, 2, 3 without gaps, which check_ordinal_column() enforces at commit."
+    },
+    "objective": {
+     "type": "integer",
+     "x-shared": "objectives",
+     "description": "The final focusing optic -- a lens, an F-theta, a microscope objective or a focusing (concave or off-axis parabolic) mirror -- forming the spot in the sample plane, when this element is one. A cylindrical lens forming a line focus is the objective, its type saying cylindrical. A refractive axicon forming the Bessel zone at the sample may be the objective; the extraction rules say when. At most one per experiment: target_positions' distance to objective refers to it, and spot_diameter is formed by it. An unfocused beam has none. The lenses of a telescope, beam expander or spatial filter are not objectives."
+    },
+    "aperture": {"$ref": "#/$defs/beam_path_apertures"}
+   },
+   "required": ["path_order"],
+   "additionalProperties": false,
+   "oneOf": [
+    {
+     "required": ["objective"]
+    },
+    {
+     "required": ["aperture"]
+    }
+   ]
+  },
+  "centrifugation_steps": {
+   "type": "object",
+   "properties": {
+    "rcf": {
+     "type": "integer",
+     "description": "Relative centrifugal force, in whole units of g, standard gravity (quantity relative_centrifugal_force). A printed force is stored as printed, rounded to whole g, whatever radius it refers to, with a radius or qualifier printed with it in the step's notes. Only when no force is printed is one inferred from the rotor speed, at the first of: r_max (the distance from the axis to the bottom of the tube) as the article prints it; r_max from the datasheet of the named rotor, or of a named centrifuge that lists no other rotor; r_av if printed, otherwise a single unqualified radius. An r_min alone is not used. RCF = 1.118e-5 * r[cm] * rpm^2, rounded to whole g; for a printed rpm range, from its midpoint rpm, not the midpoint of the forces. The inferred record's note gives the radius as printed, its source, and any range. Must be greater than 0. NULL when no force is printed and none can be inferred; a spin printing neither force nor rotor speed leaves both rcf and rotor_speed NULL."
+    },
+    "rotor_speed": {
+     "type": "integer",
+     "description": "Rotor speed, in revolutions per minute (quantity rotational_speed), as the article prints it; a printed range as its midpoint, with an inferred provenance record naming the range. Never derived from a force. Must be greater than 0. NULL when the article prints none."
+    },
+    "duration": {
+     "type": "number",
+     "description": "How long this centrifugation step ran for; NULL when the article states no duration, never assumed from its wording. Must be greater than 0."
+    },
+    "residue_is_result": {
+     "type": "boolean",
+     "description": "Whether the residue is the result of this step. False means the supernatant is the result; NULL that the article does not say which phase was kept."
+    },
+    "redispersion_medium": {
+     "type": "integer",
+     "x-shared": "liquid_media",
+     "description": "Liquid phase the residue was redispersed in, if applicable. Absent means the medium did not change: the particles stay in the medium they entered this step in, rather than having been washed into something unrecorded. Set only when the residue is the result."
+    },
+    "redispersion_volume": {
+     "type": "number",
+     "description": "Volume, in mL (quantity volume), of the liquid the residue was redispersed in, if applicable. Must be greater than 0. Set only when the residue is the result."
+    }
+   },
+   "required": [],
+   "additionalProperties": false
+  },
+  "colloids": {
+   "type": "object",
+   "properties": {
+    "id": {
+     "type": "integer",
+     "description": "Surrogate primary key, drawn from the shared entity_id_seq sequence -- globally unique across every table, not just this one."
+    },
+    "volume": {
+     "type": "number",
+     "description": "Volume of the colloid, in mL (quantity volume). Must be greater than 0."
+    },
+    "medium": {
+     "type": "integer",
+     "x-shared": "liquid_media",
+     "description": "Liquid phase the colloid is dispersed in."
+    },
+    "measurement_curves": {
+     "type": "array",
+     "items": {"$ref": "#/$defs/measurement_curves"}
+    },
+    "size_distributions": {
+     "type": "array",
+     "items": {"$ref": "#/$defs/size_distributions"}
+    },
+    "measured_properties": {
+     "type": "array",
+     "items": {"$ref": "#/$defs/measured_properties"}
+    },
+    "elemental_compositions": {
+     "type": "array",
+     "items": {"$ref": "#/$defs/elemental_compositions"}
+    },
+    "storage_duration": {
+     "type": "number",
+     "description": "How long the colloid was stored before being used or measured, if recorded. A product's duration runs from the latest of its synthesis, the end of its experiment's last post-processing step, and its move into this medium; a hold that lasts until the measurement counts from its start. It is the time since the product was last processed, not the particles' age; a step's own printed time is in its step. A stock's runs from its preparation -- the dispersion of a powder, or the receipt of a bought suspension."
+    },
+    "shape": {
+     "type": "string",
+     "description": "Morphology of the particles in this colloid, as the article reports it."
+    },
+    "particle": {
+     "type": "integer",
+     "x-shared": "particles",
+     "description": "Particles a stock colloid consists of: the powder it was dispersed from or, for a bought suspension, the supplier's nominal particles. NULL on a product, whose substance comes from its experiment, and on a stock whose substance is truly unknown."
+    },
+    "origin": {"$ref": "#/$defs/origin"}
+   },
+   "required": ["id", "medium"],
+   "additionalProperties": false
+  },
+  "described_steps": {
+   "type": "object",
+   "properties": {
+    "procedure": {
+     "type": "string",
+     "description": "What was done: an entry of postprocessing_procedures, such as dialysis, magnetic separation or coating."
+    },
+    "details": {
+     "type": "string",
+     "description": "How it was done, one fact per line, a separating step first naming the fraction kept, as in \"kept the retentate\", \"20 h, Serva Visking 44120 tube (pore about 2.5 nm)\", \"dialysate not stated\". NULL when the article states nothing beyond the procedure. No blank line, carriage return, tab, run of two spaces or space at either end of a line, so the same text always hashes alike."
+    },
+    "resulting_medium": {
+     "type": "integer",
+     "x-shared": "liquid_media",
+     "description": "Liquid medium this step leaves the product in: set when the article states it, a hold's stated medium included, or when the step adds a named agent to a known entering medium. NULL when the article names no medium the step leaves, which may also mean the medium did not change; a product's medium is then not proposed from its steps, and the curator settles it."
+    }
+   },
+   "required": ["procedure"],
+   "additionalProperties": false
+  },
+  "elemental_compositions": {
+   "type": "object",
+   "properties": {
+    "fractions": {
+     "type": "array",
+     "items": {"$ref": "#/$defs/elemental_fractions"}
+    },
+    "fraction_type": {
+     "type": "string",
+     "description": "Basis the fractions are expressed in: the mass or atomic row of fraction_types."
+    },
+    "technique": {
+     "type": "string",
+     "description": "Technique that produced this composition. Replaces composition_data_source_type_id, whose four values were techniques spelled in a fourth way."
+    },
+    "instrument": {
+     "type": "integer",
+     "x-shared": "instruments",
+     "description": "Device the composition was measured on, where the article names one."
+    }
+   },
+   "required": ["fraction_type"],
+   "additionalProperties": false
+  },
+  "elemental_fractions": {
+   "type": "object",
+   "properties": {
+    "element": {
+     "type": "string",
+     "description": "Element this fraction is reported for."
+    },
+    "fraction": {
+     "type": "number",
+     "description": "Share of this element, from 0 to 1, on the composition's basis. Reported percentages are divided by 100 before storage."
+    },
+    "uncertainty": {
+     "type": "number",
+     "description": "Reported uncertainty of fraction, on the same 0 to 1 scale, as published. Both kinds occur and this column does not distinguish them: a standard deviation across analysed spots where the authors averaged regions, and the software's own per-line counting sigma where an AZtec or INCA table was pasted verbatim."
+    }
+   },
+   "required": ["element", "fraction"],
+   "additionalProperties": false
+  },
+  "experiments": {
+   "type": "object",
+   "properties": {
+    "id": {
+     "type": "integer",
+     "description": "Surrogate primary key, drawn from the shared entity_id_seq sequence -- globally unique across every table, not just this one."
+    },
+    "article_id": {
+     "type": "integer",
+     "description": "The article that reports this experiment, and owns it."
+    },
+    "laser": {
+     "type": "integer",
+     "x-shared": "instruments",
+     "description": "Laser the experiment was carried out with: an instrument whose type descends from laser. A paper naming none links the type-only row for what it does say, down to (-, -, laser). Its parameter columns record what was used, and its values bound them."
+    },
+    "wavelength": {
+     "type": "number",
+     "description": "Emission wavelength used, in nm, a harmonic included, if reported. Whole nm, rounded to the nearest with halves up (354.7 becomes 355, 526.5 becomes 527), because the quantity is integral; the exact value (510.6 nm for copper vapour) goes in notes. A parameter column: the laser's values for wavelength bound it."
+    },
+    "pulse_duration": {
+     "type": "number",
+     "description": "Pulse duration at FWHM, in fs, as the paper reports it. Empty for CW. A parameter column: the laser's values for pulse_duration bound it."
+    },
+    "pulse_energy": {
+     "type": "number",
+     "description": "Energy per pulse, in μJ; at the sample when the paper gives both output and on-target values, otherwise the value the paper places nearest the sample. Not computed from average power and repetition rate. A parameter column: the laser's values for pulse_energy bound it."
+    },
+    "repetition_rate": {
+     "type": "number",
+     "description": "Pulse repetition rate, in whole Hz. Empty for CW and single shot. A parameter column: the laser's values for repetition_rate bound it."
+    },
+    "average_power": {
+     "type": "number",
+     "description": "Average, not peak, power, in W; at the sample when the paper gives both, otherwise the value the paper places nearest the sample. A parameter column: the laser's values for average_power bound it."
+    },
+    "beam_diameter": {
+     "type": "number",
+     "description": "Beam diameter at the laser output, in mm (at the exit of its harmonic module or of any other frequency-conversion stage after it, such as a separate SHG crystal or an OPA), before any optic that changes its size -- an aperture, an expander or the objective. Distinct from spot_diameter and from an aperture's diameter. A diameter the paper places after such an optic, such as \"expanded to 10 mm\", is not this column. One it does not place is the output's when the paper states no expander or other size-changing optic, apertures aside, before the objective (before the sample, for an unfocused beam), and the diameter differs from the opening of every aperture in that stretch. Wider than a stop, it was stated before it; narrower, the stop passed it unchanged. One equal to an opening may be the clipped beam's and is dropped, as is one beside an aperture whose opening is not stated; otherwise, too, it is dropped. A diameter of a focus's order -- well under 1 mm beside an objective -- that the paper does not place at the output is never this column. For a fiber-delivered laser the output is the collimator's exit. Record the number given; say in notes if the paper defines it otherwise than at 1/e^2. A parameter column: the laser's values for beam_diameter bound it."
+    },
+    "polarization": {
+     "type": "string",
+     "description": "Polarization of the beam at the laser output: an option of the polarization parameter. A parameter column: the options the laser lists bound it."
+    },
+    "spatial_mode": {
+     "type": "string",
+     "description": "Transverse mode of the beam at the laser output: an option of the spatial_mode parameter. A Gaussian beam is TEM00; a top-hat beam is flat-top. An aperture or beam shaper after the laser leaves this column at the laser's mode, even where it reshapes the beam. A parameter column: the options the laser lists bound it."
+    },
+    "beam_path": {
+     "type": "array",
+     "items": {"$ref": "#/$defs/beam_path_elements"}
+    },
+    "spot_diameter": {
+     "type": "number",
+     "description": "Diameter, in μm (quantity spot_diameter), of the laser spot in the plane the sample is irradiated in -- the target surface for an ablation, the beam's diameter where it crosses the liquid (its waist when the focus lies in the liquid), as the paper gives it, for a fragmentation -- if reported. A focal (waist) diameter stated for a target placed away from the focus is not this column. Distinct from beam_diameter, which is the beam at the laser output. Record the number the paper gives, whatever it means by it; most papers do not say, and no convention is assumed here. If the paper does define it and it is not 1/e^2 -- FWHM, D86, or a measured crater diameter -- say so in notes, because for a Gaussian spot those differ from a 1/e^2 diameter by up to a factor of two. Under an axicon it is the central lobe's diameter, never computed from the base angle; the lobe's diameter to the first zero is about 2.1 times its FWHM. Do not compute it from the reported fluence and pulse energy: papers usually computed the fluence from an assumed spot, so the result is circular. For femtosecond pulses in a liquid the figure is contested, since self-focusing and filamentation move the effective focus off the geometric one, so treat it as nominal. Must be greater than 0 and less than 100000."
+    },
+    "pulse_fluence": {
+     "type": "number",
+     "description": "Laser fluence at the sample surface, in J/cm² (quantity fluence), if reported. Record the number the paper gives, and say in notes whether it is the peak or the average fluence, since for a Gaussian spot the two differ by a factor of two. Under an axicon the central lobe holds a small share of the pulse, so the whole pulse energy over the lobe's area is not the lobe's fluence; say in notes which the paper gives. Must be greater than 0."
+    },
+    "ablation": {"$ref": "#/$defs/ablations"},
+    "fragmentation": {"$ref": "#/$defs/fragmentations"},
+    "feedstock": {
+     "type": "array",
+     "items": {"$ref": "#/$defs/feedstock_colloids"}
+    },
+    "synthesis_medium": {
+     "type": "integer",
+     "x-shared": "liquid_media",
+     "description": "The liquid in the vessel during irradiation, without the particles, including anything added before irradiation (salt, surfactant, acid or base for pH). A colloid used as is: the colloid's own phase. Diluted or mixed: the final mixture, each additive scaled by the volume share of the liquid it came in, e.g. a colloid in 1 mM citrate diluted 1:1 with water gives water + citrate 0.5 mM. \"Calculate from feedstock\" does this when the feedstock fills the vessel."
+    },
+    "colloids": {
+     "type": "array",
+     "items": {"$ref": "#/$defs/colloids"}
+    },
+    "postprocessing_steps": {
+     "type": "array",
+     "items": {"$ref": "#/$defs/postprocessing_steps"}
+    },
+    "entrance_mat": {
+     "type": "integer",
+     "x-shared": "materials",
+     "description": "Material of entrance glass through which the laser beam is irradiated into the liquid."
+    },
+    "free_surf_entrance": {
+     "type": "boolean",
+     "description": "Whether the laser beam enters the liquid through its free surface (from top to bottom); must be false when entrance_mat_id is set."
+    },
+    "pumping_gas": {
+     "type": "integer",
+     "x-shared": "gases",
+     "description": "Gas the medium was purged or pumped with, if any."
+    },
+    "pumping_flow_rate": {
+     "type": "number",
+     "description": "Flow rate of the pumping gas, in mL/min (quantity gas_flow_rate), if recorded. A standard flow and an actual flow are stored alike: 1 sccm is entered as 1 mL/min, 1 slm as 1000. Must be greater than 0."
+    },
+    "pumping_duration": {
+     "type": "number",
+     "description": "Duration the pumping gas was flowed for, if recorded. Only meaningful when pumping_during_processing is false -- otherwise pumping implicitly spans the whole processing duration."
+    },
+    "pumping_during_processing": {
+     "type": "boolean",
+     "description": "Whether the pumping gas was flowing during laser processing itself. False means pumping was done before processing started."
+    }
+   },
+   "required": ["id", "article_id", "laser", "synthesis_medium", "free_surf_entrance"],
+   "additionalProperties": false,
+   "oneOf": [
+    {
+     "required": ["ablation"]
+    },
+    {
+     "required": ["fragmentation"]
+    }
+   ]
+  },
+  "feedstock_colloids": {
+   "type": "object",
+   "properties": {
+    "colloid": {
+     "type": "integer",
+     "x-document": "colloids",
+     "description": "Colloid in the vessel during irradiation: a stock of this article, or the product of another of its experiments."
+    },
+    "fraction": {
+     "type": "number",
+     "description": "Share of the final volume in the vessel: diluted 10-fold is 0.1; 1 part colloid + 4 parts water is 0.2. If the paper names the order (water:colloid 1:4), follow it. A bare \"1:4\" is read as colloid:diluent, 0.2, and marked \"inferred\". If the paper gives a final concentration or a molar ratio instead, convert it using the stocks' concentrations, mark the value \"inferred\", and quote the paper's statement in the note. If the paper states no share at all, enter the likely value (1 for \"the colloid was irradiated\") and mark it \"assumed\"."
+    }
+   },
+   "required": ["colloid", "fraction"],
+   "additionalProperties": false
+  },
+  "fragmentations": {
+   "type": "object",
+   "properties": {
+    "volume": {
+     "type": "number",
+     "description": "Volume of liquid, in mL (quantity volume). For a setup circulating through a buffer volume, the total of cuvette, buffer and pipes. Must be greater than 0."
+    },
+    "duration": {
+     "type": "number",
+     "description": "Fragmentation duration for a single run."
+    },
+    "stirring": {
+     "type": "boolean",
+     "description": "Whether liquid was stirred during fragmentation (e.g. by magnetic stirrer)."
+    }
+   },
+   "required": [],
+   "additionalProperties": false
+  },
+  "gases": {
+   "type": "object",
+   "properties": {
+    "base_gas": {
+     "type": "integer",
+     "x-shared": "base_gases",
+     "description": "Base gas this row specifies a manufacturer/purity for."
+    }
+   },
+   "required": ["base_gas"],
+   "additionalProperties": false
+  },
+  "instruments": {
+   "type": "object",
+   "properties": {
+    "instrument_type": {
+     "type": "string",
+     "description": "Kind of device this is. The only required column: a device whose type is unknown is not a recordable instrument."
+    }
+   },
+   "required": ["instrument_type"],
+   "additionalProperties": false
+  },
+  "liquid_media": {
+   "type": "object",
+   "properties": {
+    "constituents": {
+     "type": "array",
+     "items": {"$ref": "#/$defs/liquid_medium_constituents"}
+    },
+    "fraction_type": {
+     "type": "string",
+     "description": "Basis the constituent fractions are expressed in, e.g. mass, volume, molar."
+    },
+    "additives": {
+     "type": "array",
+     "items": {"$ref": "#/$defs/liquid_medium_additives"}
+    },
+    "electrical_conductivity": {
+     "type": "number",
+     "description": "Electrical conductivity of the medium as prepared, before ablation, in μS/cm (quantity electrical_conductivity), at 25 C unless stated. Zero is allowed for a pure nonpolar liquid."
+    },
+    "ph": {
+     "type": "number",
+     "description": "pH of this liquid as prepared or set, as the paper gives it. Empty when none is given. From -2 to 16."
+    }
+   },
+   "required": [],
+   "additionalProperties": false
+  },
+  "liquid_medium_additives": {
+   "type": "object",
+   "properties": {
+    "material": {
+     "type": "integer",
+     "x-shared": "materials",
+     "description": "Material dissolved or suspended in the medium, in addition to its liquid constituents, e.g. NaCl for Au NPs synthesis."
+    },
+    "concentration": {
+     "type": "number",
+     "description": "Concentration of the additive in this medium, in the unit of the quantity concentration_quantity_id names: μM, mg/L, or % of the whole medium. Empty when the paper gives none."
+    },
+    "concentration_quantity": {
+     "type": "string",
+     "description": "Quantity the concentration is stored in: molar_concentration, solute_mass_concentration, solute_mass_fraction or solute_volume_fraction, as column_quantity_registry lists them. Set exactly when the concentration is; its bounds bound the concentration."
+    }
+   },
+   "required": ["material"],
+   "additionalProperties": false
+  },
+  "liquid_medium_constituents": {
+   "type": "object",
+   "properties": {
+    "liquid": {
+     "type": "integer",
+     "x-shared": "liquids",
+     "description": "Liquid this constituent is."
+    },
+    "fraction": {
+     "type": "number",
+     "description": "For any liquid_medium_id all values must sum up to 1.0."
+    }
+   },
+   "required": ["liquid", "fraction"],
+   "additionalProperties": false
+  },
+  "liquids": {
+   "type": "object",
+   "properties": {
+    "base_liquid": {
+     "type": "integer",
+     "x-shared": "base_liquids",
+     "description": "Base liquid this row specifies a manufacturer/purity for."
+    }
+   },
+   "required": ["base_liquid"],
+   "additionalProperties": false
+  },
+  "manufacturers": {
+   "type": "object",
+   "properties": {
+    "title": {"type": "string", "description": "Manufacturer name."},
+    "country": {
+     "type": "string",
+     "description": "Country the manufacturer is based in."
+    },
+    "website": {
+     "type": "string",
+     "description": "Canonicalized manufacturer website URL."
+    },
+    "city": {
+     "type": "string",
+     "description": "City in which the manufacturer is based."
+    },
+    "state_or_region": {
+     "type": "string",
+     "description": "State or region in which the manufacturer is based."
+    }
+   },
+   "required": ["title", "country"],
+   "additionalProperties": false
+  },
+  "materials": {
+   "type": "object",
+   "properties": {
+    "base_material": {
+     "type": "integer",
+     "x-shared": "base_materials",
+     "description": "Base material this row specifies a manufacturer/purity for."
+    }
+   },
+   "required": ["base_material"],
+   "additionalProperties": false
+  },
+  "measured_properties": {
+   "type": "object",
+   "properties": {
+    "technique": {
+     "type": "string",
+     "description": "Technique that produced this value, or NULL where the article states a number without saying how it was measured. Nullable unlike its siblings' because a stated value with no method is ordinary rather than malformed, and inventing one would be fabricating data."
+    },
+    "instrument": {
+     "type": "integer",
+     "x-shared": "instruments",
+     "description": "Device the value was measured on, if the article names one."
+    },
+    "component": {
+     "type": "string",
+     "description": "The part of a composite particle the value describes, e.g. a core-shell's shell thickness; NULL for the whole particle or the whole sample. It must be one shape_component_registry lists for the subject's own shape, in the quantity it names (check_particle_component()). Part of the row's identity, and matched by measured_property_redundancy()."
+    },
+    "quantity": {
+     "type": "string",
+     "description": "What the value is, e.g. band_gap or hydrodynamic_diameter. Carries the unit and, through quantities.value_min/value_max, the legal range that the retired per-column CHECK constraints used to carry."
+    },
+    "weighting_quantity": {
+     "type": "string",
+     "description": "The ordinate the statistic was taken over, e.g. particle_count for a number-weighted mean or scattering_intensity for an intensity-weighted one. This is what distinguishes a TEM or NTA number-mean from a DLS intensity-mean. NULL for a quantity that is not among its technique's x quantities, such as a band gap, to which no weighting applies (check_technique_compatibility()); may be NULL for one whose technique has a single weighting, such as a zeta potential, which ELS weights by scattering intensity alone and NULL then implies. Diameters conventionally name it."
+    },
+    "statistic": {
+     "type": "string",
+     "description": "Which number of the quantity this is -- mean, peak, onset. Paired with quantity_id it is what a form slot resolves against."
+    },
+    "value": {
+     "type": "number",
+     "description": "The measured number itself, in its quantity's canonical unit. Validated against its quantity's bounds, or as a width where its statistic is a spread, by check_measured_value_in_range(), and re-checked by revalidate_measured_properties() when the bounds or the spread flag change; not against is_integer, which declares a curve axis's values."
+    }
+   },
+   "required": ["quantity", "statistic", "value"],
+   "additionalProperties": false
+  },
+  "measurement_curves": {
+   "type": "object",
+   "properties": {
+    "technique": {
+     "type": "string",
+     "description": "Technique that produced this curve. Constrained against j_techniques_outputs, the two per-axis quantity relations and j_instrument_types_techniques by check_technique_compatibility()."
+    },
+    "instrument": {
+     "type": "integer",
+     "x-shared": "instruments",
+     "description": "Device the curve was recorded on, if the article names one."
+    },
+    "x_quantity": {
+     "type": "string",
+     "description": "What the x array means, e.g. wavelength or two_theta. Carries the unit, the dtype and the digitizer's step bounds."
+    },
+    "y_quantity": {
+     "type": "string",
+     "description": "What the y array means, e.g. extinction or intensity."
+    },
+    "x": {
+     "type": "array",
+     "items": {
+      "anyOf": [
+       {"type": "number"},
+       {
+        "type": "array",
+        "items": {"type": "number"}
+       }
+      ]
+     },
+     "description": "1D array of x values in the x quantity's canonical unit, elementwise paired with y. A single-valued curve is strictly monotone, rising or falling; its direction may record a sweep only on a loop_axis quantity, and carries no meaning elsewhere. Only an x quantity with loop_axis may turn (check_curve_x_order()). A magnetization loop is stored as one curve from its highest positive field, descending branch first, whichever branch the instrument measured first; it is closed only where its figure shows it closed. The storage order of a loop on any other loop_axis quantity is decided when that quantity is flagged. numeric[] rather than integer[] because one table serves keV, nm and degrees -- a whole-number quantity is a digitizer and editor convenience here, declared by quantities.is_integer, not a storage constraint."
+    },
+    "y": {
+     "type": "array",
+     "items": {
+      "anyOf": [
+       {"type": "number"},
+       {
+        "type": "array",
+        "items": {"type": "number"}
+       }
+      ]
+     },
+     "description": "1D array of y values, elementwise paired with x. For a size distribution, y is a density over ln d where the technique is dls and over d otherwise, unless the curve's notes name the other measure. For a zeta potential distribution, y is proportional to a density over zeta, as counts or a percentage per zeta class: the classes have equal width, because the Doppler frequency shift is linear in mobility and so in zeta. A distribution's mean, standard deviation and median are the moments and the half-area point of that density over x, whatever its scale; its mode and fwhm are read from y as stored: the x of its largest value, and the distance in x between its outermost half-maximum crossings."
+    },
+    "normalized": {
+     "type": "boolean",
+     "description": "Whether y's scale is relative and its absolute values cannot be recovered: normalized before publication, scaled to a class or bin width, as a percentage per size class is, or published without y values. Describes the array rather than the measurement conditions, which is why it sits here and not on a settings child."
+    }
+   },
+   "required": ["technique", "x_quantity", "y_quantity", "x", "y"],
+   "additionalProperties": false
+  },
+  "objectives": {
+   "type": "object",
+   "properties": {
+    "objective_type": {
+     "type": "string",
+     "description": "Type of objective, e.g. F-theta, plano-convex lens, bi-convex lens, cylindrical lens, off-axis parabolic mirror, axicon (refractive only)."
+    },
+    "focal_length": {
+     "type": "number",
+     "description": "Nominal catalogue focal length of the focusing optic, in mm (quantity focal_length), never corrected to the laser wavelength: Thorlabs LA1608 is 75 mm, although it is about 76.5 mm at 1064 nm. For a microscope objective, the effective focal length from the manufacturer's datasheet; without one, an infinity-corrected objective is tube-lens focal length / magnification, at 200 mm for Nikon, Thorlabs, Mitutoyo and Leica, 180 mm for Olympus and 165 mm for Zeiss, inferred; a finite (160 mm) objective is 160 mm / magnification, inferred; with no maker named, 200 mm / magnification, assumed. For an F-theta lens, its nominal f. For an off-axis parabolic mirror, its reflected (effective) focal length, not the parent focal length; for a spherical concave mirror, R/2 when only the radius is given, inferred. Never the working distance. NULL for an axicon, which states its base_angle instead. Must be greater than 0 and at most 10000."
+    },
+    "base_angle": {
+     "type": "number",
+     "description": "Nominal catalogue base (physical) angle α of an axicon, in degrees (quantity base_angle): the angle between its conical surface and its flat face, as Thorlabs AX251's is 1°. It does not depend on the laser wavelength. Never the beam's deviation angle or the Bessel beam's cone angle, which depend on the glass's index at the laser wavelength, nor a diffractive axicon's angle or period. An apex angle converts as (180° - apex)/2 and a half-apex angle as 90° - value, inferred. NULL for every other objective. Must be greater than 0 and less than 45."
+    }
+   },
+   "required": ["objective_type"],
+   "additionalProperties": false
+  },
+  "origin": {
+   "description": "The colloid's article, and the experiment that produced it (null for a stock the article owns itself).",
+   "type": "object",
+   "properties": {
+    "article_id": {"type": "integer"},
+    "experiment_id": {
+     "type": ["integer", "null"]
+    }
+   },
+   "required": ["article_id", "experiment_id"],
+   "additionalProperties": false
+  },
+  "particles": {
+   "type": "object",
+   "properties": {
+    "material": {
+     "type": "integer",
+     "x-shared": "materials",
+     "description": "Material this particle sample is made of. Particles are purchased or otherwise prepared feedstock, never a product of laser processing, so the material is always the one reported for the sample."
+    },
+    "average_size": {
+     "type": "number",
+     "description": "Average particle size, in nm (quantity particle_size), as specified or measured for this sample, if reported. Interpreted according to average_size_type_id. Must be greater than 0."
+    },
+    "average_size_type": {
+     "type": "string",
+     "description": "How this sample's average_size was determined or is defined, e.g. mean, median, mode diameter."
+    },
+    "size_min": {
+     "type": "number",
+     "description": "Lower bound, in nm (quantity particle_size), of the particle size range specified for this sample, if reported. A sieve fraction \"+N mesh\" gives it, from the opening the supplier states, otherwise from ASTM E11, inferred. Must be greater than 0 and not greater than size_max."
+    },
+    "size_max": {
+     "type": "number",
+     "description": "Upper bound, in nm (quantity particle_size), of the particle size range specified for this sample, if reported. A sieve fraction \"-N mesh\" gives it, from the opening the supplier states, otherwise from ASTM E11: -325 mesh is 45 μm, inferred. Must be greater than 0 and not less than size_min."
+    },
+    "measurement_curves": {
+     "type": "array",
+     "items": {"$ref": "#/$defs/measurement_curves"}
+    },
+    "size_distributions": {
+     "type": "array",
+     "items": {"$ref": "#/$defs/size_distributions"}
+    },
+    "elemental_compositions": {
+     "type": "array",
+     "items": {"$ref": "#/$defs/elemental_compositions"}
+    },
+    "shape": {
+     "type": "string",
+     "description": "Morphology of this powder's particles, as the article reports it."
+    },
+    "crystallite_size": {
+     "type": "number",
+     "description": "Crystallite size, in nm (quantity crystallite_size), from the Scherrer formula applied to an XRD peak. Must be greater than 0."
+    }
+   },
+   "required": [],
+   "additionalProperties": false
+  },
+  "postprocessing_steps": {
+   "type": "object",
+   "properties": {
+    "step": {
+     "type": "integer",
+     "description": "1-based position of this step in its experiment's post-processing, in the order performed. An experiment's steps run 1..n without gaps (check_ordinal_column())."
+    },
+    "centrifugation": {"$ref": "#/$defs/centrifugation_steps"},
+    "described": {"$ref": "#/$defs/described_steps"}
+   },
+   "required": ["step"],
+   "additionalProperties": false,
+   "oneOf": [
+    {
+     "required": ["centrifugation"]
+    },
+    {
+     "required": ["described"]
+    }
+   ]
+  },
+  "provenance": {
+   "description": "How each field of the row was obtained, by field name; a field absent here is stated in the article.",
+   "type": "object",
+   "additionalProperties": {
+    "type": "object",
+    "properties": {
+     "basis": {"type": "string"},
+     "technique": {"type": "string"}
+    },
+    "required": [],
+    "additionalProperties": false
+   }
+  },
+  "settings": {
+   "type": "object",
+   "properties": {
+    "parameter": {
+     "type": "string",
+     "description": "Parameter this setting records. One row per parameter per subject."
+    },
+    "value": {
+     "type": "number",
+     "description": "Value of a numeric parameter, in its quantity's unit. NULL on a text setting."
+    },
+    "option": {
+     "type": "string",
+     "description": "Chosen option of a text parameter. NULL on a numeric setting."
+    }
+   },
+   "required": ["parameter"],
+   "additionalProperties": false
+  },
+  "shared": {
+   "description": "Every shared row the documents reference, once, by table and then by id.",
+   "type": "object",
+   "properties": {
+    "base_gases": {
+     "type": "object",
+     "propertyNames": {"pattern": "^[0-9]+$"},
+     "additionalProperties": {"$ref": "#/$defs/base_gases"}
+    },
+    "base_liquids": {
+     "type": "object",
+     "propertyNames": {"pattern": "^[0-9]+$"},
+     "additionalProperties": {"$ref": "#/$defs/base_liquids"}
+    },
+    "base_materials": {
+     "type": "object",
+     "propertyNames": {"pattern": "^[0-9]+$"},
+     "additionalProperties": {"$ref": "#/$defs/base_materials"}
+    },
+    "gases": {
+     "type": "object",
+     "propertyNames": {"pattern": "^[0-9]+$"},
+     "additionalProperties": {"$ref": "#/$defs/gases"}
+    },
+    "instruments": {
+     "type": "object",
+     "propertyNames": {"pattern": "^[0-9]+$"},
+     "additionalProperties": {"$ref": "#/$defs/instruments"}
+    },
+    "liquid_media": {
+     "type": "object",
+     "propertyNames": {"pattern": "^[0-9]+$"},
+     "additionalProperties": {"$ref": "#/$defs/liquid_media"}
+    },
+    "liquids": {
+     "type": "object",
+     "propertyNames": {"pattern": "^[0-9]+$"},
+     "additionalProperties": {"$ref": "#/$defs/liquids"}
+    },
+    "manufacturers": {
+     "type": "object",
+     "propertyNames": {"pattern": "^[0-9]+$"},
+     "additionalProperties": {"$ref": "#/$defs/manufacturers"}
+    },
+    "materials": {
+     "type": "object",
+     "propertyNames": {"pattern": "^[0-9]+$"},
+     "additionalProperties": {"$ref": "#/$defs/materials"}
+    },
+    "objectives": {
+     "type": "object",
+     "propertyNames": {"pattern": "^[0-9]+$"},
+     "additionalProperties": {"$ref": "#/$defs/objectives"}
+    },
+    "particles": {
+     "type": "object",
+     "propertyNames": {"pattern": "^[0-9]+$"},
+     "additionalProperties": {"$ref": "#/$defs/particles"}
+    },
+    "target_position_ref_types": {
+     "type": "object",
+     "propertyNames": {"pattern": "^[0-9]+$"},
+     "additionalProperties": {"$ref": "#/$defs/target_position_ref_types"}
+    },
+    "targets": {
+     "type": "object",
+     "propertyNames": {"pattern": "^[0-9]+$"},
+     "additionalProperties": {"$ref": "#/$defs/targets"}
+    }
+   },
+   "additionalProperties": false
+  },
+  "size_distributions": {
+   "type": "object",
+   "properties": {
+    "sizes": {
+     "type": "array",
+     "items": {
+      "anyOf": [
+       {"type": "number"},
+       {
+        "type": "array",
+        "items": {"type": "number"}
+       }
+      ]
+     },
+     "description": "2D array of shape (n_bars, 2); each row is the [left, right] extent of one drawn bar, in the unit of x_quantity_id, as the figure draws it, rows ascending and not overlapping: the bin edges where bars touch, narrower than the bin where the figure leaves gaps between them. Where gaps separate the bars the bins' own width is not stored, so a count divided by a bar's width overstates a per-unit-x density by bin width / bar width. Rows written before schema change 0060 hold these extents rounded to whole units."
+    },
+    "size_counts": {
+     "type": "array",
+     "items": {
+      "anyOf": [
+       {"type": "number"},
+       {
+        "type": "array",
+        "items": {"type": "number"}
+       }
+      ]
+     },
+     "description": "Counts in arbitrary units."
+    },
+    "particles_counted": {
+     "type": "integer",
+     "description": "Number of particles the article says it measured to build this histogram, e.g. n = 312 from TEM images; of a component's, the particles it was measured on, satellites counting themselves, though a thickness histogram's bars may count several points on each. NULL when the article does not state it: the sum of size_counts is then the only estimate, and it is not recorded here. Replaces the particles_counted setting."
+    },
+    "technique": {
+     "type": "string",
+     "description": "Technique that produced this distribution. Replaces size_distribution_data_source_type_id, whose tem/sem/dls values were techniques spelled differently from the two other vocabularies that named the same things."
+    },
+    "instrument": {
+     "type": "integer",
+     "x-shared": "instruments",
+     "description": "Device the distribution was counted or measured on, if the article names one."
+    },
+    "component": {
+     "type": "string",
+     "description": "The part of a composite particle the histogram measures, e.g. the cores of core-shell particles; NULL for the whole particle. It must be one shape_component_registry lists for the subject's own shape, in the x quantity it names (check_particle_component()). Part of the row's identity."
+    },
+    "x_quantity": {
+     "type": "string",
+     "description": "What the bar extents in sizes measure: a geometric diameter counted off a micrograph, or a hydrodynamic diameter from light scattering. The two differ systematically, and before this column both were simply sizes."
+    },
+    "y_quantity": {
+     "type": "string",
+     "description": "What the counts represent, e.g. particle_count, volume_fraction. Replaces size_distribution_signal_type_id."
+    }
+   },
+   "required": ["sizes", "size_counts", "technique", "x_quantity", "y_quantity"],
+   "additionalProperties": false
+  },
+  "target_constituents": {
+   "type": "object",
+   "properties": {
+    "material": {
+     "type": "integer",
+     "x-shared": "materials",
+     "description": "Material this constituent contributes to the target, for a bulk solid constituent. Exactly one of material_id and particle_id is set."
+    },
+    "particle": {
+     "type": "integer",
+     "x-shared": "particles",
+     "description": "Particle sample this constituent contributes to the target, for a target pressed or otherwise prepared from a powder. Exactly one of material_id and particle_id is set."
+    },
+    "fraction": {
+     "type": "number",
+     "description": "For any target_id all values must sum up to 1.0"
+    }
+   },
+   "required": ["fraction"],
+   "additionalProperties": false,
+   "oneOf": [
+    {
+     "required": ["material"]
+    },
+    {
+     "required": ["particle"]
+    }
+   ]
+  },
+  "target_position_ref_types": {
+   "type": "object",
+   "properties": {
+    "reference_type": {
+     "type": "string",
+     "description": "Method, used for measuring distances between objective and target surface"
+    },
+    "relative": {
+     "type": "boolean",
+     "description": "False when distance is measured from the objective to the target. True when distance is measured from some other reference point, e.g. the position of maximum productivity."
+    }
+   },
+   "required": ["reference_type", "relative"],
+   "additionalProperties": false
+  },
+  "target_positions": {
+   "type": "object",
+   "properties": {
+    "target_position_ref_type": {
+     "type": "integer",
+     "x-shared": "target_position_ref_types",
+     "description": "Method, used for measuring distance between objective and target surface"
+    },
+    "position": {
+     "type": "number",
+     "description": "Distance, in mm (quantity target_position), of the target surface from the reference target_position_ref_type names. For a relative reference it is signed, negative closer to the focusing optic: \"focus 2 mm inside the target, behind its surface\" is -2 relative to the geometric focus. For \"distance to objective\" it is a positive distance; under an axicon, from its tip, or from the face the paper names. Recorded as the paper states it; a refraction correction the paper made for the liquid layer goes in notes. Must be greater than -1000 and less than 1000."
+    }
+   },
+   "required": ["target_position_ref_type"],
+   "additionalProperties": false
+  },
+  "targets": {
+   "type": "object",
+   "properties": {
+    "target_prep_type": {
+     "type": "string",
+     "description": "Target preparation technique used, if known."
+    },
+    "fraction_type": {
+     "type": "string",
+     "description": "Basis the constituent fractions are expressed in, e.g. mass, volume, molar."
+    },
+    "constituents": {
+     "type": "array",
+     "items": {"$ref": "#/$defs/target_constituents"}
+    }
+   },
+   "required": [],
+   "additionalProperties": false
+  }
+ }
+}
