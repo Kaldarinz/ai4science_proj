@@ -12,8 +12,11 @@ Results and interpretation are in `results/verifier/RESULTS.md` (ban 3).
 HW2 report, subgoal tree, authorship and clean-checkout commands:
 `results/verifier/REPORT.md`; actual local reproduction logs:
 `results/verifier/reproduction/`. Anton has reviewed and curated the report;
-operator-created tags remain pending. A fresh dependency installation has not
-been verified.
+release identifiers are `exp-verifier` at `776a2fe` and `hw2` at the submission
+commit. Remote publication remains an operator step. Fresh dependency installation and the
+complete experiment were verified on committed package `bbd6f39` using its own
+new venv; evidence is in `results/verifier/fresh_environment/`. The original
+`reproduction/` evidence records the earlier shared-environment check.
 
 From the project root, with the dependencies in `requirements.txt`:
 

@@ -1,6 +1,6 @@
 # HW2 report: verifying nanoparticle-size series and their shape sensitivity
 
-[порождено: gpt-6.1-sol] Report reviewed and curated by Anton. No `hw2` or `exp-verifier` tag has been created at this checkpoint. This is not yet a submission-ready package.
+[порождено: gpt-6.1-sol] Report reviewed and curated by Anton. Fresh-environment verification and numerical reproduction are complete. Release identifiers are listed below; remote publication and instructor access remain operator responsibilities.
 
 [источник: course `lectures/hw_2/REPORT_TEMPLATE.md`, §§1–9] Report structure follows the course template. Submission requirements: `lectures/hw_2/ASSIGNMENT.md`, §§3, 6–7; assessment criteria: `lectures/hw_2/RUBRIC.md`. The submission checklist below is a **student self-check**.
 
@@ -9,8 +9,8 @@
 | Direction | Computational; week 7 direction B |
 | Verifier | Nine property tests, independent data/series contract, reference and checker-corruption tests |
 | Project | <https://github.com/Kaldarinz/ai4science_proj> — private; instructor access must be arranged |
-| Submission tag | `hw2` — planned, not yet created or tested |
-| Experiment tag | `exp-verifier` — planned; original sweep source is exactly captured by `776a2fe` |
+| Submission tag | `hw2` — this submission package |
+| Experiment tag | `exp-verifier` — original sweep source captured by `776a2fe` |
 | One-command verdict | `.venv/bin/python -m pytest checks/verifier -q` — identical to `AGENTS.md` §1 |
 
 ## 1. Task and place of the verifier
@@ -91,7 +91,7 @@ Attempt counts below describe **recorded runs**, not an invented count of every 
 | Public contract/properties/reference | First recorded completed short suite after the raw gate: 65 pass; later complete verifier: 82 pass. No separate failed property run on correct main is recorded. | No sequence of three recorded property failures. |
 | Sampling/inference | Initial smoke/full completed; bookkeeping issue found during review, regression added; same seeds repeated exactly. Initial artifacts retained. | Changed bookkeeping, not experiment; did not select a favorable run. |
 | Mutation detection | One planted candidate, one targeted failing run, then passing correct-code checks; defect committed unchanged. | First candidate detected; no need for three candidates. |
-| Reproduction | One clean local clone; verifier and all stages pass; separate bug worktree: 1 failed, 81 passed. | No failed reproduction retry. |
+| Reproduction | Initial shared-environment clone and subsequent fresh-venv clone: verifier and all stages pass; separate bug worktrees: 1 failed, 81 passed. | No failed reproduction retry. |
 
 ## 5. Execution results and uncertainty
 
@@ -136,7 +136,7 @@ Main never contained the defect. “After” is the original correct parent `776
 
 ## 7. Reproduction
 
-[порождено: gpt-6.1-sol] Once the submission tag is created/pushed and instructor access is arranged:
+[порождено: gpt-6.1-sol] From the published submission tag, with instructor access arranged:
 
 ```sh
 git clone git@github.com:Kaldarinz/ai4science_proj.git hw2-check
@@ -171,7 +171,7 @@ test "$status" -eq 1
 
 Expected assertion: point-order property; **1 failed, 81 passed**, not an import/setup error. The full clone must include the bug commit (ordinary clone fetches the published bug branch). Do not merge the defect into main.
 
-**Actually tested :** a clean local clone at `c50a2ff`, with the existing project venv. Tests passed in about 2.2 s; full invocation about 3.4 s. Its summary was byte-identical; every scientific per-seed field matched the original, excluding only git commit and elapsed time. Original sweep source fingerprints match git objects at `776a2fe` exactly. Fresh manifests/artifact hashes were also checked. Logs, commands, expected/actual exits and limitations: `reproduction/manifest.json` and accompanying text files. No network access or final-tag reproduction was certified.
+**Actually tested:** the initial local clone at `c50a2ff` reused the existing project venv; its evidence remains in `reproduction/`. Subsequently, Anton cloned committed package `bbd6f39`, created a new Python 3.12.3 venv and installed `requirements.txt`. Every requirement pin, fresh-venv imports and `pip check` were verified. The fresh environment passed 82 verifier tests, all 267 regression tests and dry → smoke → full. Its summary was byte-identical; all 120 per-seed scientific rows matched the original, excluding only git commit and elapsed time. The bug commit produced the expected 1 failed / 81 passed under the same fresh environment. Actual outputs, installed package inventory, commands, source/artifact fingerprints and comparisons are in `fresh_environment/manifest.json` and accompanying files. Original sweep source fingerprints still match git objects at `776a2fe` exactly; no original numerical artifact was overwritten. These archives document local pre-tag checks. Validation of the release-tag checkout and live instructor access are separate checks.
 
 ## 8. Limitations and remaining submission checks
 
@@ -184,10 +184,10 @@ Expected assertion: point-order property; **1 failed, 81 passed**, not an import
 - Shared experiments and paired models are dependent. Five-seed intervals describe simulation variation, not population-level experimental confidence. Retaining all cases and Holm adjustment does not repair an incorrect physical noise model.
 - The raw size upper bound was removed **after** a failed run; original evidence and curator authorization are disclosed rather than presenting the revised check as untouched preregistration.
 
-Student submission checks still open:
+Student submission checklist:
 
-- [ ] Fresh dependency installation is tested, or its untested status remains explicit; current reproduction reused an installed pinned venv.
-- [ ] Report/package changes are committed; `hw2` and `exp-verifier` tags are explicitly authorized/created/pushed by the operator, then the final tag is checked.
+- [x] Fresh dependency installation and complete numerical reproduction tested on committed package `bbd6f39`; evidence in `fresh_environment/`.
+- [ ] Publish the release commit and the `hw2` / `exp-verifier` tags to the private remote, and verify their remote visibility.
 - [ ] Instructor access and permission to share the numeric snapshot are confirmed. Private status is not, by itself, a license check. No PDF redistribution is needed.
 - [ ] Course student self-check `check_week6.py --run` is run if the starter script is obtained; it was not found in the available course repository and was **not** run here.
 
@@ -208,6 +208,6 @@ Student submission checks still open:
 | Snapshot/schema | `[источник]` | ablation_db data curated by Anton, who is responsible for data quality; snapshot/schema export committed `9db97cf` | Pinned checksum/schema; not independent paper-level correctness or license certification |
 | Original JSON/CSV/test logs | `[источник]` | Actual Python/pytest executions; recorded code/environment | Manifest hashes and preserved failing/successful outputs |
 | `report_metrics.csv` | `[порождено]` (aggregation code, not invented observations) | gpt-6.1-sol; Python aggregation of original runs | Original summary fields preserved; sample SD across seeds, ddof=1; Δ SD/√5 matches original SE |
-| `reproduction/` logs and manifest | `[источник]` | Actual local clone/test/runner executions | Expected exits, exact scientific CSV comparison, source/artifact hashes |
+| `reproduction/` and `fresh_environment/` logs/manifests | `[источник]` | Actual local clone/test/runner executions; fresh venv installation performed by Anton | Expected exits, package inventory/pins, exact scientific CSV comparison, source/artifact hashes |
 
 The database's physical correctness is not certified; no instructor verdict is claimed, and the operator's publication steps remain incomplete.

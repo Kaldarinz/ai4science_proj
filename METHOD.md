@@ -217,7 +217,9 @@ or resampling acceptance thresholds have been changed. Implementation status
 and environment wording in §4–§5 now reflect the installed verifier. The
 verifier/resampling code was committed as `776a2fe` before the deliberate-error
 demonstration. The demonstration evidence/documentation was committed as
-`c50a2ff`; subsequent HW2 report/packaging changes remain uncommitted for review.
+`c50a2ff`; the curated HW2 report/package was committed as `bbd6f39`.
+The subsequent fresh-environment evidence/status updates are included in this
+submission package.
 The initial verifier regression suite passed 250 tests.
 Subsequent resampling implementation tests and execution status are recorded
 in `results/verifier/attempts.md`; the claim-comparison pipeline remains disabled.
@@ -259,8 +261,14 @@ the scientific rows and summary reproduced exactly. A separate bug worktree
 failed the existing order property. Commands, outputs and scope are recorded in
 `results/verifier/reproduction/`. The original sweep source hashes match
 `776a2fe` exactly; later documentation does not retroactively change those runs.
-Reproduction reused the installed pinned venv, not a fresh dependency install;
-no final submission tag or remote-access certification has been made.
+That initial reproduction reused the installed pinned venv. Subsequently,
+Anton installed requirements in a new venv of a clean local clone at `bbd6f39`.
+The verifier, full regression, gated experiment and planted-error detection
+were repeated with that environment; the scientific outputs reproduced exactly.
+Evidence and package inventory: `results/verifier/fresh_environment/`.
+No method/threshold/code/data changes were made during this reproduction.
+Release identifiers are `exp-verifier` at `776a2fe` and `hw2` at the submission
+commit. Remote publication and instructor access are separate operator steps.
 
 ## 10. Limitations
 

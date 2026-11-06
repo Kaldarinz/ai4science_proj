@@ -1,0 +1,727 @@
+{
+  "step": "smoke",
+  "status": "pass",
+  "snapshot_sha256": "c5380620d896237ad655bfde0ce166d3f638b84a3e9b0b996cc09226f6b8303f",
+  "baseline_commit": "e9fecd3",
+  "series": [
+    {
+      "series_id": "80094-s1",
+      "article_id": 80094,
+      "n_points": 6,
+      "x_quantity": "pulse_energy"
+    },
+    {
+      "series_id": "80094-s2",
+      "article_id": 80094,
+      "n_points": 6,
+      "x_quantity": "pulse_energy"
+    },
+    {
+      "series_id": "534424-s1",
+      "article_id": 534424,
+      "n_points": 2,
+      "x_quantity": "pulse_energy"
+    },
+    {
+      "series_id": "534494-s1",
+      "article_id": 534494,
+      "n_points": 2,
+      "x_quantity": "fluence"
+    },
+    {
+      "series_id": "535841-s1",
+      "article_id": 535841,
+      "n_points": 5,
+      "x_quantity": "fluence"
+    },
+    {
+      "series_id": "537995-s1",
+      "article_id": 537995,
+      "n_points": 2,
+      "x_quantity": "fluence"
+    },
+    {
+      "series_id": "537995-s2",
+      "article_id": 537995,
+      "n_points": 2,
+      "x_quantity": "fluence"
+    },
+    {
+      "series_id": "538366-s1",
+      "article_id": 538366,
+      "n_points": 9,
+      "x_quantity": "fluence"
+    },
+    {
+      "series_id": "538366-s2",
+      "article_id": 538366,
+      "n_points": 8,
+      "x_quantity": "fluence"
+    },
+    {
+      "series_id": "538366-s3",
+      "article_id": 538366,
+      "n_points": 3,
+      "x_quantity": "fluence"
+    }
+  ],
+  "exclusions": [
+    {
+      "article_id": 80079,
+      "experiment_ids": [
+        536974
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='geometric_diameter', technique='tem', weighting='particle_count', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 80079,
+      "experiment_ids": [
+        536985
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='geometric_diameter', technique='tem', weighting='particle_count', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 80091,
+      "experiment_ids": [
+        535643
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='geometric_diameter', technique='tem', weighting='particle_count', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 80110,
+      "experiment_ids": [
+        531344
+      ],
+      "reason": "no_size",
+      "detail": "no usable size location measurement"
+    },
+    {
+      "article_id": 80134,
+      "experiment_ids": [
+        535604
+      ],
+      "reason": "no_size",
+      "detail": "no usable size location measurement"
+    },
+    {
+      "article_id": 532464,
+      "experiment_ids": [
+        535756
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='geometric_diameter', technique='tem', weighting='particle_count', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 532516,
+      "experiment_ids": [
+        538943
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='hydrodynamic_diameter', technique='dls', weighting='particle_count', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 532516,
+      "experiment_ids": [
+        538980
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='hydrodynamic_diameter', technique='dls', weighting='particle_count', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 532673,
+      "experiment_ids": [
+        536299
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='geometric_diameter', technique='tem', weighting='particle_count', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 532755,
+      "experiment_ids": [
+        539444
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='geometric_diameter', technique='sem', weighting='particle_count', component='satellite')/mean: fewer than two points"
+    },
+    {
+      "article_id": 532755,
+      "experiment_ids": [
+        539444
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='hydrodynamic_diameter', technique='nta', weighting='particle_count', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 532982,
+      "experiment_ids": [
+        537182
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='geometric_diameter', technique='sem', weighting='particle_count', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 532982,
+      "experiment_ids": [
+        537210
+      ],
+      "reason": "no_size",
+      "detail": "no usable size location measurement"
+    },
+    {
+      "article_id": 532982,
+      "experiment_ids": [
+        537247
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='geometric_diameter', technique='sem', weighting='particle_count', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 532982,
+      "experiment_ids": [
+        537265
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='geometric_diameter', technique='sem', weighting='particle_count', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 534424,
+      "experiment_ids": [
+        537045
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='geometric_diameter', technique='tem', weighting='particle_count', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 534424,
+      "experiment_ids": [
+        537057
+      ],
+      "reason": "no_size",
+      "detail": "no usable size location measurement"
+    },
+    {
+      "article_id": 534424,
+      "experiment_ids": [
+        537068
+      ],
+      "reason": "no_size",
+      "detail": "no usable size location measurement"
+    },
+    {
+      "article_id": 534424,
+      "experiment_ids": [
+        537079
+      ],
+      "reason": "no_size",
+      "detail": "no usable size location measurement"
+    },
+    {
+      "article_id": 534424,
+      "experiment_ids": [
+        537090
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='geometric_diameter', technique='tem', weighting='particle_count', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 534424,
+      "experiment_ids": [
+        537105
+      ],
+      "reason": "no_size",
+      "detail": "no usable size location measurement"
+    },
+    {
+      "article_id": 534424,
+      "experiment_ids": [
+        537117
+      ],
+      "reason": "no_size",
+      "detail": "no usable size location measurement"
+    },
+    {
+      "article_id": 534424,
+      "experiment_ids": [
+        537129
+      ],
+      "reason": "no_size",
+      "detail": "no usable size location measurement"
+    },
+    {
+      "article_id": 534424,
+      "experiment_ids": [
+        537139
+      ],
+      "reason": "no_size",
+      "detail": "no usable size location measurement"
+    },
+    {
+      "article_id": 534424,
+      "experiment_ids": [
+        537163
+      ],
+      "reason": "no_size",
+      "detail": "no usable size location measurement"
+    },
+    {
+      "article_id": 534494,
+      "experiment_ids": [
+        535443
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='geometric_diameter', technique='tem', weighting='particle_count', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 534494,
+      "experiment_ids": [
+        535486
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='geometric_diameter', technique='tem', weighting='particle_count', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 534494,
+      "experiment_ids": [
+        535500
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='geometric_diameter', technique='tem', weighting='particle_count', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 534494,
+      "experiment_ids": [
+        535514
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='geometric_diameter', technique='tem', weighting='particle_count', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 534494,
+      "experiment_ids": [
+        535528
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='geometric_diameter', technique='tem', weighting='particle_count', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 534569,
+      "experiment_ids": [
+        534993
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='geometric_diameter', technique='tem', weighting='particle_count', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 534569,
+      "experiment_ids": [
+        534993
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='hydrodynamic_diameter', technique='dls', weighting='scattering_intensity', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 534569,
+      "experiment_ids": [
+        535010
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='geometric_diameter', technique='tem', weighting='particle_count', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 534569,
+      "experiment_ids": [
+        535010
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='hydrodynamic_diameter', technique='dls', weighting='scattering_intensity', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 534569,
+      "experiment_ids": [
+        535027
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='geometric_diameter', technique='tem', weighting='particle_count', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 534569,
+      "experiment_ids": [
+        535027
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='hydrodynamic_diameter', technique='dls', weighting='scattering_intensity', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 534569,
+      "experiment_ids": [
+        535044
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='hydrodynamic_diameter', technique='dls', weighting='scattering_intensity', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 534569,
+      "experiment_ids": [
+        535060
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='hydrodynamic_diameter', technique='dls', weighting='scattering_intensity', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 534569,
+      "experiment_ids": [
+        535076
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='hydrodynamic_diameter', technique='dls', weighting='scattering_intensity', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 534569,
+      "experiment_ids": [
+        535092
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='hydrodynamic_diameter', technique='dls', weighting='scattering_intensity', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 534569,
+      "experiment_ids": [
+        535108
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='hydrodynamic_diameter', technique='dls', weighting='scattering_intensity', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 534569,
+      "experiment_ids": [
+        535124
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='geometric_diameter', technique='tem', weighting='particle_count', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 534569,
+      "experiment_ids": [
+        535124
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='hydrodynamic_diameter', technique='dls', weighting='scattering_intensity', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 534569,
+      "experiment_ids": [
+        535146
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='hydrodynamic_diameter', technique='dls', weighting='scattering_intensity', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 535841,
+      "experiment_ids": [
+        536789
+      ],
+      "reason": "no_size",
+      "detail": "no usable size location measurement"
+    },
+    {
+      "article_id": 535841,
+      "experiment_ids": [
+        536800
+      ],
+      "reason": "no_size",
+      "detail": "no usable size location measurement"
+    },
+    {
+      "article_id": 535841,
+      "experiment_ids": [
+        536845
+      ],
+      "reason": "no_size",
+      "detail": "no usable size location measurement"
+    },
+    {
+      "article_id": 537357,
+      "experiment_ids": [
+        539842
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='geometric_diameter', technique='tem', weighting='particle_count', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 537357,
+      "experiment_ids": [
+        539858
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='geometric_diameter', technique='tem', weighting='particle_count', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 537357,
+      "experiment_ids": [
+        539875
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='geometric_diameter', technique='tem', weighting='particle_count', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 537357,
+      "experiment_ids": [
+        539892
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='geometric_diameter', technique='tem', weighting='particle_count', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 537357,
+      "experiment_ids": [
+        539911
+      ],
+      "reason": "no_size",
+      "detail": "no usable size location measurement"
+    },
+    {
+      "article_id": 537357,
+      "experiment_ids": [
+        539928
+      ],
+      "reason": "no_size",
+      "detail": "no usable size location measurement"
+    },
+    {
+      "article_id": 537357,
+      "experiment_ids": [
+        539945
+      ],
+      "reason": "no_size",
+      "detail": "no usable size location measurement"
+    },
+    {
+      "article_id": 537357,
+      "experiment_ids": [
+        539962
+      ],
+      "reason": "no_size",
+      "detail": "no usable size location measurement"
+    },
+    {
+      "article_id": 537357,
+      "experiment_ids": [
+        539979
+      ],
+      "reason": "no_size",
+      "detail": "no usable size location measurement"
+    },
+    {
+      "article_id": 537357,
+      "experiment_ids": [
+        539996
+      ],
+      "reason": "no_size",
+      "detail": "no usable size location measurement"
+    },
+    {
+      "article_id": 537357,
+      "experiment_ids": [
+        540015
+      ],
+      "reason": "no_size",
+      "detail": "no usable size location measurement"
+    },
+    {
+      "article_id": 537357,
+      "experiment_ids": [
+        540174
+      ],
+      "reason": "no_size",
+      "detail": "no usable size location measurement"
+    },
+    {
+      "article_id": 538110,
+      "experiment_ids": [
+        539507
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='geometric_diameter', technique='tem', weighting='particle_count', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 538197,
+      "experiment_ids": [
+        539611
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='hydrodynamic_diameter', technique='dls', weighting='scattering_intensity', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 538197,
+      "experiment_ids": [
+        539627
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='hydrodynamic_diameter', technique='dls', weighting='scattering_intensity', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 538197,
+      "experiment_ids": [
+        539642,
+        539770
+      ],
+      "reason": "mixed_x",
+      "detail": "SizeKind(quantity='hydrodynamic_diameter', technique='dls', weighting='scattering_intensity', component=None)/mean: no common fluence or energy"
+    },
+    {
+      "article_id": 538197,
+      "experiment_ids": [
+        539658,
+        539785
+      ],
+      "reason": "mixed_x",
+      "detail": "SizeKind(quantity='hydrodynamic_diameter', technique='dls', weighting='scattering_intensity', component=None)/mean: no common fluence or energy"
+    },
+    {
+      "article_id": 538197,
+      "experiment_ids": [
+        539674
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='hydrodynamic_diameter', technique='dls', weighting='scattering_intensity', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 538197,
+      "experiment_ids": [
+        539690
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='hydrodynamic_diameter', technique='dls', weighting='scattering_intensity', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 538197,
+      "experiment_ids": [
+        539706
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='hydrodynamic_diameter', technique='dls', weighting='scattering_intensity', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 538197,
+      "experiment_ids": [
+        539722
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='hydrodynamic_diameter', technique='dls', weighting='scattering_intensity', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 538197,
+      "experiment_ids": [
+        539738
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='hydrodynamic_diameter', technique='dls', weighting='scattering_intensity', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 538197,
+      "experiment_ids": [
+        539754
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='hydrodynamic_diameter', technique='dls', weighting='scattering_intensity', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 538197,
+      "experiment_ids": [
+        539800
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='hydrodynamic_diameter', technique='dls', weighting='scattering_intensity', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 538197,
+      "experiment_ids": [
+        539816
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='hydrodynamic_diameter', technique='dls', weighting='scattering_intensity', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 538366,
+      "experiment_ids": [
+        540465
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='geometric_diameter', technique='tem', weighting='particle_count', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 538366,
+      "experiment_ids": [
+        540514,
+        540526
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='geometric_diameter', technique='tem', weighting='particle_count', component=None)/mean: fewer than two distinct x"
+    },
+    {
+      "article_id": 538366,
+      "experiment_ids": [
+        540540
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='geometric_diameter', technique='tem', weighting='particle_count', component=None)/mean: fewer than two points"
+    }
+  ],
+  "violations": [],
+  "elapsed_seconds": 2.376149,
+  "started_at_utc": "2026-11-06T20:53:50.454702+00:00",
+  "provenance": {
+    "git_head": "bbd6f39f580cadbc09f7197053048b825c1fdb96",
+    "git_status": [
+      " M results/verifier/dry.json",
+      "?? results/verifier/fresh_environment_verifier.txt"
+    ],
+    "python": "3.12.3",
+    "packages": {
+      "numpy": "2.5.3",
+      "scipy": "1.18.1",
+      "pytest": "9.1.1",
+      "hypothesis": "6.170.15",
+      "jsonschema": "4.26.0"
+    },
+    "source_sha256": {
+      "METHOD.md": "7ba1928439f70657361b0131ac08be415ae23288b65b9c0907fca020876cda82",
+      "requirements.txt": "cebd6f618ab0e38da4f35cdd9790961efb8b556266bac0b1df3ed929c0e0e8dd",
+      "tools/series.py": "e89552257809713e47c500494f9ce0d1113dd32357c15979ed6b43acf835e8d3",
+      "tools/ablation_db.py": "9097493d35986279e373d427522af7b9082cbb64278912d16d078e3a2cfe459a",
+      "data/ablation_snapshot.schema.json": "85749e02a394184cc53faacafbac0d69d0aac34aa10c562889d704306138f8bd",
+      "checks/verifier/contract.py": "35933c98e2e4bd11651fc98003f4c578f0f8df432fad676359de1afdd1c5fef3",
+      "checks/verifier/fixtures.py": "eec4346384fb244fc9ec8620a44c92c5ce7954553f0977e0439057de01f486a0",
+      "checks/verifier/resampling.py": "9e52b71e9c6711a859b91c8363c8e3294a365214863548e3a4bd52dfe9686233",
+      "checks/verifier/run.py": "50e9595b2bed1dcb40870a568d37f61e38c8b578ada936aa4a7463d776570a7b",
+      "checks/verifier/test_contract.py": "82782f6d4944bdd44b3fa5d79190750a446a2cba5e6b4e5546d1e8cb1e598f3d",
+      "checks/verifier/test_properties.py": "a9fd622b101173bc060e32324281332a354ba55568dfb90b60e8925d2ed397c0",
+      "checks/verifier/test_resampling.py": "8a2385889f555a1924f3ab480a7a19367d231274b918faf4aa52c0fabc8b12c4"
+    }
+  },
+  "config": {
+    "seeds": [
+      0
+    ],
+    "draws": 100,
+    "models": [
+      "primary",
+      "lenient"
+    ],
+    "fixed_errors": true,
+    "noise_sigma": "original primary error",
+    "paired_z": true,
+    "truncate_negative_sizes": false,
+    "baseline_weights": "inverse primary variance"
+  },
+  "n_series": 10,
+  "n_rows": 20,
+  "summary": [],
+  "artifacts": {
+    "smoke_runs.csv": "c49032627fd02d05959691e8f7b27da78e5d2a254393ec4cfd6a41df685a5ebf",
+    "smoke_preflight.txt": "ef4fdf4a910e1d67874d4d27945113357dbac52ec8ddd90d512a748c4e81aff0"
+  }
+}

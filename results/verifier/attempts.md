@@ -200,6 +200,60 @@ push or scientific-code change is authorized/performed in this stage.
 
 One reproduction attempt succeeded; no three-failure escalation was needed.
 Anton subsequently completed report curation and supplied the earlier-model
-attribution. Dependency-install verification, instructor access/data-sharing
-permission, operator commit/tags and the course student self-check remain
-separate from completed verification.
+attribution. The fresh dependency-install test was then completed below;
+instructor access/data-sharing permission, operator commit/tags and the course
+student self-check remain separate from completed verification.
+
+## Fresh-environment reproduction of committed package bbd6f39
+
+Anton committed the curated package as `bbd6f39`, made a clean local clone,
+created a new Python 3.12.3 venv and installed `requirements.txt`. The original
+venv was not shared. His initial fresh verifier output (82 passed / 2.15 s)
+was saved. He then authorized automating the remaining reproduction steps;
+no commit, tag or push was included.
+
+- Verified the venv excludes system site-packages; numerical/verifier packages
+  import from the new venv, tools import from the clone, and every requirement
+  pin matches. Saved the full installed package inventory and passing pip check.
+  The install stdout itself was not saved; its success was reported by Anton.
+- Dry: pass, zero violations, 10 series / 45 points. Repeated verifier:
+  82 passed / 1.95 s. Both smoke and full pass their source/snapshot and test gates.
+- Fresh full regression: 267 passed / 3.76 s.
+- Fresh summary is byte-identical to the original; all 120 combined scientific
+  rows match, excluding only git commit and elapsed-time metadata. No seeds or
+  draws were added to the original inference.
+- A separate worktree at the existing bug commit, using the same new venv,
+  gives exactly the expected order-property failure: 1 failed / 81 passed.
+  Verifier Python files are unchanged between the correct and faulty commits.
+- Saved complete fresh stage outputs, CSVs, test output, inventory, command/exit
+  records and hashes under `fresh_environment/`. Original numerical artifacts
+  and the earlier `reproduction/` evidence were not overwritten.
+- Updated only reproduction-status documentation. Scientific code, data,
+  parameters, thresholds and existing conclusions are unchanged. No failed
+  reproduction retry or three-failure escalation was needed.
+
+This archived fresh-environment run tested `bbd6f39`, not the subsequent
+release tag. Its evidence is included in the submission package; it does not
+certify remote instructor access or the course student self-check.
+
+## Local release authorization
+
+Anton explicitly authorized finalizing status notes, committing the reviewed
+fresh-environment evidence and creating local annotated tags: `exp-verifier`
+at `776a2fe`, and `hw2` at the new submission commit on main. No push or merge
+is authorized. The existing planted-defect branch remains separate.
+
+Release procedure: verify evidence/source hashes, commit the packaging-only
+changes, create the two tags, then clone the `hw2` tag locally and rerun its
+verifier and experiment using the freshly installed test environment. The
+post-tag check writes its evidence only inside that separate checkout's
+`results/verifier/`, not into the tagged source tree on main; this avoids
+moving the tag merely to record a test of itself. Archived pre-tag manifests
+retain their actual tested commit and historical status without rewriting.
+Commit preflight found trailing whitespace emitted by pytest on an empty
+failure-diagnostic line. Preserved the exact output in
+`fresh_environment/bug_verifier.raw.txt.gz`, removed trailing whitespace only
+from its text display copy, and recorded both hashes plus the raw checksum in
+the manifest. No diagnostic, counterexample or scientific result changed.
+Remote publication, instructor access and the missing course student
+self-check remain separate from the local release procedure.

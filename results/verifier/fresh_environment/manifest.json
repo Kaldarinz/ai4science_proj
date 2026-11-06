@@ -1,0 +1,239 @@
+{
+  "recorded_at_utc": "2026-11-06T20:54:02.232671+00:00",
+  "tested_commit": "bbd6f39f580cadbc09f7197053048b825c1fdb96",
+  "bug_commit": "cf188ed7f3618b3334af263eb67a7ad54783b5e0",
+  "clone": "/tmp/ai4science-hw2-fresh.ZOLjoh/project",
+  "clone_transport": "local git clone --no-local; no network access certification",
+  "initial_git_status": [
+    "?? results/verifier/fresh_environment_verifier.txt"
+  ],
+  "python": "3.12.3",
+  "python_executable": "/tmp/ai4science-hw2-fresh.ZOLjoh/project/.venv/bin/python",
+  "venv_prefix": "/tmp/ai4science-hw2-fresh.ZOLjoh/project/.venv",
+  "base_prefix": "/usr",
+  "include_system_site_packages": false,
+  "package_module_paths": {
+    "hypothesis": "/tmp/ai4science-hw2-fresh.ZOLjoh/project/.venv/lib/python3.12/site-packages/hypothesis/__init__.py",
+    "jsonschema": "/tmp/ai4science-hw2-fresh.ZOLjoh/project/.venv/lib/python3.12/site-packages/jsonschema/__init__.py",
+    "numpy": "/tmp/ai4science-hw2-fresh.ZOLjoh/project/.venv/lib/python3.12/site-packages/numpy/__init__.py",
+    "pytest": "/tmp/ai4science-hw2-fresh.ZOLjoh/project/.venv/lib/python3.12/site-packages/pytest/__init__.py",
+    "scipy": "/tmp/ai4science-hw2-fresh.ZOLjoh/project/.venv/lib/python3.12/site-packages/scipy/__init__.py"
+  },
+  "dependency_installation": {
+    "performed_by": "Anton",
+    "command": "python3.12 -m venv .venv; .venv/bin/python -m pip install -r requirements.txt",
+    "source": "user-reported successful install; fresh venv config/imports, installed inventory, every requirement pin and pip check verified directly",
+    "pip_install_stdout_saved": false,
+    "shared_existing_venv": false
+  },
+  "user_initial_verifier": {
+    "exit": 0,
+    "source": "user-reported command; actual saved stdout copied as verifier_user.txt",
+    "result": "82 passed in 2.15s"
+  },
+  "records": [
+    {
+      "label": "packages",
+      "argv": [
+        "/tmp/ai4science-hw2-fresh.ZOLjoh/project/.venv/bin/python",
+        "-m",
+        "pip",
+        "list",
+        "--format=json"
+      ],
+      "cwd": "/tmp/ai4science-hw2-fresh.ZOLjoh/project",
+      "exit": 0,
+      "expected_exit": 0,
+      "seconds": 0.172614
+    },
+    {
+      "label": "pip_check",
+      "argv": [
+        "/tmp/ai4science-hw2-fresh.ZOLjoh/project/.venv/bin/python",
+        "-m",
+        "pip",
+        "check"
+      ],
+      "cwd": "/tmp/ai4science-hw2-fresh.ZOLjoh/project",
+      "exit": 0,
+      "expected_exit": 0,
+      "seconds": 0.223721
+    },
+    {
+      "label": "dry",
+      "argv": [
+        "/tmp/ai4science-hw2-fresh.ZOLjoh/project/.venv/bin/python",
+        "checks/verifier/run.py",
+        "dry"
+      ],
+      "cwd": "/tmp/ai4science-hw2-fresh.ZOLjoh/project",
+      "exit": 0,
+      "expected_exit": 0,
+      "seconds": 0.647015
+    },
+    {
+      "label": "verifier",
+      "argv": [
+        "/tmp/ai4science-hw2-fresh.ZOLjoh/project/.venv/bin/python",
+        "-m",
+        "pytest",
+        "checks/verifier",
+        "-q",
+        "--color=no"
+      ],
+      "cwd": "/tmp/ai4science-hw2-fresh.ZOLjoh/project",
+      "exit": 0,
+      "expected_exit": 0,
+      "seconds": 2.119521
+    },
+    {
+      "label": "smoke",
+      "argv": [
+        "/tmp/ai4science-hw2-fresh.ZOLjoh/project/.venv/bin/python",
+        "checks/verifier/run.py",
+        "smoke"
+      ],
+      "cwd": "/tmp/ai4science-hw2-fresh.ZOLjoh/project",
+      "exit": 0,
+      "expected_exit": 0,
+      "seconds": 2.783061
+    },
+    {
+      "label": "full",
+      "argv": [
+        "/tmp/ai4science-hw2-fresh.ZOLjoh/project/.venv/bin/python",
+        "checks/verifier/run.py",
+        "full"
+      ],
+      "cwd": "/tmp/ai4science-hw2-fresh.ZOLjoh/project",
+      "exit": 0,
+      "expected_exit": 0,
+      "seconds": 3.286338
+    },
+    {
+      "label": "regression",
+      "argv": [
+        "/tmp/ai4science-hw2-fresh.ZOLjoh/project/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "--color=no"
+      ],
+      "cwd": "/tmp/ai4science-hw2-fresh.ZOLjoh/project",
+      "exit": 0,
+      "expected_exit": 0,
+      "seconds": 3.938083
+    },
+    {
+      "label": "bug_checkout",
+      "argv": [
+        "git",
+        "worktree",
+        "add",
+        "--detach",
+        "/tmp/ai4science-hw2-fresh.ZOLjoh/bug",
+        "cf188ed7f3618b3334af263eb67a7ad54783b5e0"
+      ],
+      "cwd": "/tmp/ai4science-hw2-fresh.ZOLjoh/project",
+      "exit": 0,
+      "expected_exit": 0,
+      "seconds": 0.010523
+    },
+    {
+      "label": "bug_verifier",
+      "argv": [
+        "/tmp/ai4science-hw2-fresh.ZOLjoh/project/.venv/bin/python",
+        "-m",
+        "pytest",
+        "checks/verifier",
+        "-q",
+        "--tb=short",
+        "--color=no"
+      ],
+      "cwd": "/tmp/ai4science-hw2-fresh.ZOLjoh/bug",
+      "exit": 1,
+      "expected_exit": 1,
+      "seconds": 2.364948
+    }
+  ],
+  "source_sha256": {
+    "METHOD.md": "7ba1928439f70657361b0131ac08be415ae23288b65b9c0907fca020876cda82",
+    "requirements.txt": "cebd6f618ab0e38da4f35cdd9790961efb8b556266bac0b1df3ed929c0e0e8dd",
+    "tools/series.py": "e89552257809713e47c500494f9ce0d1113dd32357c15979ed6b43acf835e8d3",
+    "tools/ablation_db.py": "9097493d35986279e373d427522af7b9082cbb64278912d16d078e3a2cfe459a",
+    "data/ablation_snapshot.json": "c5380620d896237ad655bfde0ce166d3f638b84a3e9b0b996cc09226f6b8303f",
+    "data/ablation_snapshot.schema.json": "85749e02a394184cc53faacafbac0d69d0aac34aa10c562889d704306138f8bd",
+    "checks/verifier/contract.py": "35933c98e2e4bd11651fc98003f4c578f0f8df432fad676359de1afdd1c5fef3",
+    "checks/verifier/fixtures.py": "eec4346384fb244fc9ec8620a44c92c5ce7954553f0977e0439057de01f486a0",
+    "checks/verifier/resampling.py": "9e52b71e9c6711a859b91c8363c8e3294a365214863548e3a4bd52dfe9686233",
+    "checks/verifier/run.py": "50e9595b2bed1dcb40870a568d37f61e38c8b578ada936aa4a7463d776570a7b",
+    "checks/verifier/test_contract.py": "82782f6d4944bdd44b3fa5d79190750a446a2cba5e6b4e5546d1e8cb1e598f3d",
+    "checks/verifier/test_properties.py": "a9fd622b101173bc060e32324281332a354ba55568dfb90b60e8925d2ed397c0",
+    "checks/verifier/test_resampling.py": "8a2385889f555a1924f3ab480a7a19367d231274b918faf4aa52c0fabc8b12c4"
+  },
+  "original_main_artifact_sha256": {
+    "dry.json": "1cb44452fd7e55c7784b545e1657c9002b20b770425e21ef0ab6f73a4f989c90",
+    "smoke.json": "263a7c02283652daeb134d1c113b81792c8d6aadda8b86f105a8732829a0581c",
+    "full.json": "d5ecc18ff6a01fb846cc4c5c9fc9d79d65aa7ecf3204962b0b261febc539224f",
+    "smoke_runs.csv": "1c1a718321af8c6664450dae27a59933c619c9cf51ab55bc6de5aa0be8b1a0c8",
+    "full_runs.csv": "003b99cd61c8fd33627ba89c7f680595631d234e21e07d25dcc2d3a5e87ef1b2",
+    "runs.csv": "769bff51be4ecc5c3176e17b8811b346aec77caf112154291dfb40752c5d340c",
+    "summary.csv": "caa46f4e0cc557507fc66e6f364e157c6083372cf272554ce92ac7c71c07ea02"
+  },
+  "summary_byte_identical": true,
+  "csv_comparisons": {
+    "smoke_runs.csv": {
+      "rows": 20,
+      "scientific_fields_identical": true
+    },
+    "full_runs.csv": {
+      "rows": 100,
+      "scientific_fields_identical": true
+    },
+    "runs.csv": {
+      "rows": 120,
+      "scientific_fields_identical": true
+    }
+  },
+  "ignored_run_metadata": [
+    "git_commit",
+    "series_elapsed_seconds"
+  ],
+  "original_main_numerical_artifacts_unchanged": true,
+  "fresh_manifest_source_and_artifact_hashes_verified": true,
+  "submission_tag_tested": false,
+  "limitations": [
+    "local clone, not live instructor access",
+    "hw2 and exp-verifier tags not created or tested",
+    "fresh evidence/docs remain uncommitted on main"
+  ],
+  "text_normalization": {
+    "bug_verifier.txt": {
+      "operation": "Removed trailing whitespace from the display copy for git whitespace checks; no diagnostic content changed",
+      "raw_archive": "bug_verifier.raw.txt.gz",
+      "raw_sha256": "897747ea20cf2ec794d10a8790366fb7e07a5b9a4685792a2cbdfa58b0315c05"
+    }
+  },
+  "artifacts": {
+    "bug_checkout.txt": "0752c5b89e67586b70d304e0c26257a4fe7c44d44fa05088e24055c8e83ef4b0",
+    "bug_verifier.txt": "c696e4959aabe1c796fa94a48608886521cfc60ce480aeb1d61a55235f3d85f7",
+    "bug_verifier.raw.txt.gz": "2c77fd0daf5a942976b929b6cbbfdb5a8381c6ba34d5d263e7168b15c87d7a62",
+    "dry.json": "9e343c79163685aa46347d6cc4711d4f9a7342ef7837fd4edbb5ac1b47cf337c",
+    "dry.txt": "9e343c79163685aa46347d6cc4711d4f9a7342ef7837fd4edbb5ac1b47cf337c",
+    "full.json": "e696e23600bb646fc23de8e5d3f88afcd79da3023f1f6731cc24901391fcef31",
+    "full.txt": "e696e23600bb646fc23de8e5d3f88afcd79da3023f1f6731cc24901391fcef31",
+    "full_preflight.txt": "ad087969991bbeff855e96612bd48cbe4db428d052618643ab4e24b2d7a7f806",
+    "full_runs.csv": "1404edc872e95d94b3ed851c8855e4ddf6c4afda71a78f4fa0d3a3c8c29d81a1",
+    "packages.txt": "2a6772a7e67a2a95b08db7e4d6388194a282d46d2cb4e7d3cebc7251b98ee15d",
+    "pip_check.txt": "9261363b733079a641c2e4cc9bc46ffa1d8336945a87f807b6cf68847dbc9b09",
+    "regression.txt": "e31409a6a300e11f76840ff6702a80af30e9e306fc6073cb3bd52530d03adeae",
+    "runs.csv": "d736e1f11e7301771cd33d3e0070040f5c72552c23bc6815392e68e90fe0c213",
+    "smoke.json": "b3c01dff8b083644d69639c1545d4e747a8f76ceb8a3149e45155c9a58cd0849",
+    "smoke.txt": "b3c01dff8b083644d69639c1545d4e747a8f76ceb8a3149e45155c9a58cd0849",
+    "smoke_preflight.txt": "ef4fdf4a910e1d67874d4d27945113357dbac52ec8ddd90d512a748c4e81aff0",
+    "smoke_runs.csv": "c49032627fd02d05959691e8f7b27da78e5d2a254393ec4cfd6a41df685a5ebf",
+    "summary.csv": "caa46f4e0cc557507fc66e6f364e157c6083372cf272554ce92ac7c71c07ea02",
+    "verifier.txt": "169ed2e482c80b0f831e9ac899925460264ff45436bf73fc023fefc544304451",
+    "verifier_user.txt": "d07b477d2736fa1634821784b00432142d887ac1e0e4093d2e2b3de95a32f100"
+  }
+}

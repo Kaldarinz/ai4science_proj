@@ -115,3 +115,11 @@ Run in /home/aiagent/week2, outside this project; not project data.
 ## 2026-11-06 - HW2 report and reproduction package
 * After Anton committed main as `c50a2ff` and reported pushing the bug branch, he authorized report/package work. Prepared a draft report with subgoals, attempt history, attribution and limits; scientific results remain confined to `results/verifier/`. Initial METHOD authorship confirmed as AI draft edited by Anton; earlier model is unrecorded.
 * A clean local checkout passed the verifier and complete staged run; a separate bug checkout produced the expected failure. Evidence/provenance is in `results/verifier/reproduction/`. Reused the installed pinned environment, not a fresh install; final tags/access remain operator work. No code/data changes, new scientific method, commit, tag, push, database operation or extraction verdict. Fixed only duplicate signed-range notation in METHOD, disclosed there.
+
+## 2026-11-06 - fresh-environment reproduction
+* Anton committed the curated package as `bbd6f39`, created a clean local clone and new venv, installed the pinned requirements and ran the verifier. He then authorized automating the remaining reproduction. Full command/output, package inventory and comparison evidence is confined to `results/verifier/fresh_environment/`; no scientific result is copied into extraction memory.
+* The complete sequence and regression passed; the existing planted branch produced its expected failure. Updated reproduction-status notes only. No original outputs, scientific code/data, rules or thresholds changed; no database operation, extraction verdict, commit, tag or push. New evidence/status changes remained uncommitted at this checkpoint.
+
+## 2026-11-06 - local HW2 release authorization
+* Anton explicitly authorized finalizing packaging notes, committing the fresh-environment evidence and creating local annotated `exp-verifier` / `hw2` tags, followed by a local tagged-checkout test. Push and merge are not authorized. The faulty branch remains separate.
+* Post-tag validation evidence belongs inside the separate test checkout's `results/verifier/`; it is not appended to main merely to move a tested tag. Scientific content, source data and extraction state are unchanged. Remote publication/access and the unavailable course student self-check remain operator follow-up.

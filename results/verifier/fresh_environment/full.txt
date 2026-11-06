@@ -1,0 +1,1219 @@
+{
+  "step": "full",
+  "status": "pass",
+  "snapshot_sha256": "c5380620d896237ad655bfde0ce166d3f638b84a3e9b0b996cc09226f6b8303f",
+  "baseline_commit": "e9fecd3",
+  "series": [
+    {
+      "series_id": "80094-s1",
+      "article_id": 80094,
+      "n_points": 6,
+      "x_quantity": "pulse_energy"
+    },
+    {
+      "series_id": "80094-s2",
+      "article_id": 80094,
+      "n_points": 6,
+      "x_quantity": "pulse_energy"
+    },
+    {
+      "series_id": "534424-s1",
+      "article_id": 534424,
+      "n_points": 2,
+      "x_quantity": "pulse_energy"
+    },
+    {
+      "series_id": "534494-s1",
+      "article_id": 534494,
+      "n_points": 2,
+      "x_quantity": "fluence"
+    },
+    {
+      "series_id": "535841-s1",
+      "article_id": 535841,
+      "n_points": 5,
+      "x_quantity": "fluence"
+    },
+    {
+      "series_id": "537995-s1",
+      "article_id": 537995,
+      "n_points": 2,
+      "x_quantity": "fluence"
+    },
+    {
+      "series_id": "537995-s2",
+      "article_id": 537995,
+      "n_points": 2,
+      "x_quantity": "fluence"
+    },
+    {
+      "series_id": "538366-s1",
+      "article_id": 538366,
+      "n_points": 9,
+      "x_quantity": "fluence"
+    },
+    {
+      "series_id": "538366-s2",
+      "article_id": 538366,
+      "n_points": 8,
+      "x_quantity": "fluence"
+    },
+    {
+      "series_id": "538366-s3",
+      "article_id": 538366,
+      "n_points": 3,
+      "x_quantity": "fluence"
+    }
+  ],
+  "exclusions": [
+    {
+      "article_id": 80079,
+      "experiment_ids": [
+        536974
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='geometric_diameter', technique='tem', weighting='particle_count', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 80079,
+      "experiment_ids": [
+        536985
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='geometric_diameter', technique='tem', weighting='particle_count', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 80091,
+      "experiment_ids": [
+        535643
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='geometric_diameter', technique='tem', weighting='particle_count', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 80110,
+      "experiment_ids": [
+        531344
+      ],
+      "reason": "no_size",
+      "detail": "no usable size location measurement"
+    },
+    {
+      "article_id": 80134,
+      "experiment_ids": [
+        535604
+      ],
+      "reason": "no_size",
+      "detail": "no usable size location measurement"
+    },
+    {
+      "article_id": 532464,
+      "experiment_ids": [
+        535756
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='geometric_diameter', technique='tem', weighting='particle_count', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 532516,
+      "experiment_ids": [
+        538943
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='hydrodynamic_diameter', technique='dls', weighting='particle_count', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 532516,
+      "experiment_ids": [
+        538980
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='hydrodynamic_diameter', technique='dls', weighting='particle_count', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 532673,
+      "experiment_ids": [
+        536299
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='geometric_diameter', technique='tem', weighting='particle_count', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 532755,
+      "experiment_ids": [
+        539444
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='geometric_diameter', technique='sem', weighting='particle_count', component='satellite')/mean: fewer than two points"
+    },
+    {
+      "article_id": 532755,
+      "experiment_ids": [
+        539444
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='hydrodynamic_diameter', technique='nta', weighting='particle_count', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 532982,
+      "experiment_ids": [
+        537182
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='geometric_diameter', technique='sem', weighting='particle_count', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 532982,
+      "experiment_ids": [
+        537210
+      ],
+      "reason": "no_size",
+      "detail": "no usable size location measurement"
+    },
+    {
+      "article_id": 532982,
+      "experiment_ids": [
+        537247
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='geometric_diameter', technique='sem', weighting='particle_count', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 532982,
+      "experiment_ids": [
+        537265
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='geometric_diameter', technique='sem', weighting='particle_count', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 534424,
+      "experiment_ids": [
+        537045
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='geometric_diameter', technique='tem', weighting='particle_count', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 534424,
+      "experiment_ids": [
+        537057
+      ],
+      "reason": "no_size",
+      "detail": "no usable size location measurement"
+    },
+    {
+      "article_id": 534424,
+      "experiment_ids": [
+        537068
+      ],
+      "reason": "no_size",
+      "detail": "no usable size location measurement"
+    },
+    {
+      "article_id": 534424,
+      "experiment_ids": [
+        537079
+      ],
+      "reason": "no_size",
+      "detail": "no usable size location measurement"
+    },
+    {
+      "article_id": 534424,
+      "experiment_ids": [
+        537090
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='geometric_diameter', technique='tem', weighting='particle_count', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 534424,
+      "experiment_ids": [
+        537105
+      ],
+      "reason": "no_size",
+      "detail": "no usable size location measurement"
+    },
+    {
+      "article_id": 534424,
+      "experiment_ids": [
+        537117
+      ],
+      "reason": "no_size",
+      "detail": "no usable size location measurement"
+    },
+    {
+      "article_id": 534424,
+      "experiment_ids": [
+        537129
+      ],
+      "reason": "no_size",
+      "detail": "no usable size location measurement"
+    },
+    {
+      "article_id": 534424,
+      "experiment_ids": [
+        537139
+      ],
+      "reason": "no_size",
+      "detail": "no usable size location measurement"
+    },
+    {
+      "article_id": 534424,
+      "experiment_ids": [
+        537163
+      ],
+      "reason": "no_size",
+      "detail": "no usable size location measurement"
+    },
+    {
+      "article_id": 534494,
+      "experiment_ids": [
+        535443
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='geometric_diameter', technique='tem', weighting='particle_count', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 534494,
+      "experiment_ids": [
+        535486
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='geometric_diameter', technique='tem', weighting='particle_count', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 534494,
+      "experiment_ids": [
+        535500
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='geometric_diameter', technique='tem', weighting='particle_count', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 534494,
+      "experiment_ids": [
+        535514
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='geometric_diameter', technique='tem', weighting='particle_count', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 534494,
+      "experiment_ids": [
+        535528
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='geometric_diameter', technique='tem', weighting='particle_count', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 534569,
+      "experiment_ids": [
+        534993
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='geometric_diameter', technique='tem', weighting='particle_count', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 534569,
+      "experiment_ids": [
+        534993
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='hydrodynamic_diameter', technique='dls', weighting='scattering_intensity', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 534569,
+      "experiment_ids": [
+        535010
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='geometric_diameter', technique='tem', weighting='particle_count', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 534569,
+      "experiment_ids": [
+        535010
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='hydrodynamic_diameter', technique='dls', weighting='scattering_intensity', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 534569,
+      "experiment_ids": [
+        535027
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='geometric_diameter', technique='tem', weighting='particle_count', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 534569,
+      "experiment_ids": [
+        535027
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='hydrodynamic_diameter', technique='dls', weighting='scattering_intensity', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 534569,
+      "experiment_ids": [
+        535044
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='hydrodynamic_diameter', technique='dls', weighting='scattering_intensity', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 534569,
+      "experiment_ids": [
+        535060
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='hydrodynamic_diameter', technique='dls', weighting='scattering_intensity', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 534569,
+      "experiment_ids": [
+        535076
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='hydrodynamic_diameter', technique='dls', weighting='scattering_intensity', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 534569,
+      "experiment_ids": [
+        535092
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='hydrodynamic_diameter', technique='dls', weighting='scattering_intensity', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 534569,
+      "experiment_ids": [
+        535108
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='hydrodynamic_diameter', technique='dls', weighting='scattering_intensity', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 534569,
+      "experiment_ids": [
+        535124
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='geometric_diameter', technique='tem', weighting='particle_count', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 534569,
+      "experiment_ids": [
+        535124
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='hydrodynamic_diameter', technique='dls', weighting='scattering_intensity', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 534569,
+      "experiment_ids": [
+        535146
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='hydrodynamic_diameter', technique='dls', weighting='scattering_intensity', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 535841,
+      "experiment_ids": [
+        536789
+      ],
+      "reason": "no_size",
+      "detail": "no usable size location measurement"
+    },
+    {
+      "article_id": 535841,
+      "experiment_ids": [
+        536800
+      ],
+      "reason": "no_size",
+      "detail": "no usable size location measurement"
+    },
+    {
+      "article_id": 535841,
+      "experiment_ids": [
+        536845
+      ],
+      "reason": "no_size",
+      "detail": "no usable size location measurement"
+    },
+    {
+      "article_id": 537357,
+      "experiment_ids": [
+        539842
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='geometric_diameter', technique='tem', weighting='particle_count', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 537357,
+      "experiment_ids": [
+        539858
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='geometric_diameter', technique='tem', weighting='particle_count', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 537357,
+      "experiment_ids": [
+        539875
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='geometric_diameter', technique='tem', weighting='particle_count', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 537357,
+      "experiment_ids": [
+        539892
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='geometric_diameter', technique='tem', weighting='particle_count', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 537357,
+      "experiment_ids": [
+        539911
+      ],
+      "reason": "no_size",
+      "detail": "no usable size location measurement"
+    },
+    {
+      "article_id": 537357,
+      "experiment_ids": [
+        539928
+      ],
+      "reason": "no_size",
+      "detail": "no usable size location measurement"
+    },
+    {
+      "article_id": 537357,
+      "experiment_ids": [
+        539945
+      ],
+      "reason": "no_size",
+      "detail": "no usable size location measurement"
+    },
+    {
+      "article_id": 537357,
+      "experiment_ids": [
+        539962
+      ],
+      "reason": "no_size",
+      "detail": "no usable size location measurement"
+    },
+    {
+      "article_id": 537357,
+      "experiment_ids": [
+        539979
+      ],
+      "reason": "no_size",
+      "detail": "no usable size location measurement"
+    },
+    {
+      "article_id": 537357,
+      "experiment_ids": [
+        539996
+      ],
+      "reason": "no_size",
+      "detail": "no usable size location measurement"
+    },
+    {
+      "article_id": 537357,
+      "experiment_ids": [
+        540015
+      ],
+      "reason": "no_size",
+      "detail": "no usable size location measurement"
+    },
+    {
+      "article_id": 537357,
+      "experiment_ids": [
+        540174
+      ],
+      "reason": "no_size",
+      "detail": "no usable size location measurement"
+    },
+    {
+      "article_id": 538110,
+      "experiment_ids": [
+        539507
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='geometric_diameter', technique='tem', weighting='particle_count', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 538197,
+      "experiment_ids": [
+        539611
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='hydrodynamic_diameter', technique='dls', weighting='scattering_intensity', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 538197,
+      "experiment_ids": [
+        539627
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='hydrodynamic_diameter', technique='dls', weighting='scattering_intensity', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 538197,
+      "experiment_ids": [
+        539642,
+        539770
+      ],
+      "reason": "mixed_x",
+      "detail": "SizeKind(quantity='hydrodynamic_diameter', technique='dls', weighting='scattering_intensity', component=None)/mean: no common fluence or energy"
+    },
+    {
+      "article_id": 538197,
+      "experiment_ids": [
+        539658,
+        539785
+      ],
+      "reason": "mixed_x",
+      "detail": "SizeKind(quantity='hydrodynamic_diameter', technique='dls', weighting='scattering_intensity', component=None)/mean: no common fluence or energy"
+    },
+    {
+      "article_id": 538197,
+      "experiment_ids": [
+        539674
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='hydrodynamic_diameter', technique='dls', weighting='scattering_intensity', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 538197,
+      "experiment_ids": [
+        539690
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='hydrodynamic_diameter', technique='dls', weighting='scattering_intensity', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 538197,
+      "experiment_ids": [
+        539706
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='hydrodynamic_diameter', technique='dls', weighting='scattering_intensity', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 538197,
+      "experiment_ids": [
+        539722
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='hydrodynamic_diameter', technique='dls', weighting='scattering_intensity', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 538197,
+      "experiment_ids": [
+        539738
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='hydrodynamic_diameter', technique='dls', weighting='scattering_intensity', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 538197,
+      "experiment_ids": [
+        539754
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='hydrodynamic_diameter', technique='dls', weighting='scattering_intensity', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 538197,
+      "experiment_ids": [
+        539800
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='hydrodynamic_diameter', technique='dls', weighting='scattering_intensity', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 538197,
+      "experiment_ids": [
+        539816
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='hydrodynamic_diameter', technique='dls', weighting='scattering_intensity', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 538366,
+      "experiment_ids": [
+        540465
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='geometric_diameter', technique='tem', weighting='particle_count', component=None)/mean: fewer than two points"
+    },
+    {
+      "article_id": 538366,
+      "experiment_ids": [
+        540514,
+        540526
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='geometric_diameter', technique='tem', weighting='particle_count', component=None)/mean: fewer than two distinct x"
+    },
+    {
+      "article_id": 538366,
+      "experiment_ids": [
+        540540
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='geometric_diameter', technique='tem', weighting='particle_count', component=None)/mean: fewer than two points"
+    }
+  ],
+  "violations": [],
+  "elapsed_seconds": 2.887179,
+  "started_at_utc": "2026-11-06T20:53:53.223237+00:00",
+  "provenance": {
+    "git_head": "bbd6f39f580cadbc09f7197053048b825c1fdb96",
+    "git_status": [
+      " M results/verifier/dry.json",
+      " M results/verifier/runs.csv",
+      " M results/verifier/smoke.json",
+      " M results/verifier/smoke_preflight.txt",
+      " M results/verifier/smoke_runs.csv",
+      "?? results/verifier/fresh_environment_verifier.txt"
+    ],
+    "python": "3.12.3",
+    "packages": {
+      "numpy": "2.5.3",
+      "scipy": "1.18.1",
+      "pytest": "9.1.1",
+      "hypothesis": "6.170.15",
+      "jsonschema": "4.26.0"
+    },
+    "source_sha256": {
+      "METHOD.md": "7ba1928439f70657361b0131ac08be415ae23288b65b9c0907fca020876cda82",
+      "requirements.txt": "cebd6f618ab0e38da4f35cdd9790961efb8b556266bac0b1df3ed929c0e0e8dd",
+      "tools/series.py": "e89552257809713e47c500494f9ce0d1113dd32357c15979ed6b43acf835e8d3",
+      "tools/ablation_db.py": "9097493d35986279e373d427522af7b9082cbb64278912d16d078e3a2cfe459a",
+      "data/ablation_snapshot.schema.json": "85749e02a394184cc53faacafbac0d69d0aac34aa10c562889d704306138f8bd",
+      "checks/verifier/contract.py": "35933c98e2e4bd11651fc98003f4c578f0f8df432fad676359de1afdd1c5fef3",
+      "checks/verifier/fixtures.py": "eec4346384fb244fc9ec8620a44c92c5ce7954553f0977e0439057de01f486a0",
+      "checks/verifier/resampling.py": "9e52b71e9c6711a859b91c8363c8e3294a365214863548e3a4bd52dfe9686233",
+      "checks/verifier/run.py": "50e9595b2bed1dcb40870a568d37f61e38c8b578ada936aa4a7463d776570a7b",
+      "checks/verifier/test_contract.py": "82782f6d4944bdd44b3fa5d79190750a446a2cba5e6b4e5546d1e8cb1e598f3d",
+      "checks/verifier/test_properties.py": "a9fd622b101173bc060e32324281332a354ba55568dfb90b60e8925d2ed397c0",
+      "checks/verifier/test_resampling.py": "8a2385889f555a1924f3ab480a7a19367d231274b918faf4aa52c0fabc8b12c4"
+    }
+  },
+  "prerequisite_smoke_sha256": "b3c01dff8b083644d69639c1545d4e747a8f76ceb8a3149e45155c9a58cd0849",
+  "config": {
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "draws": 1000,
+    "models": [
+      "primary",
+      "lenient"
+    ],
+    "fixed_errors": true,
+    "noise_sigma": "original primary error",
+    "paired_z": true,
+    "truncate_negative_sizes": false,
+    "baseline_weights": "inverse primary variance"
+  },
+  "n_series": 10,
+  "n_rows": 100,
+  "summary": [
+    {
+      "article_id": 534424,
+      "series_id": "534424-s1",
+      "model": "lenient",
+      "shape": "decreasing",
+      "n_seeds": 5,
+      "draws_per_seed": 1000,
+      "stability": 1.0,
+      "stability_ci95_low": 1.0,
+      "stability_ci95_high": 1,
+      "baseline_share": 0.0196,
+      "baseline_ci95_low": 0.010837687044799142,
+      "baseline_ci95_high": 0.028362312955200857,
+      "delta": 0.9804,
+      "delta_ci95_low": 0.9716376870447991,
+      "delta_ci95_high": 0.989162312955201,
+      "delta_standard_error": 0.0031559467676119026,
+      "zero_between_seed_variance": false,
+      "p_one_sided": 3.221044465419496e-10,
+      "stable": true,
+      "p_holm": 5.475775591213143e-09,
+      "supported": true,
+      "verdict": "supported"
+    },
+    {
+      "article_id": 534424,
+      "series_id": "534424-s1",
+      "model": "primary",
+      "shape": "decreasing",
+      "n_seeds": 5,
+      "draws_per_seed": 1000,
+      "stability": 1.0,
+      "stability_ci95_low": 1.0,
+      "stability_ci95_high": 1,
+      "baseline_share": 0.15760000000000002,
+      "baseline_ci95_low": 0.1484083311772531,
+      "baseline_ci95_high": 0.16679166882274693,
+      "delta": 0.8424,
+      "delta_ci95_low": 0.833208331177253,
+      "delta_ci95_high": 0.8515916688227468,
+      "delta_standard_error": 0.003310589071449373,
+      "zero_between_seed_variance": false,
+      "p_one_sided": 7.155240162170051e-10,
+      "stable": true,
+      "p_holm": 1.0162318435303945e-08,
+      "supported": true,
+      "verdict": "supported"
+    },
+    {
+      "article_id": 534494,
+      "series_id": "534494-s1",
+      "model": "lenient",
+      "shape": "increasing",
+      "n_seeds": 5,
+      "draws_per_seed": 1000,
+      "stability": 1.0,
+      "stability_ci95_low": 1.0,
+      "stability_ci95_high": 1,
+      "baseline_share": 0.158,
+      "baseline_ci95_low": 0.15185407676840443,
+      "baseline_ci95_high": 0.16414592323159558,
+      "delta": 0.842,
+      "delta_ci95_low": 0.8358540767684044,
+      "delta_ci95_high": 0.8481459232315955,
+      "delta_standard_error": 0.0022135943621178675,
+      "zero_between_seed_variance": false,
+      "p_one_sided": 1.4329961982763275e-10,
+      "stable": true,
+      "p_holm": 2.865992396552655e-09,
+      "supported": true,
+      "verdict": "supported"
+    },
+    {
+      "article_id": 534494,
+      "series_id": "534494-s1",
+      "model": "primary",
+      "shape": "increasing",
+      "n_seeds": 5,
+      "draws_per_seed": 1000,
+      "stability": 1.0,
+      "stability_ci95_low": 1.0,
+      "stability_ci95_high": 1,
+      "baseline_share": 0.158,
+      "baseline_ci95_low": 0.15185407676840443,
+      "baseline_ci95_high": 0.16414592323159558,
+      "delta": 0.842,
+      "delta_ci95_low": 0.8358540767684044,
+      "delta_ci95_high": 0.8481459232315955,
+      "delta_standard_error": 0.0022135943621178675,
+      "zero_between_seed_variance": false,
+      "p_one_sided": 1.4329961982763275e-10,
+      "stable": true,
+      "p_holm": 2.865992396552655e-09,
+      "supported": true,
+      "verdict": "supported"
+    },
+    {
+      "article_id": 535841,
+      "series_id": "535841-s1",
+      "model": "lenient",
+      "shape": "increasing",
+      "n_seeds": 5,
+      "draws_per_seed": 1000,
+      "stability": 1.0,
+      "stability_ci95_low": 1.0,
+      "stability_ci95_high": 1,
+      "baseline_share": 0.194,
+      "baseline_ci95_low": 0.18357445787248008,
+      "baseline_ci95_high": 0.20442554212751993,
+      "delta": 0.806,
+      "delta_ci95_low": 0.7955744578724802,
+      "delta_ci95_high": 0.8164255421275199,
+      "delta_standard_error": 0.003754996671103706,
+      "zero_between_seed_variance": false,
+      "p_one_sided": 1.413046567960331e-09,
+      "stable": true,
+      "p_holm": 1.5543512247563643e-08,
+      "supported": true,
+      "verdict": "supported"
+    },
+    {
+      "article_id": 535841,
+      "series_id": "535841-s1",
+      "model": "primary",
+      "shape": "increasing",
+      "n_seeds": 5,
+      "draws_per_seed": 1000,
+      "stability": 1.0,
+      "stability_ci95_low": 1.0,
+      "stability_ci95_high": 1,
+      "baseline_share": 0.11339999999999999,
+      "baseline_ci95_low": 0.10352116017111532,
+      "baseline_ci95_high": 0.12327883982888466,
+      "delta": 0.8866,
+      "delta_ci95_low": 0.8767211601711152,
+      "delta_ci95_high": 0.8964788398288847,
+      "delta_standard_error": 0.0035580893749314426,
+      "zero_between_seed_variance": false,
+      "p_one_sided": 7.780923205625411e-10,
+      "stable": true,
+      "p_holm": 1.0162318435303945e-08,
+      "supported": true,
+      "verdict": "supported"
+    },
+    {
+      "article_id": 537995,
+      "series_id": "537995-s1",
+      "model": "lenient",
+      "shape": "flat",
+      "n_seeds": 5,
+      "draws_per_seed": 1000,
+      "stability": 0.6612,
+      "stability_ci95_low": 0.6368146547667105,
+      "stability_ci95_high": 0.6855853452332895,
+      "baseline_share": 0.6754,
+      "baseline_ci95_low": 0.656475313497066,
+      "baseline_ci95_high": 0.694324686502934,
+      "delta": -0.0142,
+      "delta_ci95_low": -0.02828618417623561,
+      "delta_ci95_high": -0.00011381582376438978,
+      "delta_standard_error": 0.005073460357586329,
+      "zero_between_seed_variance": false,
+      "p_one_sided": 0.9755663107492608,
+      "stable": false,
+      "p_holm": 1.0,
+      "supported": false,
+      "verdict": "not distinguishable from no dependence"
+    },
+    {
+      "article_id": 537995,
+      "series_id": "537995-s1",
+      "model": "primary",
+      "shape": "flat",
+      "n_seeds": 5,
+      "draws_per_seed": 1000,
+      "stability": 0.6612,
+      "stability_ci95_low": 0.6368146547667105,
+      "stability_ci95_high": 0.6855853452332895,
+      "baseline_share": 0.6754,
+      "baseline_ci95_low": 0.656475313497066,
+      "baseline_ci95_high": 0.694324686502934,
+      "delta": -0.0142,
+      "delta_ci95_low": -0.02828618417623561,
+      "delta_ci95_high": -0.00011381582376438978,
+      "delta_standard_error": 0.005073460357586329,
+      "zero_between_seed_variance": false,
+      "p_one_sided": 0.9755663107492608,
+      "stable": false,
+      "p_holm": 1.0,
+      "supported": false,
+      "verdict": "not distinguishable from no dependence"
+    },
+    {
+      "article_id": 537995,
+      "series_id": "537995-s2",
+      "model": "lenient",
+      "shape": "increasing",
+      "n_seeds": 5,
+      "draws_per_seed": 1000,
+      "stability": 1.0,
+      "stability_ci95_low": 1.0,
+      "stability_ci95_high": 1,
+      "baseline_share": 0.16440000000000002,
+      "baseline_ci95_low": 0.15555014927756883,
+      "baseline_ci95_high": 0.1732498507224312,
+      "delta": 0.8356,
+      "delta_ci95_low": 0.8267501492775688,
+      "delta_ci95_high": 0.8444498507224312,
+      "delta_standard_error": 0.0031874754901018484,
+      "zero_between_seed_variance": false,
+      "p_one_sided": 6.351449022064966e-10,
+      "stable": true,
+      "p_holm": 1.0162318435303945e-08,
+      "supported": true,
+      "verdict": "supported"
+    },
+    {
+      "article_id": 537995,
+      "series_id": "537995-s2",
+      "model": "primary",
+      "shape": "increasing",
+      "n_seeds": 5,
+      "draws_per_seed": 1000,
+      "stability": 1.0,
+      "stability_ci95_low": 1.0,
+      "stability_ci95_high": 1,
+      "baseline_share": 0.16440000000000002,
+      "baseline_ci95_low": 0.15555014927756883,
+      "baseline_ci95_high": 0.1732498507224312,
+      "delta": 0.8356,
+      "delta_ci95_low": 0.8267501492775688,
+      "delta_ci95_high": 0.8444498507224312,
+      "delta_standard_error": 0.0031874754901018484,
+      "zero_between_seed_variance": false,
+      "p_one_sided": 6.351449022064966e-10,
+      "stable": true,
+      "p_holm": 1.0162318435303945e-08,
+      "supported": true,
+      "verdict": "supported"
+    },
+    {
+      "article_id": 538366,
+      "series_id": "538366-s1",
+      "model": "lenient",
+      "shape": "irregular",
+      "n_seeds": 5,
+      "draws_per_seed": 1000,
+      "stability": 0.9158000000000002,
+      "stability_ci95_low": 0.9061261703702607,
+      "stability_ci95_high": 0.9254738296297397,
+      "baseline_share": 0.022799999999999997,
+      "baseline_ci95_low": 0.018644597465265728,
+      "baseline_ci95_high": 0.026955402534734267,
+      "delta": 0.893,
+      "delta_ci95_low": 0.8853963919310418,
+      "delta_ci95_high": 0.9006036080689582,
+      "delta_standard_error": 0.002738612787525833,
+      "zero_between_seed_variance": false,
+      "p_one_sided": 2.653448825350106e-10,
+      "stable": true,
+      "p_holm": 4.7762078856301904e-09,
+      "supported": true,
+      "verdict": "supported"
+    },
+    {
+      "article_id": 538366,
+      "series_id": "538366-s1",
+      "model": "primary",
+      "shape": "irregular",
+      "n_seeds": 5,
+      "draws_per_seed": 1000,
+      "stability": 0.9984,
+      "stability_ci95_low": 0.9972894219579208,
+      "stability_ci95_high": 0.9995105780420791,
+      "baseline_share": 0.4875999999999999,
+      "baseline_ci95_low": 0.47897065853623644,
+      "baseline_ci95_high": 0.4962293414637634,
+      "delta": 0.5108,
+      "delta_ci95_low": 0.5029765314257624,
+      "delta_ci95_high": 0.5186234685742377,
+      "delta_standard_error": 0.0028178005607210764,
+      "zero_between_seed_variance": false,
+      "p_one_sided": 2.7776057533750836e-09,
+      "stable": true,
+      "p_holm": 2.7776057533750835e-08,
+      "supported": true,
+      "verdict": "supported"
+    },
+    {
+      "article_id": 538366,
+      "series_id": "538366-s2",
+      "model": "lenient",
+      "shape": "decreasing",
+      "n_seeds": 5,
+      "draws_per_seed": 1000,
+      "stability": 0.7188,
+      "stability_ci95_low": 0.7005217949656662,
+      "stability_ci95_high": 0.7370782050343337,
+      "baseline_share": 0.0524,
+      "baseline_ci95_low": 0.046279213574075696,
+      "baseline_ci95_high": 0.05852078642592431,
+      "delta": 0.6664,
+      "delta_ci95_low": 0.6440914752263686,
+      "delta_ci95_high": 0.6887085247736316,
+      "delta_standard_error": 0.008034923770640273,
+      "zero_between_seed_variance": false,
+      "p_one_sided": 6.334138486684003e-08,
+      "stable": false,
+      "p_holm": 4.936331151782511e-07,
+      "supported": true,
+      "verdict": "supported"
+    },
+    {
+      "article_id": 538366,
+      "series_id": "538366-s2",
+      "model": "primary",
+      "shape": "valley",
+      "n_seeds": 5,
+      "draws_per_seed": 1000,
+      "stability": 0.5342,
+      "stability_ci95_low": 0.5161125735219965,
+      "stability_ci95_high": 0.5522874264780036,
+      "baseline_share": 0.13679999999999998,
+      "baseline_ci95_low": 0.1232152652110204,
+      "baseline_ci95_high": 0.15038473478897957,
+      "delta": 0.3974,
+      "delta_ci95_low": 0.38418342137364875,
+      "delta_ci95_high": 0.4106165786263513,
+      "delta_standard_error": 0.004760252094164757,
+      "zero_between_seed_variance": false,
+      "p_one_sided": 6.170413939728138e-08,
+      "stable": false,
+      "p_holm": 4.936331151782511e-07,
+      "supported": true,
+      "verdict": "supported"
+    },
+    {
+      "article_id": 538366,
+      "series_id": "538366-s3",
+      "model": "lenient",
+      "shape": "flat",
+      "n_seeds": 5,
+      "draws_per_seed": 1000,
+      "stability": 0.7416,
+      "stability_ci95_low": 0.7303015398699094,
+      "stability_ci95_high": 0.7528984601300907,
+      "baseline_share": 0.921,
+      "baseline_ci95_low": 0.9137068753463952,
+      "baseline_ci95_high": 0.9282931246536049,
+      "delta": -0.1794,
+      "delta_ci95_low": -0.18737956312758916,
+      "delta_ci95_high": -0.17142043687241085,
+      "delta_standard_error": 0.0028740215726399854,
+      "zero_between_seed_variance": false,
+      "p_one_sided": 0.9999998027355198,
+      "stable": false,
+      "p_holm": 1.0,
+      "supported": false,
+      "verdict": "not distinguishable from no dependence"
+    },
+    {
+      "article_id": 538366,
+      "series_id": "538366-s3",
+      "model": "primary",
+      "shape": "flat",
+      "n_seeds": 5,
+      "draws_per_seed": 1000,
+      "stability": 0.21200000000000002,
+      "stability_ci95_low": 0.191692054828554,
+      "stability_ci95_high": 0.23230794517144604,
+      "baseline_share": 0.5084,
+      "baseline_ci95_low": 0.48444199743185407,
+      "baseline_ci95_high": 0.5323580025681458,
+      "delta": -0.2964,
+      "delta_ci95_low": -0.3349576158734045,
+      "delta_ci95_high": -0.2578423841265955,
+      "delta_standard_error": 0.013887404365107252,
+      "zero_between_seed_variance": false,
+      "p_one_sided": 0.9999857516869967,
+      "stable": false,
+      "p_holm": 1.0,
+      "supported": false,
+      "verdict": "not distinguishable from no dependence"
+    },
+    {
+      "article_id": 80094,
+      "series_id": "80094-s1",
+      "model": "lenient",
+      "shape": "increasing",
+      "n_seeds": 5,
+      "draws_per_seed": 1000,
+      "stability": 0.9932000000000001,
+      "stability_ci95_low": 0.9891384109657109,
+      "stability_ci95_high": 0.9972615890342893,
+      "baseline_share": 0.0634,
+      "baseline_ci95_low": 0.05412484473275552,
+      "baseline_ci95_high": 0.07267515526724447,
+      "delta": 0.9298,
+      "delta_ci95_low": 0.9187150624760669,
+      "delta_ci95_high": 0.940884937523933,
+      "delta_standard_error": 0.003992492955535417,
+      "zero_between_seed_variance": false,
+      "p_one_sided": 1.0197326865625965e-09,
+      "stable": true,
+      "p_holm": 1.2236792238751157e-08,
+      "supported": true,
+      "verdict": "supported"
+    },
+    {
+      "article_id": 80094,
+      "series_id": "80094-s1",
+      "model": "primary",
+      "shape": "increasing",
+      "n_seeds": 5,
+      "draws_per_seed": 1000,
+      "stability": 0.915,
+      "stability_ci95_low": 0.9104378351586251,
+      "stability_ci95_high": 0.919562164841375,
+      "baseline_share": 0.1332,
+      "baseline_ci95_low": 0.11721674077132771,
+      "baseline_ci95_high": 0.14918325922867232,
+      "delta": 0.7818,
+      "delta_ci95_low": 0.7660352674335725,
+      "delta_ci95_high": 0.7975647325664276,
+      "delta_standard_error": 0.005678027826631361,
+      "zero_between_seed_variance": false,
+      "p_one_sided": 8.344031822664071e-09,
+      "stable": true,
+      "p_holm": 7.509628640397663e-08,
+      "supported": true,
+      "verdict": "supported"
+    },
+    {
+      "article_id": 80094,
+      "series_id": "80094-s2",
+      "model": "lenient",
+      "shape": "flat",
+      "n_seeds": 5,
+      "draws_per_seed": 1000,
+      "stability": 0.31320000000000003,
+      "stability_ci95_low": 0.2926018458565674,
+      "stability_ci95_high": 0.33379815414343267,
+      "baseline_share": 0.836,
+      "baseline_ci95_low": 0.8228888277597103,
+      "baseline_ci95_high": 0.8491111722402896,
+      "delta": -0.5228,
+      "delta_ci95_low": -0.5438973292659637,
+      "delta_ci95_high": -0.5017026707340362,
+      "delta_standard_error": 0.007598684096605155,
+      "zero_between_seed_variance": false,
+      "p_one_sided": 0.9999998663031726,
+      "stable": false,
+      "p_holm": 1.0,
+      "supported": false,
+      "verdict": "not distinguishable from no dependence"
+    },
+    {
+      "article_id": 80094,
+      "series_id": "80094-s2",
+      "model": "primary",
+      "shape": "peak",
+      "n_seeds": 5,
+      "draws_per_seed": 1000,
+      "stability": 0.3094,
+      "stability_ci95_low": 0.2868508895083025,
+      "stability_ci95_high": 0.3319491104916975,
+      "baseline_share": 0.1534,
+      "baseline_ci95_low": 0.14870460527458815,
+      "baseline_ci95_high": 0.15809539472541187,
+      "delta": 0.156,
+      "delta_ci95_low": 0.1321161161190002,
+      "delta_ci95_high": 0.1798838838809998,
+      "delta_standard_error": 0.008602325267042623,
+      "zero_between_seed_variance": false,
+      "p_one_sided": 2.718524785249293e-05,
+      "stable": false,
+      "p_holm": 0.00016311148711495757,
+      "supported": false,
+      "verdict": "not distinguishable from no dependence"
+    }
+  ],
+  "artifacts": {
+    "full_runs.csv": "1404edc872e95d94b3ed851c8855e4ddf6c4afda71a78f4fa0d3a3c8c29d81a1",
+    "full_preflight.txt": "ad087969991bbeff855e96612bd48cbe4db428d052618643ab4e24b2d7a7f806",
+    "summary.csv": "caa46f4e0cc557507fc66e6f364e157c6083372cf272554ce92ac7c71c07ea02",
+    "runs.csv": "d736e1f11e7301771cd33d3e0070040f5c72552c23bc6815392e68e90fe0c213"
+  }
+}
