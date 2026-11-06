@@ -1,0 +1,144 @@
+{
+  "tested_commit": "c50a2ff413b4a14e272b52d5496c80d1ac3e931f",
+  "bug_commit": "cf188ed7f3618b3334af263eb67a7ad54783b5e0",
+  "clone_transport": "local git clone --no-local; no network or remote-access test",
+  "initial_checkout_clean": true,
+  "python": "3.12.3",
+  "dependency_environment": "/srv/ai4science_proj/.venv/bin/python",
+  "dependency_setup": "reused existing pinned project venv; fresh pip installation NOT tested",
+  "summary_byte_identical": true,
+  "scientific_csv_rows_identical_excluding": [
+    "git_commit",
+    "series_elapsed_seconds"
+  ],
+  "fresh_manifest_source_and_artifact_hashes_verified": true,
+  "submission_tag_tested": false,
+  "records": [
+    {
+      "label": "clone",
+      "argv": [
+        "git",
+        "clone",
+        "--no-local",
+        "--branch",
+        "main",
+        "/srv/ai4science_proj",
+        "/tmp/ai4science-hw2-check-054blhcn/project"
+      ],
+      "cwd": "/srv/ai4science_proj",
+      "exit": 0,
+      "expected_exit": 0,
+      "seconds": 0.085341
+    },
+    {
+      "label": "imports",
+      "argv": [
+        "/srv/ai4science_proj/.venv/bin/python",
+        "-c",
+        "from pathlib import Path; import tools.series; p=Path(tools.series.__file__).resolve(); assert p==Path.cwd()/'tools/series.py'; print(p)"
+      ],
+      "cwd": "/tmp/ai4science-hw2-check-054blhcn/project",
+      "exit": 0,
+      "expected_exit": 0,
+      "seconds": 0.441969
+    },
+    {
+      "label": "verifier",
+      "argv": [
+        "/srv/ai4science_proj/.venv/bin/python",
+        "-m",
+        "pytest",
+        "checks/verifier",
+        "-q",
+        "--color=no"
+      ],
+      "cwd": "/tmp/ai4science-hw2-check-054blhcn/project",
+      "exit": 0,
+      "expected_exit": 0,
+      "seconds": 2.193049
+    },
+    {
+      "label": "dry",
+      "argv": [
+        "/srv/ai4science_proj/.venv/bin/python",
+        "checks/verifier/run.py",
+        "dry"
+      ],
+      "cwd": "/tmp/ai4science-hw2-check-054blhcn/project",
+      "exit": 0,
+      "expected_exit": 0,
+      "seconds": 0.676307
+    },
+    {
+      "label": "smoke",
+      "argv": [
+        "/srv/ai4science_proj/.venv/bin/python",
+        "checks/verifier/run.py",
+        "smoke"
+      ],
+      "cwd": "/tmp/ai4science-hw2-check-054blhcn/project",
+      "exit": 0,
+      "expected_exit": 0,
+      "seconds": 2.842366
+    },
+    {
+      "label": "full",
+      "argv": [
+        "/srv/ai4science_proj/.venv/bin/python",
+        "checks/verifier/run.py",
+        "full"
+      ],
+      "cwd": "/tmp/ai4science-hw2-check-054blhcn/project",
+      "exit": 0,
+      "expected_exit": 0,
+      "seconds": 3.413154
+    },
+    {
+      "label": "bug_checkout",
+      "argv": [
+        "git",
+        "worktree",
+        "add",
+        "--detach",
+        "/tmp/ai4science-hw2-check-054blhcn/bug",
+        "origin/bug/point-order"
+      ],
+      "cwd": "/tmp/ai4science-hw2-check-054blhcn/project",
+      "exit": 0,
+      "expected_exit": 0,
+      "seconds": 0.010467
+    },
+    {
+      "label": "bug_verifier",
+      "argv": [
+        "/srv/ai4science_proj/.venv/bin/python",
+        "-m",
+        "pytest",
+        "checks/verifier",
+        "-q",
+        "--tb=short",
+        "--color=no"
+      ],
+      "cwd": "/tmp/ai4science-hw2-check-054blhcn/bug",
+      "exit": 1,
+      "expected_exit": 1,
+      "seconds": 2.403956
+    }
+  ],
+  "source_sha256": {
+    "tools/series.py": "e89552257809713e47c500494f9ce0d1113dd32357c15979ed6b43acf835e8d3",
+    "tools/ablation_db.py": "9097493d35986279e373d427522af7b9082cbb64278912d16d078e3a2cfe459a",
+    "requirements.txt": "cebd6f618ab0e38da4f35cdd9790961efb8b556266bac0b1df3ed929c0e0e8dd",
+    "data/ablation_snapshot.json": "c5380620d896237ad655bfde0ce166d3f638b84a3e9b0b996cc09226f6b8303f"
+  },
+  "artifacts": {
+    "bug_checkout.txt": "0752c5b89e67586b70d304e0c26257a4fe7c44d44fa05088e24055c8e83ef4b0",
+    "bug_verifier.txt": "b2d2cbe1961538749987bd07619faf0e32df3ccd759176072a2dc2717b04bb73",
+    "clone.txt": "7622f4e05db945a723f625adb8c6546344b42953439465998cd6828da991c661",
+    "dry.txt": "c5d6ef48d032b6023f4afd43a801097fd74f716f4d413efce72205e334026cd8",
+    "full.txt": "412ea5339af91e515a946dfdebe31faf8fe908c585cd1c3b62306a3df3ee1afa",
+    "imports.txt": "6951cb22376d42b3fd1adafa93022b759fa2b9cdd4cbce8c4576eebd040838d6",
+    "smoke.txt": "db8aea4d8f7d0dc6c3895aee64214f134b430bef9d6ee222d2dcd0eac782e7ee",
+    "verifier.txt": "3ff157ebd3daf40cb959c4e6dfcb18ad61dd5e88c40acf1098b7b9df03e7af0b"
+  }
+}

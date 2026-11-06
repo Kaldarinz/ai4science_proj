@@ -9,6 +9,11 @@ its synthetic tests, and gated `smoke`/`full` commands are now implemented;
 execution status is recorded in `results/verifier/attempts.md`.
 Smoke and full completed; 82 verifier tests and 267 full-suite tests pass.
 Results and interpretation are in `results/verifier/RESULTS.md` (ban 3).
+HW2 report, subgoal tree, authorship and clean-checkout commands:
+`results/verifier/REPORT.md`; actual local reproduction logs:
+`results/verifier/reproduction/`. Anton has reviewed and curated the report;
+operator-created tags remain pending. A fresh dependency installation has not
+been verified.
 
 From the project root, with the dependencies in `requirements.txt`:
 
@@ -80,8 +85,8 @@ integration. Ordinary diameter-density moments are deliberate project policy.
 Independent checks share the written specification with the implementation;
 they do not prove the specification or curated values scientifically correct.
 Hypothesis searches a bounded generated domain, not all possible inputs.
-The stage does not implement claim comparison, submission tags or the HW2
-report. Resampling estimates sensitivity under a specified noise model, not
+The resampling stage did not implement claim comparison, submission tags or
+the later HW2 report. Resampling estimates sensitivity under a specified noise model, not
 repeat-measurement stability. It does not make shared experiments or
 overlapping series independent.
 
@@ -92,4 +97,6 @@ shape function's sorting line. The existing point-order property fails on
 the mutation and passes on the unchanged correct main implementation.
 No verifier Python source was modified for the demonstration.
 Before/after output, patch, provenance and safe-worktree reproduction commands:
-`results/verifier/caught_error.md` (ban 3). The branch was not merged or pushed.
+`results/verifier/caught_error.md` (ban 3). The branch was not merged;
+Anton subsequently reported pushing it, and local `origin/bug/point-order`
+points to `cf188ed`. No live remote-access check was performed here.

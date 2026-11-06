@@ -1,0 +1,2 @@
+Preparing worktree (detached HEAD cf188ed)
+HEAD is now at cf188ed Plant point-order bug for HW2 verifier demonstration

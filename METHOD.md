@@ -165,7 +165,8 @@ with a note, not a violation.
 
 1. **Metric:** for each series and error model, stability (share of
    draws keeping the series' shape) and Δ = stability − baseline share of
-   that same shape; both unitless, 0–1.
+   that same shape; both unitless: stability ranges from 0 to 1 and Δ from
+   −1 to 1 (notation clarified after the run; see §9).
 2. **Repeats and noise:** 5 seeds (0–4) × 1000 draws. A draw moves each
    size by σ·z with z ~ N(0, 1), σ the size's `primary` error (stored, or
    0.10 × size). The same z feeds both error models and the baseline, so
@@ -215,7 +216,8 @@ of the size upper bound described above; no fallback fractions, shape rules
 or resampling acceptance thresholds have been changed. Implementation status
 and environment wording in §4–§5 now reflect the installed verifier. The
 verifier/resampling code was committed as `776a2fe` before the deliberate-error
-demonstration; the new evidence/documentation is uncommitted for review.
+demonstration. The demonstration evidence/documentation was committed as
+`c50a2ff`; subsequent HW2 report/packaging changes remain uncommitted for review.
 The initial verifier regression suite passed 250 tests.
 Subsequent resampling implementation tests and execution status are recorded
 in `results/verifier/attempts.md`; the claim-comparison pipeline remains disabled.
@@ -242,6 +244,23 @@ conventions were recorded (no threshold or noise-distribution change):
   Holm adjustment includes every series × both models, without filtering.
 - Corrected the notation in §2: a difference of two shares ranges from −1 to 1,
   not 0 to 1. Negative Δ is retained, not clipped; the Δ ≥ 0.20 criterion is unchanged.
+  During report packaging, corrected the remaining duplicate 0–1 notation in §7.1
+  to match §2 and the existing signed implementation. This is not a threshold,
+  inference or experiment change.
+
+HW2 report/package checkpoint (2026-11-06): `results/verifier/REPORT.md` records
+results, a subgoal tree, attempt history, limitations and authorship. The initial
+METHOD draft was generated with DeepSeek flash 4 and edited by Anton, who
+subsequently identified the model while curating the report.
+`results/verifier/report_metrics.csv` adds sample SD across the original five
+per-seed estimates without changing the original summary or inference.
+A clean local clone of `c50a2ff` passed the verifier and dry/smoke/full sequence;
+the scientific rows and summary reproduced exactly. A separate bug worktree
+failed the existing order property. Commands, outputs and scope are recorded in
+`results/verifier/reproduction/`. The original sweep source hashes match
+`776a2fe` exactly; later documentation does not retroactively change those runs.
+Reproduction reused the installed pinned venv, not a fresh dependency install;
+no final submission tag or remote-access certification has been made.
 
 ## 10. Limitations
 

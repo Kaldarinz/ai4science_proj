@@ -1,8 +1,10 @@
 # HW2 verifier implementation attempts — 2026-11-06
 
-Baseline: `e9fecd3` (tools and curated METHOD committed before these runs).
-Verifier changes are uncommitted. This is an implementation journal, not an
-HW2 acceptance verdict or the deliberate-bug-branch demonstration.
+Initial baseline: `e9fecd3` (tools and curated METHOD committed before these
+runs). Verifier/resampling were subsequently committed as `776a2fe`, and the
+mutation evidence as `c50a2ff`. Earlier uncommitted/no-branch/no-resampling
+statements below describe their historical checkpoints. This is an execution
+journal, not an HW2 acceptance verdict; later stages are appended.
 
 ## Subgoals
 
@@ -163,3 +165,41 @@ production failure. No actual snapshot values, resampling settings or data
 were altered. `caught_error.md` explains exactly what this demonstrates and
 what it does not; `caught_error_manifest.json` records identities/hashes.
 Main's scientific Python source remains identical to `776a2fe`.
+
+## HW2 report/package and clean local reproduction
+
+After Anton committed the evidence on main (`c50a2ff`) and reported pushing the
+bug branch, he authorized the next report/package stage. No new commit, tag,
+push or scientific-code change is authorized/performed in this stage.
+
+- Confirmed initial METHOD commit: `1dfe8db`, 2026-10-28 19:32:46 +03:00;
+  distinguished this from the stated 2026-10-27 drafting date.
+- Anton confirmed that the initial METHOD was AI-drafted and personally edited.
+  Its model was initially unrecorded; Anton subsequently identified it as
+  DeepSeek flash 4 while curating the report. Current session metadata identifies
+  `gpt-6.1-sol`; the two attributions remain separate.
+- Checked original smoke/full source hashes against git objects in `776a2fe`:
+  exact match for every source, including historical METHOD. Original artifact
+  hashes also match; no historical manifest or numerical output was rewritten.
+- Made one clean **local** clone at `c50a2ff`, without ignored PDFs or network.
+  Reused the installed project venv; fresh pip installation was NOT tested.
+- Verifier: 82 pass; dry, smoke and full: exit 0. New summary is byte-identical;
+  every per-seed scientific field is identical, excluding only git commit and
+  elapsed time. Fresh source/artifact hashes checked.
+- Separate worktree at bug commit `cf188ed`: complete verifier exits 1 with
+  **1 failed, 81 passed**; failure is the existing point-order property.
+- Actual commands, stdout, expected/actual exits, timing and test scope are in
+  `reproduction/manifest.json` and its text files. These do not certify the
+  not-yet-created `hw2` tag, fresh dependency installation or instructor access.
+- `report_metrics.csv` retains all 20 original summary rows and adds sample SD
+  (ddof=1) of stability, baseline share and Δ across the same five seeds.
+  Δ SD/√5 matches the archived standard error. No new draw enters inference.
+- Prepared `REPORT.md`, including ≥3 subgoals, recorded attempts, results,
+  error reproduction, limitations and attribution. Corrected the duplicate
+  signed-Δ range typo in METHOD §7.1, disclosed in §9; no rule changed.
+
+One reproduction attempt succeeded; no three-failure escalation was needed.
+Anton subsequently completed report curation and supplied the earlier-model
+attribution. Dependency-install verification, instructor access/data-sharing
+permission, operator commit/tags and the course student self-check remain
+separate from completed verification.

@@ -50,6 +50,11 @@ Curator-authorized resampling runs with
 Both gate on the contract and property/reference tests. Full also requires
 matching, complete smoke evidence. Outputs stay in `results/verifier/`;
 resampling does not enable claim comparison/summary generation.
+HW2 report, subgoals, authorship and standalone checkout instructions:
+`results/verifier/REPORT.md` (ban 3). The verifier needs the committed numeric
+snapshot/schema, not article PDFs or a live database. Its one-command verdict
+is `.venv/bin/python -m pytest checks/verifier -q`; reproduction logs distinguish
+an already-installed pinned environment from a fresh dependency installation.
 
 A literature task is ready when `.venv/bin/python tools/graph.py --validate`
 exits with 0: it checks the three tables and that `results/` and

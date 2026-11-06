@@ -1,0 +1,23 @@
+........................................................F............... [ 87%]
+..........                                                               [100%]
+=================================== FAILURES ===================================
+_______________________ test_point_order_does_not_matter _______________________
+checks/verifier/test_properties.py:33: in test_point_order_does_not_matter
+    @given(walks(), st.data())
+                   ^^^
+checks/verifier/test_properties.py:37: in test_point_order_does_not_matter
+    assert classify_shape([x[i] for i in order], [y[i] for i in order], [e[i] for i in order]) == classify_shape(x, y, e)
+E   AssertionError: assert 'decreasing' == 'increasing'
+E     
+E     - increasing
+E     ? ^^
+E     + decreasing
+E     ? ^^
+E   Failing test case: test_point_order_does_not_matter(
+E       walk=([1, 2], [0.125, 0.25], [0.0, 0.0]),
+E       data=data(...),
+E   )
+E   Draw 1: [1, 0]
+=========================== short test summary info ============================
+FAILED checks/verifier/test_properties.py::test_point_order_does_not_matter
+1 failed, 81 passed in 2.23s
