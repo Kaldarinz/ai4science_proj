@@ -1,0 +1,220 @@
+"""Synthetic evidence for pairing, fixed errors, inference and stage gates.
+
+Tests never run a real snapshot resampling experiment or spawn recursive pytest.
+"""
+
+import csv
+import json
+from copy import deepcopy
+from types import SimpleNamespace
+
+import numpy as np
+import pytest
+from scipy.stats import ttest_rel
+
+from checks.verifier import resampling as rs
+from checks.verifier import run
+from checks.verifier.fixtures import snapshot
+from tools.series import classify_shape
+
+
+def case(sid="77-s1"):
+    x, sizes, primary, lenient = [1, 2], [10, 30], [1, 2], [2, 4]
+    return {"article_id": 77, "series_id": sid, "x_quantity": "pulse_energy", "x": x, "sizes": sizes,
+            "errors": {"primary": primary, "lenient": lenient},
+            "shapes": {"primary": classify_shape(x, sizes, primary), "lenient": classify_shape(x, sizes, lenient)}}
+
+
+def test_inverse_variance_baseline_and_input_validation():
+    assert rs.weighted_baseline([10, 30], [1, 2]) == pytest.approx(14)
+    for sizes, errors in (([], []), ([1], [0]), ([1], [-1]), ([1], [float("inf")]), ([0], [1]), ([1, 2], [1])):
+        with pytest.raises(ValueError):
+            rs.weighted_baseline(sizes, errors)
+    for scale in (1e-10, 1e10):
+        assert rs.weighted_baseline([10, 30], [scale, 2 * scale]) == pytest.approx(14)
+
+
+def test_one_noise_matrix_paired_models_baseline_fixed_errors_and_no_clipping(monkeypatch):
+    calls = []
+
+    def record(x, sizes, errors):
+        calls.append((list(sizes), list(errors)))
+        return "increasing"
+
+    class Noise:
+        def standard_normal(self, shape):
+            assert shape == (2, 2)
+            return np.array([[-100., 0.], [1., 2.]])
+
+    c = case()
+    monkeypatch.setattr(rs, "classify_shape", record)
+    rows = rs.sample_case(c, seed=0, draws=2, rng=Noise())
+    assert len(calls) == 10  # original + observed draws + baseline draws, twice
+    for offset, errors in ((0, [1, 2]), (5, [2, 4])):
+        assert calls[offset] == ([10, 30], errors)
+        assert [y for y, e in calls[offset + 1:offset + 3]] == [[-90, 30], [11, 34]]
+        assert [y for y, e in calls[offset + 3:offset + 5]] == [[-86, 14], [15, 18]]
+        assert all(e == errors for y, e in calls[offset:offset + 5])
+    assert all(r["nonpositive_observed_draws"] == r["nonpositive_baseline_draws"] == 1 for r in rows)
+    assert all(r["observed_hits"] == r["baseline_hits"] == 2 for r in rows)
+
+
+def test_baseline_hits_target_original_shape_not_baseline_own_shape(monkeypatch):
+    c = case()
+
+    class ZeroNoise:
+        def standard_normal(self, shape):
+            return np.zeros(shape)
+
+    rows = rs.sample_case(c, seed=0, draws=3, rng=ZeroNoise())
+    assert all(r["observed_hits"] == 3 and r["baseline_hits"] == 0 for r in rows)
+    assert all(r["delta"] == 1 for r in rows)
+
+
+def test_reproducible_sweep_and_order_does_not_change_random_stream():
+    a, b = case(), case("77-s2")
+    saved = deepcopy([a, b])
+    first, second = rs.sweep([a, b], "smoke", "hash"), rs.sweep([b, a], "smoke", "hash")
+    for rows in (first, second):
+        for r in rows:
+            r.pop("series_elapsed_seconds")
+    assert first == second
+    assert [a, b] == saved
+    assert len(first) == 4
+    assert all(r["draws"] == 100 and r["seed"] == 0 for r in first)
+    with pytest.raises(ValueError):
+        rs.sweep([a, a], "smoke", "hash")
+
+
+def test_collect_cases_uses_public_payloads_and_checks_members():
+    from tools.series import build_series
+
+    built = build_series(snapshot(), 77).series[0]
+
+    class DB:
+        def find_articles(self):
+            return [{"article_id": 77}]
+
+        def list_series(self, aid):
+            return [built.row]
+
+        def get_series(self, sid, model):
+            return {"series": built.row, "points": built.points(model)}
+
+    cases = rs.collect_cases(DB())
+    assert len(cases) == 1
+    assert cases[0]["errors"]["lenient"] == pytest.approx([2 * e for e in cases[0]["errors"]["primary"]])
+
+    class WrongDB(DB):
+        def get_series(self, sid, model):
+            data = super().get_series(sid, model)
+            if model == "lenient":
+                data["points"][0]["size"] += 1
+            return data
+
+    with pytest.raises(ValueError, match="identical members"):
+        rs.collect_cases(WrongDB())
+
+
+def fake_rows(observed, baseline):
+    rows = []
+    for model in rs.MODELS:
+        for seed, (obs, null) in enumerate(zip(observed, baseline, strict=True)):
+            rows.append({"step": "full", "article_id": 77, "series_id": "77-s1", "model": model,
+                         "seed": seed, "shape": "increasing", "draws": 1000,
+                         "observed_hits": round(obs * 1000), "baseline_hits": round(null * 1000),
+                         "stability": obs, "baseline_share": null, "delta": obs - null})
+    return rows
+
+
+def test_per_seed_t_intervals_paired_test_and_holm():
+    observed, baseline = [.6, .65, .7, .75, .8], [.2] * 5
+    result = rs.summarize(fake_rows(observed, baseline))
+    expected_p = float(ttest_rel(observed, baseline, alternative="greater").pvalue)
+    for row in result:
+        assert row["stability"] == pytest.approx(.7)
+        assert row["delta"] == pytest.approx(.5)
+        assert row["delta_ci95_low"] == pytest.approx(.401837841926122, abs=1e-10)
+        assert row["delta_ci95_high"] == pytest.approx(.598162158073878, abs=1e-10)
+        assert row["p_one_sided"] == pytest.approx(expected_p)
+        assert row["p_holm"] == pytest.approx(2 * expected_p)
+        assert row["supported"] and not row["stable"]
+    assert rs.holm([.04, .01, .03]) == pytest.approx([.06, .03, .06])
+    with pytest.raises(ValueError):
+        rs.holm([float("nan")])
+
+
+def test_signed_deltas_degenerate_variance_and_stability_threshold():
+    negative = rs.summarize(fake_rows([.25] * 5, [.75] * 5))
+    assert all(r["delta"] == -.5 and r["p_one_sided"] == 1 and not r["supported"] for r in negative)
+    positive = rs.summarize(fake_rows([1.] * 5, [.5] * 5))
+    assert all(r["p_holm"] == 0 and r["zero_between_seed_variance"] and r["stable"] and r["supported"] for r in positive)
+    zero = rs.summarize(fake_rows([1.] * 5, [1.] * 5))
+    assert all(r["p_one_sided"] == 1 and r["stable"] and not r["supported"] for r in zero)
+
+
+def test_practical_threshold_includes_exact_point_twenty():
+    result = rs.summarize(fake_rows([.4] * 5, [.2] * 5))
+    assert all(r["delta"] == .2 and r["supported"] for r in result)
+    below = rs.summarize(fake_rows([.399] * 5, [.2] * 5))
+    assert all(r["delta"] == .199 and not r["supported"] for r in below)
+
+
+@pytest.mark.parametrize("corruption", ["missing_seed", "duplicate_seed", "smoke", "draws", "missing_model"])
+def test_inference_rejects_incomplete_or_smoke_data(corruption):
+    rows = fake_rows([.5] * 5, [.2] * 5)
+    if corruption == "missing_seed":
+        rows.pop()
+    elif corruption == "duplicate_seed":
+        rows[1]["seed"] = 0
+    elif corruption == "smoke":
+        rows[0]["step"] = "smoke"
+    elif corruption == "draws":
+        rows[0]["draws"] = 100
+    else:
+        rows = [r for r in rows if r["model"] == "primary"]
+    with pytest.raises(ValueError):
+        rs.summarize(rows)
+
+
+def smoke_evidence(directory):
+    report = {"snapshot_sha256": "snapshot", "series": [{"series_id": "77-s1"}],
+              "provenance": {"source_sha256": {"code.py": "code"}}}
+    rows = [{k: "" for k in rs.RUN_FIELDS} for _ in rs.MODELS]
+    for row, model in zip(rows, rs.MODELS, strict=True):
+        row.update(step="smoke", seed=0, draws=100, series_id="77-s1", model=model)
+    run.write_csv(directory / "smoke_runs.csv", rows, rs.RUN_FIELDS)
+    manifest = {**report, "step": "smoke", "status": "pass", "artifacts": {"smoke_runs.csv": run.digest(directory / "smoke_runs.csv")}}
+    (directory / "smoke.json").write_text(json.dumps(manifest), encoding="utf-8")
+    return report
+
+
+def test_full_requires_matching_complete_smoke_and_unmodified_csv(tmp_path):
+    report = smoke_evidence(tmp_path)
+    assert len(run.require_smoke(tmp_path, report)) == 2
+    changed = deepcopy(report)
+    changed["provenance"]["source_sha256"]["code.py"] = "changed"
+    with pytest.raises(ValueError, match="current snapshot and source"):
+        run.require_smoke(tmp_path, changed)
+    with (tmp_path / "smoke_runs.csv").open("a", encoding="utf-8") as f:
+        f.write("corruption\n")
+    with pytest.raises(ValueError, match="CSV"):
+        run.require_smoke(tmp_path, report)
+
+
+def test_failed_short_check_stops_before_sampling(tmp_path, monkeypatch):
+    report = {"series": [], "provenance": {"git_head": "hash"}}
+    monkeypatch.setattr(run.subprocess, "run", lambda *a, **kw: SimpleNamespace(returncode=1, stdout="failed", stderr=""))
+    monkeypatch.setattr(run, "collect_cases", lambda db: pytest.fail("must not collect after failed properties"))
+    with pytest.raises(ValueError, match="preflight failed"):
+        run.experiment("smoke", tmp_path, report)
+    assert (tmp_path / "smoke_preflight.txt").read_text() == "failed"
+    assert not (tmp_path / "smoke_runs.csv").exists()
+
+
+def test_csv_encoding_newlines_and_fields(tmp_path):
+    path = tmp_path / "rows.csv"
+    run.write_csv(path, [{"a": "mean, paired", "b": "Δ"}], ["a", "b"])
+    assert path.read_bytes().endswith(b"\n") and b"\r" not in path.read_bytes()
+    with path.open(encoding="utf-8", newline="") as f:
+        assert list(csv.DictReader(f)) == [{"a": "mean, paired", "b": "Δ"}]

@@ -39,6 +39,18 @@ The snapshot tools are implemented; their implementation tests run with
 The comparison/summary generation in `src/`, its tests in `tests/` and the
 comparison and summary readiness checks are not implemented/enabled yet.
 
+The curator's HW2 verifier is separate from claim extraction:
+`.venv/bin/python checks/verifier/run.py dry` checks the pinned snapshot and
+series contract (IDs/counts only, no shapes in its output); then
+`.venv/bin/python -m pytest checks/verifier -q` checks METHOD.md §5's nine
+properties and the reference case. Stop on any failure. Its code is protected
+under `checks/verifier/`; outputs belong in `results/verifier/` (ban 3).
+Curator-authorized resampling runs with
+`.venv/bin/python checks/verifier/run.py smoke`, then `... run.py full`.
+Both gate on the contract and property/reference tests. Full also requires
+matching, complete smoke evidence. Outputs stay in `results/verifier/`;
+resampling does not enable claim comparison/summary generation.
+
 A literature task is ready when `.venv/bin/python tools/graph.py --validate`
 exits with 0: it checks the three tables and that `results/` and
 `diary.md` are committed.

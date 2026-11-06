@@ -11,7 +11,8 @@ part verifies the extraction of textual claims or the correctness of the
 curated database values.
 
 Sections 0–10 follow the course template `METHOD_TEMPLATE.md` (week 6).
-Sections 1–7 are fixed before the first run; 8–10 are filled as work goes.
+Sections 1–7 were fixed before the first run; any subsequent curator-authorized
+revision is disclosed in §9. Sections 8–10 are filled as work goes.
 This file names no database values except the reference article 80094,
 whose shapes `checks/results_spec.md` §7.5 already states.
 
@@ -49,7 +50,7 @@ whose shapes `checks/results_spec.md` §7.5 already states.
 |---|---|
 | Varied | error model: `primary` (fallback 0.10 × size) and `lenient` (0.20 × size); in resampling, the noise draw (seed) |
 | Fixed | the snapshot (§3), the series compatibility rules (§3 below and §2 of the spec), the anchor-walk rule (§3 of the spec), the noise model (§7.2) |
-| Measured | shape (one of six names); stability = share of draws whose shape equals the series' shape on the unperturbed data (0–1); Δ = stability − baseline share (0–1) |
+| Measured | shape (one of six names); stability = share of draws whose shape equals the series' shape on the unperturbed data (0–1); Δ = stability − baseline share (−1 to 1) |
 | Baseline | the same series with every size replaced by the error-weighted mean of its sizes: no dependence on fluence, same x and errors |
 
 ## 3. Data
@@ -91,15 +92,16 @@ unknown violation fails the check.
 | experiment ids unique; each experiment's `article_id` is its article's | count and compare | `duplicate_experiment`, `wrong_article` |
 | every ablation target is gold only | resolve the target in `shared` | `non_gold_target` |
 | units: fluence J/cm², pulse energy µJ, spot diameter µm, sizes nm | the snapshot's `units` table | `unit_mismatch` |
-| ranges: 0 < fluence ≤ 1000 J/cm², 0 < energy ≤ 10⁶ µJ, 0 < size ≤ 1000 nm, SD ≥ 0 | per value | `out_of_range` |
+| ranges: finite values; 0 < fluence ≤ 1000 J/cm², 0 < energy ≤ 10⁶ µJ, size > 0, SD ≥ 0; no upper bound on sizes or distribution-axis coordinates | per value | `out_of_range` |
 | distribution bins ascending, not overlapping, counts ≥ 0 with a positive sum | per distribution | `bad_bins` |
 | a series has ≥ 2 distinct x, all fluence or all energy, never mixed | per series | `mixed_x`, `short_series` |
 | members share the article and exact measurement identity and have pairwise-compatible fixed conditions (Series key above) | independently reconstruct profiles and check every pair, not equality of serialized keys | `key_mismatch` |
 | an experiment occurs at most once within each series; overlap between series is allowed | count within each series | `duplicate_point` |
 
-**Known violations:** none recorded yet. An experiment that cannot join a
-series (no varied x or mixed x) is dropped with a note, not a
-violation.
+**Known violations:** no accepted exceptions. The initial size-upper-bound
+failures and the curator's subsequent removal of that rule are recorded in §9.
+An experiment that cannot join a series (no varied x or mixed x) is dropped
+with a note, not a violation.
 
 ## 4. Code and environment
 
@@ -109,13 +111,18 @@ violation.
   `results_spec.md` §4 functions, including `get_series(id, model="primary")`
   and `list_exclusions(article_id)`. No database connection.
 - Tool implementation tests: `.venv/bin/python -m pytest tools/tests -q`.
-  These are separate from the planned HW2 verifier and resampling runs.
-- Planned verifier command: `.venv/bin/python -m pytest checks/verifier -q`;
-  resampling: `.venv/bin/python checks/verifier/run.py <step>` (§6).
+  These are separate from the HW2 verifier and planned resampling runs.
+- Verifier commands: `.venv/bin/python checks/verifier/run.py dry`, then
+  `.venv/bin/python -m pytest checks/verifier -q`.
+  Resampling: `.venv/bin/python checks/verifier/run.py smoke`, then
+  `.venv/bin/python checks/verifier/run.py full` (§6). Both run the contract and
+  property/reference preflight; full requires a passing smoke manifest and
+  complete CSV with matching snapshot and source hashes.
 - Implementation environment: Python 3.12.3; `requirements.txt` pins the
   installed numpy 2.5.3, scipy 1.18.1, pytest 9.1.1, pandas 3.0.6,
-  PyYAML 6.0.3 and pypdf 6.19.0. Hypothesis is not installed or pinned
-  yet; that belongs to implementing the HW2 verifier.
+  PyYAML 6.0.3 and pypdf 6.19.0. At verifier implementation, Hypothesis
+  6.170.15 and jsonschema 4.26.0 were installed and pinned along with
+  their new dependencies; this environment realization is recorded in §9.
 - Seeds: resampling seeds 0–4, each a `numpy.random.default_rng(seed)`;
   hypothesis runs with `derandomize=True`, so its examples repeat.
 
@@ -125,8 +132,8 @@ violation.
   reference case: 80094-s1 `increasing` / `increasing`, 80094-s2 `peak` /
   `flat` (`results_spec.md` §7.5).
 - **Command:** `.venv/bin/python -m pytest checks/verifier -q`.
-- **Location:** planned `checks/verifier/`, read-only for the agent (ban 1).
-  Outputs will go to `results/verifier/`, already covered by ban 3 because
+- **Location:** `checks/verifier/`, read-only for the agent (ban 1).
+  Outputs go to `results/verifier/`, already covered by ban 3 because
   they hold shapes. Tool implementation tests do not write verifier outputs.
 - **Does not check:** that the database values match the articles
   (curation); claim extraction (`check.py` does); whether the fallback
@@ -197,7 +204,41 @@ violation.
 
 | Date | What was wrong | Caught by | Fixed by | Before / after |
 |---|---|---|---|---|
-| | | | | |
+| 2026-11-06 | First completed dry check reported three `out_of_range` violations from the former size upper bound, including stored axis coordinates with zero density. Short check and later steps stopped. | `checks/verifier/run.py dry` | Curator explicitly requested removing the size upper-bound check, not adding data-specific exceptions. Removed it for scalar sizes, selected representative sizes, histogram boundaries and curve axes; finite-value/positivity checks retained. Snapshot unchanged. This is a disclosed post-run revision to §3. | Original failure preserved in `results/verifier/dry_before_size_bound_removal.json`; corrected dry passes with zero violations. Short check: 65 tests pass, including the nine properties and reference. See `dry.json`, `short_check.txt` and `attempts.md` in `results/verifier/`. |
+
+Verifier implementation dependencies were installed and pinned on 2026-11-06:
+Hypothesis 6.170.15 and jsonschema 4.26.0 (plus their dependencies in
+`requirements.txt`). This realizes the planned environment in §4. The only
+post-run scientific-method revision so far is the curator-authorized removal
+of the size upper bound described above; no fallback fractions, shape rules
+or resampling acceptance thresholds have been changed. Implementation status
+and environment wording in §4–§5 now reflect the installed verifier. The code
+is uncommitted. The initial verifier regression suite passed 250 tests.
+Subsequent resampling implementation tests and execution status are recorded
+in `results/verifier/attempts.md`; the claim-comparison pipeline remains disabled.
+
+Before the first implemented resampling run, the following execution
+conventions were recorded (no threshold or noise-distribution change):
+
+- Retain the original primary and lenient error arrays for every draw and
+  baseline classification; never recompute fallback errors from perturbed sizes.
+  Draw once with the original primary σ and reuse z across models and baseline.
+  Normal draws are not truncated, clipped or rejected when sizes become
+  nonpositive; their frequency is logged. The shape function accepts signed sizes.
+- Use one constant baseline centre per series, weighted by inverse original
+  primary variance. Its precise centre cannot affect the anchor-walk shape:
+  translation by a constant cancels all differences. If a future series has
+  zero primary error, stop rather than invent a baseline weighting convention.
+- For each seed, iterate series in stable ID order using one `default_rng(seed)`.
+  CIs for mean stability, baseline share and Δ are 95% t-intervals across the five
+  per-seed estimates (df = 4), intersected with the metric's legal range. They
+  quantify Monte Carlo variation under the assumed model, not experimental
+  repeat-measurement uncertainty. Smoke has no significance verdict or CI.
+- For zero between-seed variance in Δ, use the t-test limiting convention:
+  p = 0 for positive constant Δ, otherwise p = 1; retain a diagnostic flag.
+  Holm adjustment includes every series × both models, without filtering.
+- Corrected the notation in §2: a difference of two shares ranges from −1 to 1,
+  not 0 to 1. Negative Δ is retained, not clipped; the Δ ≥ 0.20 criterion is unchanged.
 
 ## 10. Limitations
 
