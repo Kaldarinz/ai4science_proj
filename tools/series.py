@@ -295,7 +295,7 @@ def classify_shape(x: list[float] | tuple, sizes: list[float] | tuple,
     """
     if len(x) != len(sizes) or len(x) != len(errors) or not len(x):
         raise ValueError("shape arrays must have equal nonzero lengths")
-    points = sorted(
+    points = list(
         (number(a, "x"), number(b, "size"), number(c, "error"))
         for a, b, c in zip(x, sizes, errors, strict=True))
     if len({p[0] for p in points}) != len(points) or any(p[2] < 0 for p in points):
