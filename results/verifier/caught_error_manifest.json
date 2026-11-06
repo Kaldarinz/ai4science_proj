@@ -1,0 +1,59 @@
+{
+  "base_commit": "776a2fe60c70a2225231511555302c4ca44e7e4a",
+  "bug_branch": "bug/point-order",
+  "bug_commit": "cf188ed7f3618b3334af263eb67a7ad54783b5e0",
+  "changed_files": [
+    "tools/series.py"
+  ],
+  "mutation": "classify_shape: points = sorted(...) replaced with list(...)",
+  "command": [
+    "python",
+    "-m",
+    "pytest",
+    "checks/verifier/test_properties.py::test_point_order_does_not_matter",
+    "-q",
+    "--tb=short",
+    "--color=no"
+  ],
+  "baseline_exit": 0,
+  "before_exit": 1,
+  "after_exit": 0,
+  "verifier_after_exit": 0,
+  "regression_after_exit": 0,
+  "implementation": {
+    "before": {
+      "module": "/home/anton/dev/shad/ai4science_proj-bug-point-order/tools/series.py",
+      "sha256": "7638b381b4cd3e40e1322e88fe49b19c62337a0a7671468704f6fd8f0ffa62c9",
+      "ordered": "increasing",
+      "permuted": "decreasing"
+    },
+    "after": {
+      "module": "/srv/ai4science_proj/tools/series.py",
+      "sha256": "e89552257809713e47c500494f9ce0d1113dd32357c15979ed6b43acf835e8d3",
+      "ordered": "increasing",
+      "permuted": "increasing"
+    }
+  },
+  "unchanged_verifier_sha256": {
+    "checks/verifier/contract.py": "35933c98e2e4bd11651fc98003f4c578f0f8df432fad676359de1afdd1c5fef3",
+    "checks/verifier/fixtures.py": "eec4346384fb244fc9ec8620a44c92c5ce7954553f0977e0439057de01f486a0",
+    "checks/verifier/resampling.py": "9e52b71e9c6711a859b91c8363c8e3294a365214863548e3a4bd52dfe9686233",
+    "checks/verifier/run.py": "50e9595b2bed1dcb40870a568d37f61e38c8b578ada936aa4a7463d776570a7b",
+    "checks/verifier/test_contract.py": "82782f6d4944bdd44b3fa5d79190750a446a2cba5e6b4e5546d1e8cb1e598f3d",
+    "checks/verifier/test_properties.py": "a9fd622b101173bc060e32324281332a354ba55568dfb90b60e8925d2ed397c0",
+    "checks/verifier/test_resampling.py": "8a2385889f555a1924f3ab480a7a19367d231274b918faf4aa52c0fabc8b12c4"
+  },
+  "artifacts": {
+    "caught_error.patch": "f2242aefcdb949dcb8c55e28a5f85df70c32d1c1ed7dba5de53afbdf448f0e6c",
+    "caught_error_after.txt": "63203b4ec2b29e7ab8c45616e4d500960794bb60488784fb13fb7fe05b0386bf",
+    "caught_error_baseline.txt": "8afe2471606046b386cbefd7224d475f9d94ddb804d914ca3a5b3472c14d8f5c",
+    "caught_error_before.txt": "72f6cb1366795a81b795e9a7cd0ad9bf555f422836219072c6a5a3bd7915cfed",
+    "caught_error_regression_after.txt": "ce726b699c88ab7fd7fcf9c9d1849146676aee69915042c9f57be558674055b6",
+    "caught_error_verifier_after.txt": "ad087969991bbeff855e96612bd48cbe4db428d052618643ab4e24b2d7a7f806"
+  },
+  "notes": [
+    "baseline and before tests ran in separate worktree; before source subsequently committed unchanged",
+    "after uses the original correct parent on main, not a newly discovered production fix",
+    "only mutation was committed; no merge/tag/push/resampling occurred"
+  ]
+}

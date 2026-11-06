@@ -142,3 +142,24 @@ Reran all tests and both fixed-seed stages after the correction:
 
 The current manifests/logs supersede the initial timing/test counts above.
 No scientific thresholds, inputs or noise conventions changed between runs.
+
+## Deliberate-error demonstration after baseline commit 776a2fe
+
+Anton committed the verifier/resampling baseline, then explicitly authorized
+committing only an intentional mutation on `bug/point-order`, leaving main's
+evidence uncommitted for review. Created a separate private worktree so main
+never contained the defect.
+
+| Attempt | Result | Action |
+|---|---|---|
+| Baseline property, before mutation | 1 passed / exit 0 | Establish unchanged test passes on baseline. |
+| First mutation: remove sorting in shape classification | Existing property 1 failed / exit 1; Hypothesis shrank to two points and reversed order. | Detection succeeded on first candidate; no alternate bug or weakened test tried. |
+| Preserve mutation | Commit `cf188ed` changes only `tools/series.py`, parent `776a2fe`. | Retain local branch; no merge/tag/push. |
+| Original correct main | Same property: 1 passed; complete verifier: 82 passed; full suite: 267 passed. | Save actual outputs; no new repair commit needed. |
+
+The three-attempt rule did not require escalation: one bug candidate was
+sufficient, and its expected failure was not retried or treated as an unknown
+production failure. No actual snapshot values, resampling settings or data
+were altered. `caught_error.md` explains exactly what this demonstrates and
+what it does not; `caught_error_manifest.json` records identities/hashes.
+Main's scientific Python source remains identical to `776a2fe`.

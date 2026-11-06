@@ -204,6 +204,7 @@ with a note, not a violation.
 
 | Date | What was wrong | Caught by | Fixed by | Before / after |
 |---|---|---|---|---|
+| 2026-11-06 | Deliberate mutation on `bug/point-order`: removed sorting from the shape function. A two-point permutation changed increasing to decreasing. This is a planted defect, not a discovered error in main. | Existing §5 property 1, unchanged from baseline `776a2fe`; Hypothesis reduced the failing input. | Compared the faulty commit `cf188ed` with the original correct parent on main. No new repair or mutation was applied to main; the bug branch remains separate. | `results/verifier/caught_error_before.txt` exits 1; `caught_error_after.txt` exits 0. Full verifier: 82 pass; regression: 267 pass. Commands, patch and source/artifact fingerprints in `caught_error.md` and `caught_error_manifest.json`. |
 | 2026-11-06 | First completed dry check reported three `out_of_range` violations from the former size upper bound, including stored axis coordinates with zero density. Short check and later steps stopped. | `checks/verifier/run.py dry` | Curator explicitly requested removing the size upper-bound check, not adding data-specific exceptions. Removed it for scalar sizes, selected representative sizes, histogram boundaries and curve axes; finite-value/positivity checks retained. Snapshot unchanged. This is a disclosed post-run revision to §3. | Original failure preserved in `results/verifier/dry_before_size_bound_removal.json`; corrected dry passes with zero violations. Short check: 65 tests pass, including the nine properties and reference. See `dry.json`, `short_check.txt` and `attempts.md` in `results/verifier/`. |
 
 Verifier implementation dependencies were installed and pinned on 2026-11-06:
@@ -212,8 +213,10 @@ Hypothesis 6.170.15 and jsonschema 4.26.0 (plus their dependencies in
 post-run scientific-method revision so far is the curator-authorized removal
 of the size upper bound described above; no fallback fractions, shape rules
 or resampling acceptance thresholds have been changed. Implementation status
-and environment wording in §4–§5 now reflect the installed verifier. The code
-is uncommitted. The initial verifier regression suite passed 250 tests.
+and environment wording in §4–§5 now reflect the installed verifier. The
+verifier/resampling code was committed as `776a2fe` before the deliberate-error
+demonstration; the new evidence/documentation is uncommitted for review.
+The initial verifier regression suite passed 250 tests.
 Subsequent resampling implementation tests and execution status are recorded
 in `results/verifier/attempts.md`; the claim-comparison pipeline remains disabled.
 

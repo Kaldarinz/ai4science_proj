@@ -13,9 +13,11 @@ From the project root with `requirements.txt` installed:
 
 Stop on failure. Full requires smoke for the same snapshot and source hashes;
 both resampling steps rerun the contract and property/reference preflight.
-Code is currently **uncommitted**, based on git HEAD `e9fecd3`. The manifests
-record actual dirty status and exact source hashes: HEAD alone does not
-identify the verifier code that ran. No submission/reproduction tag was made.
+At execution, code was **uncommitted**, based on git HEAD `e9fecd3`; it was
+subsequently committed as `776a2fe`. The manifests retain the actual execution
+time's dirty status and exact source hashes, not retroactively rewritten git
+metadata. HEAD alone does not identify the code that ran. No
+submission/reproduction tag was made.
 
 ## Execution
 

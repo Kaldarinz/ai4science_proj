@@ -50,7 +50,7 @@ The second command includes the pinned snapshot contract, both error models,
 the reference shapes in `checks/results_spec.md` §7.5, nine Hypothesis properties
 from METHOD.md §5 (150 deterministic examples each, no example database), and
 tests that synthetic corruptions actually fail the contract. Synthetic failures
-are checker self-tests, not the future deliberate-bug-branch demonstration.
+are checker self-tests, separate from the deliberate-bug-branch demonstration.
 It does not depend on implementation-test fixtures in `tools/tests/`.
 
 ## Independent evidence
@@ -80,7 +80,16 @@ integration. Ordinary diameter-density moments are deliberate project policy.
 Independent checks share the written specification with the implementation;
 they do not prove the specification or curated values scientifically correct.
 Hypothesis searches a bounded generated domain, not all possible inputs.
-The stage does not implement claim comparison, submission tags,
-the HW2 report or the planted-error branch. Resampling estimates sensitivity
-under a specified noise model, not repeat-measurement stability. It does not
-make shared experiments or overlapping series independent.
+The stage does not implement claim comparison, submission tags or the HW2
+report. Resampling estimates sensitivity under a specified noise model, not
+repeat-measurement stability. It does not make shared experiments or
+overlapping series independent.
+
+## Deliberate-error demonstration
+
+Local branch `bug/point-order` (`cf188ed`, parent `776a2fe`) changes only the
+shape function's sorting line. The existing point-order property fails on
+the mutation and passes on the unchanged correct main implementation.
+No verifier Python source was modified for the demonstration.
+Before/after output, patch, provenance and safe-worktree reproduction commands:
+`results/verifier/caught_error.md` (ban 3). The branch was not merged or pushed.
