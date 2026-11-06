@@ -111,9 +111,9 @@ class Article(TypedDict):
     """An article as `find_articles` returns it (results_spec §4)."""
 
     article_id: int
-    doi: str
+    doi: str | None
     title: str
-    year: int
+    year: int | None
     n_experiments: int
 
 
@@ -126,12 +126,14 @@ class Series(TypedDict):
     x_quantity: str
     size_quantity: str
     size_statistic: str
-    size_technique: str
+    size_technique: str | None
+    size_weighting: str | None
+    size_component: str | None
     size_source: str
     storage_duration_h: float | None
-    pulse_duration_fs: float
-    pulse_duration_class: str
-    wavelength_nm: float
+    pulse_duration_fs: float | None
+    pulse_duration_class: str | None
+    wavelength_nm: float | None
     medium_class: str
     shape_primary: str
     shape_lenient: str
@@ -147,7 +149,11 @@ class AblationTools(Protocol):
         ...
 
     def list_series(self, article_id: int) -> list[Series]:
-        """List the series of one article."""
+        """List possibly overlapping series of one article (results_spec §2).
+
+        Missing fixed-condition details are wildcards; this is not a
+        partition of experiments. Measurement identity remains exact.
+        """
         ...
 
 
@@ -280,7 +286,7 @@ def check_vocabulary(report: Report) -> None:
     results = (checks / "results_spec.md").read_text(encoding="utf-8")
     claim_lines = claims.splitlines()
     result_lines = results.splitlines()
-    medium = re.search(r"\*\*medium_class\*\*(.*?)\n\n", results, re.S)
+    medium = re.search(r"\*\*medium_class\*\*(.*?)\n\n", results, re.DOTALL)
     stated = {
         ("claims §3", "direction"):
             table_cells(claim_lines, "| `direction` |", 2),
@@ -907,12 +913,12 @@ def load_tools(report: Report) -> AblationTools | None:
     AblationTools | None
         The tools module, or None when it cannot be imported.
     """
-    # Imported by name: the module is maintained separately and may not
-    # exist yet, so a static import would not resolve.
+    # Imported by name so claim-only checks do not load the numerical
+    # snapshot tools or their numpy/scipy dependencies.
     sys.path.insert(0, f"{ROOT}")
     try:
         module = importlib.import_module("tools.ablation_db")
-    except Exception as error:
+    except Exception as error:  # noqa: BLE001 -- report any tool import failure
         report.fail(
             "results §4",
             f"tools/ablation_db.py cannot be imported: {error}",
@@ -1286,8 +1292,9 @@ def main() -> int:
     if args.gold:
         report_gold(claims, article)
 
-    # Comparison and summary (results_spec §4–§7) wait for
-    # tools/ablation_db.py; enable them together with it.
+    # The snapshot tools exist, but comparison/summary generation in src/
+    # and the corresponding result files are still a separate task.
+    # Enable this block only when that pipeline is ready (results §5–§7).
     # if article is None:
     #     tools = load_tools(report)
     #     if tools is not None:

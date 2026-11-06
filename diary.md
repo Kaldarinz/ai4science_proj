@@ -90,3 +90,12 @@ Run in /home/aiagent/week2, outside this project; not project data.
 * Query q3: openalex_search "gold nanoparticles laser ablation liquid size laser power", sort=relevance, limit=5. Found 33966; recorded 5: 1 already in sources.csv (q3 added to its found_by), 4 new.
 * Screening of the new ones: 0 relevant, 4 excluded; 1 describes a corpus article (R9). No citations. Commits d6fa6ee, fd0b086.
 * Entries q1-q3 cut to counts by the human: they named works and described abstracts, which a literature diary entry must not (checks/literature_spec.md §6).
+
+## 2026-11-06 - snapshot series tools: authorized implementation
+* Anton approved implementing `tools/series.py`, the snapshot-only `tools/ablation_db.py` and their implementation tests. Updated results_spec §2–§4, METHOD.md, the checker's output types and project-map descriptions to match. Reason: the old contract assumed live database access and did not cover curves, weighting, components or model-specific point errors.
+* Curator decisions: normalize z_average and a missing scalar statistic to mean; preserve original labels and measurement distinctions; derive histogram mode from a lognormal fit; treat every size curve as an ordinary density over diameter, including DLS. These are project approximations, not database edits.
+* Unit/adapter tests are separate from the planned HW2 verifier. No resampling experiment or comparison/summary generation is run or enabled by this change; no verdict on an extraction is recorded here.
+
+## 2026-11-06 - curator changes to series compatibility
+* Anton requested an explicit Series key definition in METHOD.md, missing condition values as wildcards and removal of the spot-diameter equality restriction. Clarifications: allow overlapping pairwise-compatible groups rather than a partition or transitive merging; absent/empty condition collections mean none, while missing details within listed records are wildcards. Measurement labels, x availability and storage-duration selection do not become wildcard conditions.
+* Updated the tools, implementation tests and coordinated contract/ontology/checker descriptions. Overlap is exposed in series notes; no stored values are imputed and no database or snapshot is changed. Changes remain uncommitted for review. No HW2 verifier/resampling or comparison/summary generation is enabled or run.

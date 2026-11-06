@@ -1,5 +1,15 @@
 # Method: verifying the series shapes of ablation_db data
 
+Here, “code” means the Python tools `tools/series.py` and
+`tools/ablation_db.py`: they read a fixed database snapshot, group experiments
+with compatible stated conditions into nanoparticle-size-versus-fluence
+(or pulse-energy) series, and classify each as flat, increasing, decreasing, peak, valley
+or irregular, accounting for size errors. The verifier checks that these tools
+implement the specified rules correctly; a resampling experiment then measures
+how sensitive their classifications are to the assumed size errors. Neither
+part verifies the extraction of textual claims or the correctness of the
+curated database values.
+
 Sections 0–10 follow the course template `METHOD_TEMPLATE.md` (week 6).
 Sections 1–7 are fixed before the first run; 8–10 are filled as work goes.
 This file names no database values except the reference article 80094,
@@ -10,7 +20,7 @@ whose shapes `checks/results_spec.md` §7.5 already states.
 | Field | Value |
 |---|---|
 | Task | check the code that groups ablation_db experiments into size-versus-fluence series and gives each series a shape (`results_spec.md` §2–§3), and measure how stable each shape is under the size errors |
-| Discipline | materials science (laser ablation in liquids, gold nanoparticles) |
+| Discipline | materials science (laser ablation in liquids) |
 | Verifier type | property tests and a data contract |
 | Method recorded | 2026-10-27, before the first run |
 | Git tag | `exp-verifier`; the submission is tagged `hw2` |
@@ -38,7 +48,7 @@ whose shapes `checks/results_spec.md` §7.5 already states.
 | What | Value |
 |---|---|
 | Varied | error model: `primary` (fallback 0.10 × size) and `lenient` (0.20 × size); in resampling, the noise draw (seed) |
-| Fixed | the snapshot (§3), the series key (§2 of the spec), the anchor-walk rule (§3 of the spec), the noise model (§7.2) |
+| Fixed | the snapshot (§3), the series compatibility rules (§3 below and §2 of the spec), the anchor-walk rule (§3 of the spec), the noise model (§7.2) |
 | Measured | shape (one of six names); stability = share of draws whose shape equals the series' shape on the unperturbed data (0–1); Δ = stability − baseline share (0–1) |
 | Baseline | the same series with every size replaced by the error-weighted mean of its sizes: no dependence on fluence, same x and errors |
 
@@ -47,11 +57,29 @@ whose shapes `checks/results_spec.md` §7.5 already states.
 | What | Value |
 |---|---|
 | Source | ablation_db (curated database of laser-ablation experiments), read-only account, exported with `ablation_db snapshot` |
-| Version | `data/ablation_snapshot.json`, SHA-256 `c5380620d896237ad655bfde0ce166d3f638b84a3e9b0b996cc09226f6b8303f`; format 1, schema change `0095`, metadata hash `c129120a031257f6e46e3a46d0762bef`, exported 2026-10-27T11:18:47Z from live; exporter at ablation_db commit `<fill in>`; committed in `9db97cf` |
+| Version | `data/ablation_snapshot.json`, SHA-256 `c5380620d896237ad655bfde0ce166d3f638b84a3e9b0b996cc09226f6b8303f`; format 1, schema change `0095`, metadata hash `c129120a031257f6e46e3a46d0762bef`, exported 2026-10-27T11:18:47Z from live; committed in `9db97cf` |
 | Export options | gold as the sole target material, completed articles only; no manufacturers, instrument details, measurement settings or provenance; compact materials; nulls omitted |
-| Licence | none stated; included only so that the check can be reproduced |
 | Size | 19 articles, 118 experiments, 753 KB |
-| Split | none: nothing is fitted; every series of the snapshot is used |
+| Split | none: every usable series is evaluated; histogram modes, when requested, are fitted locally with a lognormal distribution |
+
+### Series key
+
+Series are formed from experiments of individual articles. The experiments additionally must share the following paramters to form a series:
+
+| Part | Exported fields compared |
+|---|---|
+| Laser and optics | Laser description, wavelength, pulse duration, repetition rate, output beam diameter, polarization, spatial mode and ordered beam path |
+| Ablation setup | Complete `ablation` record: target, target position, liquid-layer thickness, scanning parameters and batch/flow settings |
+| Materials and media | Synthesis medium, feedstock colloid identities and fractions, and the selected product's liquid medium |
+| Beam entrance and gas | Entrance material, free-surface entrance flag, pumping gas, flow rate, duration and whether pumping occurs during processing |
+| Post-processing | Complete ordered protocol and its parameters |
+
+
+A missing or null scalar condition or optional condition is a
+wildcard matching any stated value. Missing details inside listed records
+are wildcards too. **Absent, null or empty condition collections mean none**,
+not unknown: no feedstock does not match a nonempty feedstock list. Beam-path
+and post-processing order is significant.
 
 **Data contract**, checked by `checks/verifier/contract.py` on the snapshot
 and on the series built from it. Each rule returns named violations; an
@@ -65,25 +93,29 @@ unknown violation fails the check.
 | units: fluence J/cm², pulse energy µJ, spot diameter µm, sizes nm | the snapshot's `units` table | `unit_mismatch` |
 | ranges: 0 < fluence ≤ 1000 J/cm², 0 < energy ≤ 10⁶ µJ, 0 < size ≤ 1000 nm, SD ≥ 0 | per value | `out_of_range` |
 | distribution bins ascending, not overlapping, counts ≥ 0 with a positive sum | per distribution | `bad_bins` |
-| a series has ≥ 2 distinct x, all fluence or all energy, never both | per series | `mixed_x`, `short_series` |
-| energy as x only when the spot diameter is equal for all points or missing for all | per series | `spot_varies` |
-| members of a series share every key condition | compare the key of each member | `key_mismatch` |
-| each (experiment, size kind) in at most one series | count | `point_in_two_series` |
+| a series has ≥ 2 distinct x, all fluence or all energy, never mixed | per series | `mixed_x`, `short_series` |
+| members share the article and exact measurement identity and have pairwise-compatible fixed conditions (Series key above) | independently reconstruct profiles and check every pair, not equality of serialized keys | `key_mismatch` |
+| an experiment occurs at most once within each series; overlap between series is allowed | count within each series | `duplicate_point` |
 
 **Known violations:** none recorded yet. An experiment that cannot join a
-series (no varied x, mixed x, varying spot) is dropped with a note, not a
+series (no varied x or mixed x) is dropped with a note, not a
 violation.
 
 ## 4. Code and environment
 
-- Code: pure functions in `tools/series.py` (series key, x, size, size_err,
-  shape); `tools/ablation_db.py` reads the snapshot and serves the
-  `results_spec.md` §4 functions. No database connection.
-- Command: `.venv/bin/python -m pytest checks/verifier -q`; resampling:
-  `.venv/bin/python checks/verifier/run.py <step>` (§6).
-- Environment: Python 3.14.4; `requirements.txt` pins numpy 2.5.4,
-  scipy 1.18.1, pytest 9.1.1, PyYAML 6.0.3, pypdf 6.20.0 and hypothesis
-  (version fixed when installed).
+- Code: pure functions in `tools/series.py` (condition compatibility,
+  overlapping groups, x, size, size_err, shape); `tools/ablation_db.py` reads
+  the snapshot and serves the
+  `results_spec.md` §4 functions, including `get_series(id, model="primary")`
+  and `list_exclusions(article_id)`. No database connection.
+- Tool implementation tests: `.venv/bin/python -m pytest tools/tests -q`.
+  These are separate from the planned HW2 verifier and resampling runs.
+- Planned verifier command: `.venv/bin/python -m pytest checks/verifier -q`;
+  resampling: `.venv/bin/python checks/verifier/run.py <step>` (§6).
+- Implementation environment: Python 3.12.3; `requirements.txt` pins the
+  installed numpy 2.5.3, scipy 1.18.1, pytest 9.1.1, pandas 3.0.6,
+  PyYAML 6.0.3 and pypdf 6.19.0. Hypothesis is not installed or pinned
+  yet; that belongs to implementing the HW2 verifier.
 - Seeds: resampling seeds 0–4, each a `numpy.random.default_rng(seed)`;
   hypothesis runs with `derandomize=True`, so its examples repeat.
 
@@ -93,9 +125,9 @@ violation.
   reference case: 80094-s1 `increasing` / `increasing`, 80094-s2 `peak` /
   `flat` (`results_spec.md` §7.5).
 - **Command:** `.venv/bin/python -m pytest checks/verifier -q`.
-- **Location:** `checks/verifier/`, read-only for the agent (ban 1).
-  Outputs go to `results/verifier/`, which holds shapes, so ban 3 must
-  name it before the first run.
+- **Location:** planned `checks/verifier/`, read-only for the agent (ban 1).
+  Outputs will go to `results/verifier/`, already covered by ban 3 because
+  they hold shapes. Tool implementation tests do not write verifier outputs.
 - **Does not check:** that the database values match the articles
   (curation); claim extraction (`check.py` does); whether the fallback
   fractions 0.10 and 0.20 are right; anything the snapshot left out
@@ -110,8 +142,8 @@ violation.
 | 5 | if `primary` gives `flat`, `lenient` gives `flat` | lenient errors are never smaller, and a flat walk never moves its anchor | `test_lenient_flat_when_primary_flat` |
 | 6 | appending a copy of the last point at a larger x does not change the shape | a copy is never farther than the error from the anchor | `test_repeated_last_point_changes_nothing` |
 | 7 | the number-weighted mean of a distribution lies within its bin edges and does not change when all counts are scaled | digitized counts have an arbitrary scale | `test_distribution_mean` |
-| 8 | the error is the stored SE if any, else SD/√N, else the fallback | `results_spec.md` §2 priority | `test_error_priority` |
-| 9 | on generated experiments, each (experiment, size kind) lands in at most one series, and all members share the key | the series key is a partition | `test_series_partition` |
+| 8 | the error is the matching stored SE if any, else SD/√N for a mean with explicitly reported N, else the fallback | `results_spec.md` §2 priority | `test_error_priority` |
+| 9 | generated series have exact article/measurement identity, pairwise-compatible fixed conditions and no repeated experiment within a series; reordering inputs preserves the groups | unknowns may overlap but never bridge conflicting stated values; grouping is not a partition | `test_series_compatibility` |
 
 ## 6. Depth steps
 
@@ -171,11 +203,33 @@ violation.
 
 - The snapshot has no provenance: sizes read from figures, and x values
   the curator assumed, look the same as reported values.
-- The noise model assumes independent normal errors. Resampling around
-  measured values adds the noise a second time, so stability is a lower
-  bound.
-- SD/√N counts particle-sampling error only; one colloid per point hides
-  the scatter between syntheses.
+- By the curator's toy-project decision, all size curves, including DLS,
+  are treated as ordinary densities over stored diameter in nm. Mean is
+  `∫d*y dd / ∫y dd`: no ln-d integration, Jacobian or exponentiation of x.
+  This overrides the snapshot schema's DLS y convention, not its x units.
+- By the curator's decision, scalar `z_average` is grouped as `mean`;
+  missing scalar statistic is assumed to be mean. Original labels and
+  assumptions remain on the points; quantity, technique, weighting and
+  component remain distinct. Nothing in the database is rewritten.
+- Histogram mode is the global maximum of a fitted lognormal density,
+  never the tallest bin. The fit uses stored bar extents as bin limits;
+  those can differ from actual bin boundaries. Fit failures are reported,
+  and residuals are retained; fitting does not establish unimodality.
+- Unsupported statistics, ambiguous measurements, duplicate x and groups
+  without a common storage duration are explicitly excluded. Counts
+  depend on these rules; the historical estimate of nine series is not
+  an acceptance target.
+- Missing condition details are wildcards and spot diameter is ignored.
+  This may combine physically different experiments. Absent collections still
+  mean none, and conflicting stated values are never joined transitively.
+- Series may share experiments; they are not independent observations.
+  `overlapping_series` notes expose this reuse, but do not remove dependence.
+- The noise model assumes independent normal errors. Resampling measures
+  sensitivity under the assumed noise model; it does not establish
+  repeat-measurement stability.
+- SD/√N is used only for means with an explicit reported particle count;
+  it counts particle-sampling error only. It is not the uncertainty of a
+  fitted mode or median. One colloid per point hides synthesis scatter.
 - The fallback fractions (0.10, 0.20) and the thresholds in §7 are
   choices, not measurements.
 - About 9 series: enough to test the code, too few for a strong sign test

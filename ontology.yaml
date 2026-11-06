@@ -24,7 +24,7 @@ classes:
     definition: a row of results/claims.csv - a statement of an article about how size depends on fluence or energy
   Series:
     parent: null
-    definition: experiments of one article in ablation_db that differ only in fluence or energy (results_spec section 2)
+    definition: possibly overlapping experiments of one article with pairwise-compatible exported fixed conditions and exact size quantity, technique, weighting, component and normalized location statistic, varying fluence or energy; missing condition details are wildcards, absent collections mean none, and spot diameter is ignored (results_spec section 2)
   Check:
     parent: null
     definition: a check of a claim by a curator
@@ -79,7 +79,7 @@ attributes:
       values: [flat, increasing, decreasing, peak, valley, irregular],
     }
   reason: { domain: Check, values: [gold_sample, mismatch, runs_disagree, review] } # review: non-blind, not used for error rates
-  database: { domain: Query, values: [openalex, ablation_db] } # ablation_db: no instances until tools/ablation_db.py exists
+  database: { domain: Query, values: [openalex, ablation_db] } # snapshot series tools do not create Query instances
   screening: { domain: Source, values: [relevant, excluded] } # from the abstract; admission is the describes link
 
 rules:
