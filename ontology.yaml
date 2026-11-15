@@ -1,13 +1,13 @@
 ontology: au-size-vs-fluence
 goal: >
-  Record which articles claim that Au nanoparticle size depends on pulse fluence
-  or energy, which ablation_db series test each claim, whether they agree, which
+  Record which articles claim that Au nanoparticle size depends on pulse fluence,
+  pulse energy, power or intensity, which ablation_db series test each claim, whether they agree, which
   results a curator has checked and why, and where every source, table and script
   lies; also which OpenAlex records are candidates for ablation_db and by which
   query they were found. Used by the agent and a curator.
 
 competency_questions:
-  - Which articles make a claim about size vs fluence or energy, and on what basis (own_data, cited, general)?
+  - Which fully reviewed articles make a claim about size vs fluence, energy, power or intensity, and on what basis (own_data, cited, general)?
   - Which series in ablation_db belong to each article, and what is their shape under the two error models?
   - Which articles have no claim, and why - no claim in the text, or no matching series?
   - Which claims were checked by a curator, and why - gold sample, claim-data mismatch, or disagreement between runs?
@@ -21,7 +21,7 @@ classes:
     definition: a publication in ablation_db, listed in data/corpus.csv; its PDF lies in data/articles/<id>/
   Claim:
     parent: null
-    definition: a row of results/claims.csv - a statement of an article about how size depends on fluence or energy
+    definition: a row of results/claims.csv - a statement of an article about how size depends on fluence, energy, power or intensity; unspecified labels are retained separately
   Series:
     parent: null
     definition: possibly overlapping experiments of one article with pairwise-compatible exported fixed conditions and exact size quantity, technique, weighting, component and normalized location statistic, varying fluence or energy; missing condition details are wildcards, absent collections mean none, and spot diameter is ignored (results_spec section 2)
@@ -66,8 +66,12 @@ attributes:
   basis: { domain: Claim, values: [own_data, cited, general] }
   verdict: {
       domain: Claim,
-      values: [agrees, disagrees, model_dependent, unmatched],
-    } # own_data claims only
+      values: [agrees, disagrees, mixed, model_dependent, unmatched, unassessable],
+    } # legacy graph projection of two model-specific outcomes; own_data only
+  extraction_status: { domain: Article, values: [complete, pending, unreadable] }
+  matching_decision: { domain: Claim, values: [include, exclude, no_candidates] } # audit-pair vocabulary, not a scalar claim verdict
+  assessment: { domain: Claim, values: [direct, qualified, unassessable] } # comparison-pair vocabulary
+  claim_outcome: { domain: Claim, values: [all_agree, all_disagree, mixed, unassessable] } # separately per model
   shape_primary:
     {
       domain: Series,
@@ -94,14 +98,14 @@ rules:
     check: { kind: some, class: Series, property: reportedIn, target: Article }
   - id: R3
     text: A matched claim is a claim whose verdict compares it with data.
-    dl: "MatchedClaim ≡ Claim ⊓ ∃verdict.{agrees, disagrees, model_dependent}"
+    dl: "MatchedClaim ≡ Claim ⊓ ∃verdict.{agrees, disagrees, mixed, model_dependent}"
     check:
       {
         kind: defined_value,
         name: MatchedClaim,
         class: Claim,
         attribute: verdict,
-        values: [agrees, disagrees, model_dependent],
+        values: [agrees, disagrees, mixed, model_dependent],
       }
   - id: R4
     text: Every matched claim is compared with at least one series.
@@ -114,15 +118,15 @@ rules:
         target: Series,
       }
   - id: R5
-    text: A disputed claim is a claim whose data disagree with it under at least one error model.
-    dl: "DisputedClaim ≡ Claim ⊓ ∃verdict.{disagrees, model_dependent}"
+    text: A disputed graph verdict records disagreement, mixed evidence or model-dependent concordance (not a physical verification).
+    dl: "DisputedClaim ≡ Claim ⊓ ∃verdict.{disagrees, mixed, model_dependent}"
     check:
       {
         kind: defined_value,
         name: DisputedClaim,
         class: Claim,
         attribute: verdict,
-        values: [disagrees, model_dependent],
+        values: [disagrees, mixed, model_dependent],
       }
   - id: R6
     text: Every disputed claim is checked by a curator.

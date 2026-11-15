@@ -16,9 +16,13 @@ At the end the project will contain:
 - `results/claims.csv` — the claims of every article in `data/corpus.csv`;
 - `results/no_claims.csv` — for an article with no claim, the closest
   sentence and why it is not one;
-- `results/comparison.csv` — each `own_data` claim against its series;
-- `results/summary.json` — claim counts, agreement rates, series shapes;
-- `src/` — the code producing the last two from `results/claims.csv` and
+- `results/extraction_status.csv` — reading coverage of main text and all supplied SI;
+- `results/matching_audit.csv` — every own-data candidate, inclusion/exclusion,
+  evidence, assumptions and caveats, including claims with no candidates;
+- `results/comparison.csv` — every included pair, both error models;
+- `results/summary.json` — article prevalence, comparison coverage, per-claim
+  outcomes and secondary pair/series diagnostics, with explicit denominators;
+- `src/` — the code producing the analysis outputs from `results/claims.csv` and
   the database tools;
 - `results/queries.csv`, `results/sources.csv`, `results/citations.csv` —
   the OpenAlex queries, the works they found, and citation links.
@@ -36,8 +40,15 @@ before answering; without `--article` it checks every article.
 
 The snapshot tools are implemented; their implementation tests run with
 `.venv/bin/python -m pytest tools/tests -q`. These are not the HW2 verifier.
-The comparison/summary generation in `src/`, its tests in `tests/` and the
-comparison and summary readiness checks are not implemented/enabled yet.
+The scientific generator in `src/` and its tests in `tests/` remain your task.
+Independent acceptance checks are enabled explicitly, after blind extraction:
+`.venv/bin/python checks/check.py --analysis draft`, then after Anton's matching
+review, `... checks/check.py --analysis final`. They require the reading ledger,
+exhaustive audit, comparisons and summary (results_spec §§5–6). No analysis
+outputs or approval exist merely because the checker has been implemented.
+Protected checker tests: `.venv/bin/python -m pytest checks/tests -q`.
+Claim-only mode never loads numerical tools or analysis outputs. Without a
+reading ledger it retains legacy behavior, not complete-reading certification.
 
 The curator's current-snapshot verifier is separate from claim extraction:
 `.venv/bin/python checks/verifier/run.py dry` checks the pinned snapshot and
@@ -109,7 +120,8 @@ exits with 0: it checks the three tables and that `results/` and
    continue. `[window]`
 3. While extracting claims, do not call the database tools or the
    `research` tools, or read `data/ablation_snapshot.json` (the database
-   values), `results/comparison.csv`, `results/verifier/`,
+   values), `results/comparison.csv`, `results/matching_audit.csv`,
+   `results/summary.json`, `checks/matching_review.json`, `results/verifier/`,
    `results/sources.csv`, `results/citations.csv`, `notes/` (Claim notes
    hold verdicts), `checks/claims_gold.csv`, `checks/gold_articles.csv` or
    `checks/claim_checks.csv` in any form, including their git history and
@@ -136,11 +148,26 @@ exits with 0: it checks the three tables and that `results/` and
   `AI4SCIENCE_WEB_DISABLED=1 ai4science --no-lean run "Extract the claims of article <id>."`. Follow
   `checks/claims_spec.md` (what counts as a claim, columns, quote rules).
   Read every PDF of the article with `pdf_read`, 2 pages per call; copy
-  quotes from that output. Append the rows to `results/claims.csv`, or one
-  row to `results/no_claims.csv` if the article has no claim (spec §8); run
-  the check for that article, commit.
-- **Code:** ReAct, following `checks/results_spec.md` — each function in `src/` with a test in `tests/`; run the
-  tests after each change. Commit before and after each task.
+  quotes from that output. Review the whole corpus, not only articles with
+  numerical series. Append claims or one no-claim row only after main text and
+  all supplied SI are reviewed (spec §8). Record the inventory-bound reading
+  status in `results/extraction_status.csv` (spec §9); unreadable/unresolved
+  articles are unassessed, never fabricated negatives. A new SI invalidates a
+  prior complete attestation. Run the check for that article, commit.
+- **Comparison:** only after blind extraction is recorded, follow results_spec
+  §§5–6: permissive same-article/medium candidates for own-data claims only,
+  include by default, audit every decision with evidence and caveats. Do not
+  select by agreement. Keep qualified proxies labelled and unknowns explicit.
+  Draft first; Anton reviews matching before final aggregation. Never write
+  `checks/matching_review.json` yourself. Claim outcomes are all_agree,
+  all_disagree, mixed or unassessable per model, not majority voting. Primary
+  prevalence pools fluence/energy/power/intensity at article level; unspecified
+  is separate. Keep unmatched/excluded claims in coverage accounting.
+- **Code:** ReAct, following `checks/results_spec.md` — each function in `src/`
+  with a test in `tests/`; run tests after each change. Implement from the specs:
+  do not import or call the protected checker's tally oracle from `src/` or use
+  it as the implementation's expected-output generator. Keep verification
+  independent. Commit before and after each task.
 - **Literature:** follow `checks/literature_spec.md`. Every row comes from a
   tool response, never from memory. At most five new works per message.
   Add a `diary.md` entry (query ids, counts and commit ids only: no

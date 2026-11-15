@@ -89,7 +89,7 @@ VAULT_FILES: Final[dict[str, object]] = {
         "showAttachments": True, "showOrphans": True, "showArrow": True,
         "colorGroups": [
             {"query": "path:ontology", "color": {"a": 1, "rgb": 9474192}},
-            {"query": "[verdict:disagrees OR model_dependent]",
+            {"query": "[verdict:disagrees OR mixed OR model_dependent]",
              "color": {"a": 1, "rgb": 14701138}},
             {"query": "[type:Check]", "color": {"a": 1, "rgb": 1153422}},
             {"query": "path:notes", "color": {"a": 1, "rgb": 5987296}},
@@ -248,10 +248,9 @@ def verdict(
 ) -> str | None:
     """Return the verdict of an own_data claim from its comparison rows.
 
-    No comparison.csv yet → no verdict. No row with a series →
-    ``unmatched``; all rows agree under both error models → ``agrees``;
-    all disagree under both → ``disagrees``; anything else →
-    ``model_dependent``.
+    Project the two model outcomes without majority voting. Within-model
+    disagreement is ``mixed``, not ``model_dependent``. Missing/unknown
+    judgments stay ``unassessable``. Qualified results remain conditional.
 
     Parameters
     ----------
@@ -272,13 +271,29 @@ def verdict(
     rows = [r for r in comparison if r["claim_id"] == cid and r["series_id"]]
     if not rows:
         return "unmatched"
-    pairs = {(r["agree_primary"].lower(), r["agree_lenient"].lower())
-             for r in rows}
-    if pairs == {("true", "true")}:
+    outcomes = [comparison_outcome(rows, model) for model in ("primary", "lenient")]
+    if "mixed" in outcomes:
+        return "mixed"
+    if "unassessable" in outcomes:
+        return "unassessable"
+    if outcomes == ["all_agree", "all_agree"]:
         return "agrees"
-    if pairs == {("false", "false")}:
+    if outcomes == ["all_disagree", "all_disagree"]:
         return "disagrees"
     return "model_dependent"
+
+
+def comparison_outcome(rows: list[dict[str, str]], model: str) -> str:
+    """Graph projection of results_spec §5.3, independent of src/ or checks/."""
+    values = {r[f"agree_{model}"].lower() if r.get("assessment") != "unassessable"
+              else "" for r in rows}
+    if {"true", "false"} <= values:
+        return "mixed"
+    if values == {"true"}:
+        return "all_agree"
+    if values == {"false"}:
+        return "all_disagree"
+    return "unassessable"
 
 
 def build_objects(lit: dict[str, list[dict[str, str]] | None]) -> list[Note]:
@@ -325,6 +340,15 @@ def build_objects(lit: dict[str, list[dict[str, str]] | None]) -> list[Note]:
         v = verdict(cid, row, comparison)
         if v is not None:
             note.attrs["verdict"] = v
+            included = [r for r in comparison or []
+                        if r["claim_id"] == cid and r["series_id"]]
+            note.body += [
+                f"{model} outcome: {comparison_outcome(included, model)}"
+                for model in ("primary", "lenient")]
+            note.body.append(
+                "Directional concordance, not unqualified verification; "
+                f"qualified pairs: {sum(r.get('assessment') == 'qualified' for r in included)}; "
+                "assumptions/caveats: results/matching_audit.csv.")
         note.links.append(("extractedFrom", f"Article {row['article_id']}"))
         for r in comparison or []:
             if r["claim_id"] == cid and r["series_id"]:

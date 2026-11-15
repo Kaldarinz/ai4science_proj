@@ -5,6 +5,8 @@ Usage::
     .venv/bin/python checks/check.py                  # everything
     .venv/bin/python checks/check.py --article 80094  # one article
     .venv/bin/python checks/check.py --gold           # + gold scores (human)
+    .venv/bin/python checks/check.py --analysis draft # full-corpus draft
+    .venv/bin/python checks/check.py --analysis final # curator-approved inputs
 
 Exits with 0 when every rule holds and 1 otherwise; each failure is
 printed with the spec section it breaks. With --gold, hits against
@@ -16,9 +18,7 @@ import argparse
 import csv
 import hashlib
 import importlib
-import json
 import logging
-import math
 import re
 import subprocess
 import sys
@@ -31,6 +31,9 @@ from typing import Final, NamedTuple, Protocol, TypeAlias, TypedDict, cast
 import yaml
 
 ROOT: Final[Path] = Path(__file__).resolve().parent.parent
+# Both direct-script execution and imports in protected tests use this module.
+sys.path.insert(0, str(ROOT))
+from checks import analysis  # noqa: E402
 DATA: Final[Path] = ROOT / "data"
 RESULTS: Final[Path] = ROOT / "results"
 GOLD: Final[Path] = ROOT / "checks" / "claims_gold.csv"
@@ -55,10 +58,6 @@ CLAIMS_COLUMNS: Final[tuple[str, ...]] = (
 )
 NO_CLAIMS_COLUMNS: Final[tuple[str, ...]] = (
     "article_id", "file", "page", "quote", "reason",
-)
-COMPARISON_COLUMNS: Final[tuple[str, ...]] = (
-    "claim_id", "series_id", "direction", "shape_primary",
-    "shape_lenient", "agree_primary", "agree_lenient", "note",
 )
 GOLD_KEY: Final[tuple[str, ...]] = (
     "article_id", "variable", "direction", "basis", "medium_class",
@@ -93,7 +92,6 @@ BASES: Final[tuple[str, ...]] = VOCABULARY["basis"]
 MEDIUM_CLASSES: Final[frozenset[str]] = (
     frozenset(VOCABULARY["medium_class"]) - {"unspecified"})
 SHAPES: Final[tuple[str, ...]] = VOCABULARY["shape_primary"]
-MODELS: Final[tuple[str, ...]] = ("primary", "lenient")
 
 AGREES: Final[dict[str, frozenset[str]]] = {
     "increase": frozenset({"increasing"}),
@@ -166,25 +164,6 @@ class QuotePosition(NamedTuple):
     file: str
     page: int
     offset: int
-
-
-class Reference(NamedTuple):
-    """Expected pairing of one 80094 claim (results_spec §7.5)."""
-
-    series_id: str
-    shape_primary: str
-    shape_lenient: str
-    agree_primary: bool
-    agree_lenient: bool
-
-
-# Keyed by the own_data claim's (direction, medium_class).
-REFERENCE: Final[dict[tuple[str, str], Reference]] = {
-    ("increase", "water"):
-        Reference("80094-s1", "increasing", "increasing", True, True),
-    ("no_effect", "colloid"):
-        Reference("80094-s2", "peak", "flat", False, True),
-}
 
 
 class Report:
@@ -305,6 +284,24 @@ def check_vocabulary(report: Report) -> None:
         if values != expected[name]:
             report.fail(rule, f"{name} values {sorted(values)} differ from "
                         f"ontology.yaml {sorted(expected[name])}")
+    for name, values in {
+        "extraction_status": analysis.STATUSES,
+        "matching_decision": analysis.DECISIONS,
+        "assessment": analysis.ASSESSMENTS,
+        "claim_outcome": analysis.OUTCOMES,
+        "basis": analysis.BASES, "direction": analysis.DIRECTIONS,
+        "shape_primary": analysis.SHAPES,
+    }.items():
+        if tuple(values) != VOCABULARY[name]:
+            report.fail("ontology", f"analysis {name} differs from ontology.yaml")
+    if analysis.VARIABLES != VARIABLES - {"unspecified"} or any(
+            set(AGREES[key]) != analysis.AGREES[key] for key in AGREES):
+        report.fail("ontology", "analysis variables/agreement table differs")
+    analysis_lines = result_lines + claim_lines
+    for name in ("extraction_status", "matching_decision", "assessment", "claim_outcome"):
+        stated_values = backticked(table_cells(analysis_lines, f"| `{name}` |", 1))
+        if stated_values != set(VOCABULARY[name]):
+            report.fail("ontology", f"spec {name} differs from ontology.yaml")
     if VOCABULARY["shape_primary"] != VOCABULARY["shape_lenient"]:
         report.fail("ontology", "shape_primary and shape_lenient differ")
     if set(AGREES) != set(DIRECTIONS) or not all(
@@ -863,43 +860,6 @@ def report_gold(claims: list[Row], article: int | None) -> None:
         )
 
 
-def parse_bool(value: str) -> bool | None:
-    """Parse a boolean CSV field.
-
-    Parameters
-    ----------
-    value : str
-        Field as read from a CSV.
-
-    Returns
-    -------
-    bool | None
-        True or False for ``true`` or ``false`` in any case, None for
-        anything else.
-    """
-    return {"true": True, "false": False}.get(value.strip().lower())
-
-
-def shape_of(series: Series, model: str) -> str:
-    """Return a series' shape under one error model.
-
-    Parameters
-    ----------
-    series : Series
-        Series row from the tools.
-    model : str
-        ``primary`` or ``lenient``.
-
-    Returns
-    -------
-    str
-        The shape under that model.
-    """
-    if model == "primary":
-        return series["shape_primary"]
-    return series["shape_lenient"]
-
-
 def load_tools(report: Report) -> AblationTools | None:
     """Import tools/ablation_db.py.
 
@@ -925,311 +885,6 @@ def load_tools(report: Report) -> AblationTools | None:
         )
         return None
     return cast(AblationTools, module)
-
-
-def check_comparison(
-    report: Report,
-    claims: list[Row],
-    ids: set[int],
-    tools: AblationTools,
-) -> list[Row] | None:
-    """Check results/comparison.csv against results_spec §5 and §7.5.
-
-    Parameters
-    ----------
-    report : Report
-        Receives every failure.
-    claims : list[Row]
-        Claims that passed the claim checks.
-    ids : set[int]
-        Article ids of the corpus.
-    tools : AblationTools
-        Database tools giving each article's series.
-
-    Returns
-    -------
-    list[Row] | None
-        The comparison rows, or None when the file cannot be used.
-    """
-    rows = read_csv(
-        RESULTS / "comparison.csv", COMPARISON_COLUMNS, report,
-        "results §5")
-    if rows is None:
-        return None
-    by_id = {c["claim_id"]: c for c in claims}
-    series: dict[int, dict[str, Series]] = {
-        aid: {s["series_id"]: s for s in tools.list_series(aid)}
-        for aid in ids
-    }
-
-    expected: set[tuple[str, str]] = set()
-    for c in claims:
-        if c["basis"] != "own_data":
-            continue
-        candidates = {
-            (c["claim_id"], sid)
-            for sid, s in series[int(c["article_id"])].items()
-            if c["medium_class"] in ("unspecified", s["medium_class"])
-        }
-        expected |= candidates or {(c["claim_id"], "")}
-    actual = Counter((r["claim_id"], r["series_id"]) for r in rows)
-    for pair in sorted(expected - set(actual)):
-        report.fail("results §5", f"missing comparison row {pair}")
-    for pair, n in sorted(actual.items()):
-        if pair not in expected:
-            report.fail("results §5", f"unexpected comparison row {pair}")
-        elif n > 1:
-            report.fail(
-                "results §5", f"comparison row {pair} appears {n} times")
-
-    for row in rows:
-        claim = by_id.get(row["claim_id"])
-        if claim is None or (row["claim_id"], row["series_id"]) not in expected:
-            continue
-        check_comparison_row(report, row, claim, series)
-
-    check_reference(report, claims, rows)
-    report.ok(f"comparison: {len(rows)} row(s) checked")
-    return rows
-
-
-def check_comparison_row(
-    report: Report,
-    row: Row,
-    claim: Row,
-    series: dict[int, dict[str, Series]],
-) -> None:
-    """Check one expected comparison row's values (results_spec §5).
-
-    Parameters
-    ----------
-    report : Report
-        Receives every failure.
-    row : Row
-        The comparison row.
-    claim : Row
-        The claim the row refers to.
-    series : dict[int, dict[str, Series]]
-        Series of every article, by article id and series id.
-    """
-    where = f"comparison {row['claim_id']}/{row['series_id'] or '-'}"
-    if row["direction"] != claim["direction"]:
-        report.fail(
-            "results §5", f"{where}: direction differs from the claim's")
-    if not row["series_id"]:
-        filled = ("shape_primary", "shape_lenient",
-                  "agree_primary", "agree_lenient")
-        if any(row[column] for column in filled):
-            report.fail(
-                "results §5",
-                f"{where}: unmatched row must leave shapes and "
-                f"agreement empty",
-            )
-        if not row["note"].strip():
-            report.fail(
-                "results §5", f"{where}: unmatched row needs a note")
-        return
-    s = series[int(claim["article_id"])][row["series_id"]]
-    for model in MODELS:
-        shape = shape_of(s, model)
-        if row[f"shape_{model}"] != shape:
-            report.fail(
-                "results §5",
-                f"{where}: shape_{model} {row[f'shape_{model}']!r}, "
-                f"series has {shape!r}",
-            )
-        agree = parse_bool(row[f"agree_{model}"])
-        if agree is None:
-            report.fail(
-                "results §5",
-                f"{where}: agree_{model} {row[f'agree_{model}']!r} is "
-                f"not true/false",
-            )
-        elif agree != (shape in AGREES[claim["direction"]]):
-            report.fail(
-                "results §5",
-                f"{where}: agree_{model} does not follow the table",
-            )
-
-
-def check_reference(
-    report: Report, claims: list[Row], rows: list[Row],
-) -> None:
-    """Check the reference article 80094 (results_spec §7.5).
-
-    Parameters
-    ----------
-    report : Report
-        Receives every failure.
-    claims : list[Row]
-        Claims that passed the claim checks.
-    rows : list[Row]
-        Comparison rows.
-    """
-    own = {
-        (c["direction"], c["medium_class"]): c["claim_id"]
-        for c in claims
-        if c["article_id"] == "80094" and c["basis"] == "own_data"
-    }
-    for key, ref in REFERENCE.items():
-        cid = own.get(key)
-        if cid is None:
-            report.fail(
-                "results §7.5", f"80094: no own_data claim {key}")
-            continue
-        row = next(
-            (r for r in rows
-             if r["claim_id"] == cid and r["series_id"] == ref.series_id),
-            None,
-        )
-        if row is None:
-            report.fail(
-                "results §7.5",
-                f"80094: claim {cid} is not paired with {ref.series_id}",
-            )
-            continue
-        actual = (
-            row["shape_primary"], row["shape_lenient"],
-            parse_bool(row["agree_primary"]),
-            parse_bool(row["agree_lenient"]),
-        )
-        if actual != tuple(ref)[1:]:
-            report.fail(
-                "results §7.5",
-                f"80094: {cid}/{ref.series_id} is {actual}, expected "
-                f"{tuple(ref)[1:]}",
-            )
-
-
-def check_summary(
-    report: Report,
-    claims: list[Row],
-    rows: list[Row],
-    tools: AblationTools,
-) -> None:
-    """Recompute results/summary.json and compare (results_spec §6).
-
-    Parameters
-    ----------
-    report : Report
-        Receives every failure.
-    claims : list[Row]
-        Claims that passed the claim checks.
-    rows : list[Row]
-        Comparison rows.
-    tools : AblationTools
-        Database tools giving every gold series.
-    """
-    path = RESULTS / "summary.json"
-    if not path.exists():
-        report.fail("results §6", "results/summary.json does not exist")
-        return
-    try:
-        stored = cast(object, json.loads(path.read_text(encoding="utf-8")))
-    except json.JSONDecodeError as error:
-        report.fail("results §6", f"summary.json does not parse: {error}")
-        return
-
-    counts = {b: {d: 0 for d in DIRECTIONS} for b in BASES}
-    for c in claims:
-        counts[c["basis"]][c["direction"]] += 1
-    matched = [r for r in rows if r["series_id"]]
-    agreement = {
-        m: {
-            "n": len(matched),
-            "agree": sum(
-                parse_bool(r[f"agree_{m}"]) is True for r in matched),
-        }
-        for m in MODELS
-    }
-    all_series = [
-        s for a in tools.find_articles(material="Au")
-        for s in tools.list_series(a["article_id"])
-    ]
-    shapes: dict[str, dict[str, object]] = {}
-    for m in MODELS:
-        shape_counts = {shape: 0 for shape in SHAPES}
-        for s in all_series:
-            shape_counts[shape_of(s, m)] += 1
-        n_test = shape_counts["increasing"] + shape_counts["decreasing"]
-        p_value = None
-        if n_test:
-            p_value = sign_test_p_value(shape_counts["increasing"], n_test)
-        shapes[m] = {
-            "counts": shape_counts, "n_test": n_test, "p_value": p_value,
-        }
-    expected = {
-        "claims": {"by_basis_and_direction": counts},
-        "agreement": agreement,
-        "series": shapes,
-    }
-    for difference in compare_json(expected, stored, "summary"):
-        report.fail("results §6", difference)
-    report.ok("summary: recomputed and compared")
-
-
-def sign_test_p_value(increasing: int, n_test: int) -> float:
-    """Return the one-sided sign-test p-value (results_spec §6).
-
-    Exactly P(X >= increasing) for X ~ Binomial(n_test, 0.5), the
-    value of ``scipy.stats.binomtest(increasing, n_test, 0.5,
-    alternative="greater").pvalue``, computed without scipy.
-
-    Parameters
-    ----------
-    increasing : int
-        Number of increasing series.
-    n_test : int
-        Number of increasing plus decreasing series; at least 1.
-
-    Returns
-    -------
-    float
-        The p-value.
-    """
-    tail = sum(math.comb(n_test, k) for k in range(increasing, n_test + 1))
-    return tail / 2**n_test
-
-
-def compare_json(expected: object, actual: object, where: str) -> list[str]:
-    """List the differences between two JSON values.
-
-    Floats are compared with a relative tolerance of 1e-9.
-
-    Parameters
-    ----------
-    expected : object
-        The recomputed value.
-    actual : object
-        The stored value.
-    where : str
-        Path of the value, for the messages.
-
-    Returns
-    -------
-    list[str]
-        One message per difference; empty when the values agree.
-    """
-    if isinstance(expected, dict):
-        if not isinstance(actual, dict) or set(expected) != set(actual):
-            got = (sorted(actual) if isinstance(actual, dict)
-                   else type(actual).__name__)
-            return [f"{where}: keys {got}, expected {sorted(expected)}"]
-        return [
-            difference
-            for key in expected
-            for difference in compare_json(
-                expected[key], actual[key], f"{where}.{key}")
-        ]
-    is_number = (isinstance(actual, (int, float))
-                 and not isinstance(actual, bool))
-    if isinstance(expected, float) and is_number:
-        if math.isclose(expected, cast(float, actual), rel_tol=1e-9):
-            return []
-        return [f"{where}: {actual}, expected {expected}"]
-    if expected != actual or type(expected) is not type(actual):
-        return [f"{where}: {actual!r}, expected {expected!r}"]
-    return []
 
 
 def check_committed(report: Report) -> None:
@@ -1281,26 +936,38 @@ def main() -> int:
         help="also print precision and recall against the hand labels; "
              "for the human only, never for the agent",
     )
+    parser.add_argument(
+        "--analysis", choices=("draft", "final"),
+        help="also validate the full-corpus audit, comparison and summary; "
+             "final requires a curator-owned matching review",
+    )
     args = parser.parse_args()
     article = cast(int | None, args.article)
+    if args.analysis and article is not None:
+        parser.error("--analysis is full-corpus only; cannot combine with --article")
 
     report = Report()
     check_vocabulary(report)
     ids, roles = check_data(report, article)
     claims = check_claims(report, ids, roles, article)
-    check_no_claims(report, ids, roles, claims)
+    statuses = None
+    if args.analysis or (RESULTS / "extraction_status.csv").exists():
+        statuses = analysis.check_coverage(ROOT, report, ids, claims, article)
+    complete_ids = ids if statuses is None else {
+        int(aid) for aid, status in statuses.items() if status == "complete"}
+    check_no_claims(report, complete_ids, roles, claims)
+    if article is not None and statuses is not None and statuses.get(str(article)) != "complete":
+        report.fail("claims §9", f"article {article}: extraction is not complete")
+    if not args.analysis and statuses is not None and "pending" in statuses.values():
+        report.fail("claims §9", "claim readiness cannot contain pending articles")
     if args.gold:
         report_gold(claims, article)
 
-    # The snapshot tools exist, but comparison/summary generation in src/
-    # and the corresponding result files are still a separate task.
-    # Enable this block only when that pipeline is ready (results §5–§7).
-    # if article is None:
-    #     tools = load_tools(report)
-    #     if tools is not None:
-    #         rows = check_comparison(report, claims, ids, tools)
-    #         if rows is not None:
-    #             check_summary(report, claims, rows, tools)
+    # Claim-only runs never load numerical tools or inspect analysis outputs.
+    if args.analysis and not report.failures:
+        tools = load_tools(report)
+        if tools is not None:
+            analysis.check_analysis(ROOT, report, ids, claims, statuses, tools, args.analysis)
 
     # Last, so that the agent commits only work that passed every rule.
     if not report.failures:

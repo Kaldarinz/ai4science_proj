@@ -186,21 +186,76 @@ For a fresh checkout, create a Python 3.12 virtual environment with
 with `.venv/bin/python -m pip install -r requirements.txt`. Run commands
 from the project root; the course agent cannot install packages itself.
 
-## 5. `results/comparison.csv`
+## 5. Auditable claim–series comparison (working contract v1)
 
-One row per pair of an `own_data` claim and a series of the same article
-whose `medium_class` equals the claim's, or any series of the article when
-the claim's is `unspecified`. A claim with no such series gets one row with
-an empty `series_id` and the reason in `note`.
+This is a provisional, curator-adopted contract, not a scientific result.
+A later change must be disclosed in `diary.md`, increment the contract
+version and regenerate affected outputs and matching approval. Never
+reinterpret old outputs under new rules without rerunning the pipeline.
+The AI4Science agent implements the generator in `src/` and its tests in
+`tests/`. The protected checker independently verifies records and tallies;
+it cannot judge a scientific exclusion, a caveat or whether reading was thorough.
+The generator must not import/call the checker or reuse its tally oracle as
+its own test oracle: implement the pipeline and its tests from this specification.
+
+### 5.1 Candidates and `results/matching_audit.csv`
+
+After blind extraction is recorded, generate candidates for **every
+`own_data` claim of a completely reviewed article**, including claims
+with `variable=unspecified`. Candidates are all series of the same
+article with the same medium; a claim medium of `unspecified` permits
+every series of that article. Do not add variable, material, wavelength,
+pulse-duration or measurement-statistic filters at candidate generation.
+Pooling laser variables for prevalence is not physical equivalence and
+does not justify a numerical proxy.
+
+Include candidates by default. The agent may exclude a pair for a
+substantive, evidence-backed reason, but must audit **every** candidate,
+including inclusions, without seeing agreement as a selection criterion.
+Explain scientific judgments, cited text/conditions, assumptions and
+limitations in the audit; Anton reviews them before final aggregation.
+
+Header (exact order):
+`claim_id,series_id,decision,assessment,reason,caveats`.
+
+- Exactly one row per candidate pair, even excluded pairs. No duplicates.
+- If a claim has no candidates, exactly one row with empty `series_id`,
+  `decision=no_candidates`, empty `assessment`, and a reason.
+- Every row has nonblank `reason` and `caveats`; write `none` explicitly
+  for no identified caveat, not an unexplained empty field.
+- An included pair has an assessment: `direct` (comparable on the
+  stated terms), `qualified` (a defensible proxy/assumption, explicitly
+  conditional), or `unassessable` (retain the candidate but no defensible
+  agreement judgment). Qualified/unassessable pairs need substantive caveats.
+- Excluded/no-candidate rows leave assessment empty.
+- `cited` and `general` claims contribute to prevalence, not direct
+  numerical comparison. They get neither audit nor comparison rows.
+
+Controlled values (also in `ontology.yaml`):
+
+| Attribute | Values |
+|---|---|
+| `matching_decision` | `include`, `exclude`, `no_candidates` |
+| `assessment` | `direct`, `qualified`, `unassessable` |
+| `claim_outcome` | `all_agree`, `all_disagree`, `mixed`, `unassessable` |
+
+### 5.2 `results/comparison.csv`
+
+Exactly one row per **included** audit pair, both models in the same row.
+There are no unmatched or excluded placeholder rows here; those remain
+visible in the audit and summary.
 
 | Column | Type | Rule |
 |---|---|---|
-| `claim_id` | str | from `results/claims.csv` |
-| `series_id` | str | §1; empty when unmatched |
+| `claim_id` | str | from `results/claims.csv`, `own_data` only |
+| `series_id` | str | included audit pair, never empty |
 | `direction` | str | the claim's |
-| `shape_primary`, `shape_lenient` | str | the series' (§3) |
-| `agree_primary`, `agree_lenient` | bool | by the table below; empty when unmatched |
-| `note` | str | e.g. `article has no curated experiments` |
+| `shape_primary`, `shape_lenient` | str | the series' (§3), even if unassessable |
+| `agree_primary`, `agree_lenient` | bool | lowercase `true`/`false` by the table below; both empty for unassessable |
+| `assessment` | str | exactly the audit's assessment |
+| `note` | str | explanation/caveat reference; `none` if genuinely none |
+
+Header order is the table order, expanding paired columns left to right.
 
 | `direction` | Agrees with shape |
 |---|---|
@@ -210,26 +265,148 @@ an empty `series_id` and the reason in `note`.
 | `non_monotonic` | `peak`, `valley`, `irregular` |
 | `affects` | any shape but `flat` |
 
-## 6. `results/summary.json`
+Agreement is directional concordance under the recorded comparison
+assumptions, **not proof or unqualified verification/contradiction**.
+Qualified results remain labelled and separately counted; uncertain
+proxies must not acquire a boolean by silently treating unlike variables
+as identical.
 
-```json
-{
-  "claims": {"by_basis_and_direction": {"own_data": {"increase": 0, "...": 0}, "cited": {}, "general": {}}},
-  "agreement": {"primary": {"n": 0, "agree": 0}, "lenient": {"n": 0, "agree": 0}},
-  "series": {
-    "primary": {"counts": {}, "n_test": 0, "p_value": null},
-    "lenient": {"counts": {}, "n_test": 0, "p_value": null}
-  }
-}
+### 5.3 Claim-level outcomes (separately per model)
+
+Aggregate all included pairs of each own-data claim, not a majority vote:
+
+- Both true and false present → `mixed`, regardless of other unknowns.
+- At least one included pair and **all** true → `all_agree`.
+- At least one included pair and **all** false → `all_disagree`.
+- Otherwise → `unassessable`: no included series, only unknowns, or a
+  one-sided result with an unknown. Never call partial evidence “all”.
+
+A claim with two agreeing series and one disagreeing series is mixed,
+not “agreement by 2/3”. Keep qualifications and counts alongside the
+claim outcome. Pair-level counts are secondary: more series in an
+article must not silently give that article greater prevalence weight.
+Claim-outcome counts are descriptive **claim-level** counts, not an
+article-level agreement estimate or independent observations.
+
+The legacy graph verdict projects these two outcomes: no included series →
+`unmatched`; either model mixed → `mixed`; otherwise either unassessable →
+`unassessable`; both all-agree → `agrees`; both all-disagree → `disagrees`;
+remaining fully assessable differences → `model_dependent`. Graph notes retain
+both model outcomes and the number of qualified pairs. No comparison file →
+no verdict. Graph labels do not replace the full audit or curator gate.
+
+## 6. `results/summary.json` and curator gate
+
+### 6.1 Article-level frequency
+
+Read `results/extraction_status.csv` (claims_spec §9). Only `complete`
+articles enter the denominator: main text and **all supplied SI** reviewed.
+Unread/unreadable is unassessed, never a negative. The corpus is selected
+(completed, curated, gold-only articles), not representative of all literature.
+
+The primary numerator counts each complete article at most once if it has
+at least one claim for `fluence`, `energy`, `power` or `intensity`,
+including no-effect claims and any basis. This pools categories only, not
+physical quantities. Preserve original labels in claims.csv. Report
+articles with unspecified-variable claims separately; those claims never
+enter the primary numerator. No separate variable-specific significance tests.
+
+Basis and direction breakdowns count **articles**, not sentences or claims,
+using the same four specified variables. Categories may overlap; an
+article can appear in several cells, but at most once in any cell.
+
+### 6.2 Exact summary schema, version 1
+
+All keys below are required, no extra keys. Counts are nonnegative JSON
+integers (not booleans), fractions/p-values are finite numbers or null.
+Every enum-indexed object includes all allowed values, including zeros.
+All own-data claims below are from complete articles; include unspecified
+variables. Retain claims with no candidates and with all candidates excluded.
+
+Top-level keys:
+
+- `contract_version`: integer `1`.
+- `stage`: `draft` or `final`.
+- `inputs`: raw-byte SHA-256 map with exactly the relative paths below.
+- `articles`:
+  - `n_corpus, n_complete, n_pending, n_unreadable`.
+  - `prevalence: {numerator, denominator, fraction}`; denominator =
+    n_complete, fraction = numerator/denominator or null for zero denominator.
+  - `n_with_unspecified_claim`: complete articles with ≥1 unspecified claim,
+    overlapping the primary numerator if other claims qualify.
+  - `by_basis`, `by_direction`: article counts by their respective enums.
+  - `by_basis_and_direction`: basis → direction → article count.
+- `comparison`:
+  - `n_own_data_claims, n_with_candidates, n_without_candidates,
+    n_with_included_series, n_all_candidates_excluded, n_candidate_pairs,
+    n_included_pairs, n_excluded_pairs`. Candidate pairs exclude no-candidate
+    placeholder rows; the three claim coverage groups (no candidates,
+    all excluded, ≥1 included) partition own-data claims.
+  - `claim_outcomes`: claim_id → `{primary, lenient, n_included,
+    n_qualified, n_unassessable}`. Every own-data claim appears, including
+    unmatched claims (unassessable in both models, zero counts).
+  - `by_model`: primary/lenient → object with:
+    - `claims: {denominator, all_agree, all_disagree, mixed, unassessable}`,
+      denominator = all own-data claims, not only matched/assessable ones.
+    - `pairs: {n_included, n_assessable, agree, disagree, unassessable}`;
+      n_assessable = agree + disagree; n_included additionally includes unknowns.
+    - `pairs_by_assessment`: direct/qualified/unassessable → the same
+      pair-count object. These prevent proxy concordance masquerading as
+      unconditional validation. Any displayed pair agreement fraction uses
+      n_assessable as denominator and shows excluded/unassessable counts.
+- `series`: primary/lenient → `{counts, n_test, p_value}`:
+  all corpus series counted once per series_id, all six shapes including zeros.
+  n_test = increasing + decreasing. Retain the previous secondary
+  `binomtest(increasing, n_test, 0.5, alternative="greater")` definition,
+  null for n_test=0. This is an exploratory series-level diagnostic, not the
+  primary claim statistic. Overlapping series and article clustering violate
+  independent-series sampling; do not present this p-value as independent
+  article-level evidence. No additional inference is prescribed here.
+
+Exact `inputs` paths (same map in curator approval):
+
+```text
+data/corpus.csv
+data/files.csv
+data/ablation_snapshot.json
+data/ablation_snapshot.schema.json
+results/claims.csv
+results/no_claims.csv
+results/extraction_status.csv
+results/matching_audit.csv
+results/comparison.csv
+checks/claims_spec.md
+checks/results_spec.md
+ontology.yaml
+checks/analysis.py
+checks/check.py
+tools/ablation_db.py
+tools/series.py
 ```
 
-- `by_basis_and_direction`: claim counts, all five directions under each
-  basis.
-- `agreement`: over matched comparison rows; `n` rows, `agree` of them true.
-- `series`: counts of the six shapes over all series; `n_test` is
-  `increasing + decreasing`; `p_value` is
-  `scipy.stats.binomtest(increasing, n_test, 0.5, alternative="greater").pvalue`,
-  `null` when `n_test` is 0.
+Hash bytes as stored, including whitespace. No self-hash of summary or review;
+do not bind to a moving Git HEAD. Changes to inputs, comparison decisions
+or the contract invalidate approval and require regenerated outputs.
+
+### 6.3 Draft → review → final
+
+1. AI4Science writes the complete audit, comparison and **draft** summary;
+   `checks/check.py --analysis draft` checks completeness, duplicate/missing
+   pairs, copied shapes, boolean consistency, fingerprints and tallies.
+2. Anton reviews every inclusion/exclusion, reason and caveat. Corrections
+   require a new draft; no selecting only agreeing series.
+3. Only the curator writes protected `checks/matching_review.json`:
+   exactly `{"decision":"accepted","reviewer":"<name>",
+   "date":"YYYY-MM-DD","inputs":{...}}`, using the checked draft's inputs map.
+   An agent cannot grant itself approval.
+4. The agent regenerates the summary with stage=final after approval;
+   `checks/check.py --analysis final` additionally requires no pending
+   articles and an exact matching approval. Unreadable articles stay explicitly
+   outside the prevalence denominator. An accepted draft is not a final result.
+
+No approval file or scientific outputs are fabricated by infrastructure setup.
+The checker does not import src/, extract claims, judge physical matching,
+run resampling or produce comparison/summary files.
 
 ## 7. What `check.py` verifies
 
@@ -238,10 +415,17 @@ an empty `series_id` and the reason in `note`.
 2. Every PDF in `data/articles/` matches its SHA-256 in `data/files.csv`,
    and every claim's quote is found on its page of its file
    (`claims_spec.md` §4).
-3. `comparison.csv` holds exactly the pairs of §5, and its agreement columns
-   follow the table.
-4. `summary.json` recomputed from the CSV files equals the stored one.
-5. Reference article 80094:
+3. With `--analysis draft` or `--analysis final` only: the audit is exhaustive,
+   comparison contains exactly its included pairs, and agreement follows §5.
+   Claim-only checks never load numerical tools or analysis outputs.
+4. In analysis mode, summary keys, fingerprints, denominators and all tallies
+   follow §6. Final mode also requires the curator's matching approval.
+   `--analysis` cannot be combined with `--article`. Claim-only checks retain
+   legacy behavior if no extraction ledger exists; this does not certify
+   complete reading or analysis readiness. Once present, the ledger is checked.
+5. Reference article 80094 (series reference verified separately in
+   `checks/verifier/`; the table illustrates a direct comparison when included,
+   not a compulsory extraction label or an exception to auditable matching):
 
 | Claim | Series | Shape primary / lenient | Agrees primary / lenient |
 |---|---|---|---|
