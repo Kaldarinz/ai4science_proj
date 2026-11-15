@@ -45,8 +45,10 @@
 - [`tools/ablation_db.py`](tools/ablation_db.py) — API только чтения снимка;
   [`tools/series.py`](tools/series.py) — чистые вычисления.
 - [`checks/results_spec.md`](checks/results_spec.md) — договор API и результатов.
-- `data/corpus.csv`, `data/files.csv`, `data/articles/` — корпус доступных PDF;
-  он не равен полному составу снимка БД.
+- `data/corpus.csv`, `data/files.csv`, `data/articles/` — все 41 статья снимка:
+  41 основной PDF и 8 PDF приложений, скопированных из файлового сервиса БД.
+  PDF остаются локально и исключены из Git; роли и SHA-256 записаны в `files.csv`.
+  Извлечение утверждений охватывает весь корпус независимо от наличия рядов.
 - `results/claims.csv`, `results/no_claims.csv` — извлечённые утверждения и
   объяснения их отсутствия; не дополнены этой миграцией.
 - `src/`, `tests/` — место будущей реализации сравнения агентом.
