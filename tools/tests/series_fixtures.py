@@ -38,7 +38,8 @@ def experiment(eid: int, value: float = 10., **changes) -> dict:
         "wavelength": 800., "pulse_duration": 100., "repetition_rate": 1000.,
         "pulse_energy": float(eid), "synthesis_medium": 10,
         "free_surf_entrance": True,
-        "ablation": {"target": 1, "ablation_batch_setup": {"volume": 2., "duration": .1}},
+        "process_type": "ablation", "target": 1, "volume": 2., "duration": .1,
+        "single_pass": False,
         "colloids": [{"id": eid + 1000, "medium": 10,
                       "measured_properties": [scalar(value)]}],
     } | changes
@@ -47,7 +48,7 @@ def experiment(eid: int, value: float = 10., **changes) -> dict:
 def snapshot(experiments: list[dict] | None = None) -> dict:
     """Construct a loader-compatible gold-only snapshot with shared refs."""
     return {
-        "format": 1, "filter": {"sole_target_material": "gold", "completed_only": True},
+        "format": 6, "filter": {"sole_target_material": "gold", "completed_only": True},
         "interval_unit": "h", "options": {},
         "units": {"fluence": "J/cm²", "pulse_energy": "μJ", "spot_diameter": "μm",
                   "wavelength": "nm", "pulse_duration": "fs", "particle_size": "nm",

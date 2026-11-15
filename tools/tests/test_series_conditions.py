@@ -20,6 +20,12 @@ from tools.tests.series_fixtures import experiment, scalar, snapshot
     ("beam_diameter", 2.), ("polarization", "linear"), ("spatial_mode", "TEM00"),
     ("free_surf_entrance", False), ("pumping_flow_rate", 10.),
     ("pumping_duration", 1.), ("pumping_during_processing", False),
+    ("volume", 2.), ("duration", .1), ("stirring", False), ("single_pass", False),
+    ("flow_rate", 1.), ("flow_speed", 2.), ("target_position", 0.),
+    ("liquid_layer_thickness", 1.), ("beam_movement_speed", 2.),
+    ("beam_movement_size_x", 3.), ("beam_movement_size_y", 2.),
+    ("beam_movement_type", "scanner"), ("beam_movement_pattern", "spiral"),
+    ("beam_movement_passes", 1),
 ])
 def test_missing_and_null_scalar_conditions_match_stated_values(field, stated):
     es = [experiment(100), experiment(200), experiment(300)]
@@ -60,7 +66,7 @@ def test_nested_shared_conditions_use_wildcards_without_mutating_shared_rows():
     medium["ph"] = 7.
     s["shared"]["liquid_media"]["20"] = medium
     s["articles"][0]["experiments"][1]["synthesis_medium"] = 20
-    s["articles"][0]["experiments"][0]["ablation"]["liquid_layer_thickness"] = 2.
+    s["articles"][0]["experiments"][0]["liquid_layer_thickness"] = 2.
     original = deepcopy(s)
     assert len(build_series(s, 77).series) == 1
     assert s == original
@@ -196,3 +202,49 @@ def test_compatible_keys_are_not_equal_keys():
     ka, kb = condition_key(a, s["shared"], 10), condition_key(b, s["shared"], 10)
     assert ka != kb
     assert conditions_compatible(json.loads(ka), json.loads(kb))
+
+
+def test_flat_target_position_reference_uses_contents_not_ids():
+    s = snapshot([experiment(100), experiment(200)])
+    s["shared"]["target_position_ref_types"] = {
+        "60": {"reference_type": "focus", "relative": True},
+        "61": {"reference_type": "focus", "relative": True},
+    }
+    es = s["articles"][0]["experiments"]
+    for e, ref in zip(es, [60, 61], strict=True):
+        e["target_position"], e["target_position_ref_type"] = 0., ref
+    assert len(build_series(s, 77).series) == 1
+    s["shared"]["target_position_ref_types"]["61"]["reference_type"] = "objective"
+    assert not build_series(s, 77).series
+
+
+def test_target_stack_uses_physical_layer_order_and_keeps_roles_and_thickness():
+    s = snapshot([experiment(100), experiment(200)])
+    target = {"stack": {"complete": True, "layers": [
+        {"layer_order": 1, "material": 2, "thickness": 10.},
+        {"layer_order": 2, "material": 2, "thickness": 20., "role": "substrate"},
+    ]}}
+    s["shared"]["targets"]["1"] = target
+    other = deepcopy(target)
+    other["stack"]["layers"].reverse()
+    s["shared"]["targets"]["20"] = other
+    s["articles"][0]["experiments"][1]["target"] = 20
+    assert len(build_series(s, 77).series) == 1
+    for field, changed in [("thickness", 30.), ("role", "coating"), ("layer_order", 1)]:
+        original = deepcopy(other)
+        if field == "layer_order":
+            other["stack"]["layers"][1]["layer_order"] = 2
+        other["stack"]["layers"][0][field] = changed
+        assert not build_series(s, 77).series
+        other.clear()
+        other.update(original)
+
+
+@pytest.mark.parametrize("quantity", ["geometric_radius", "hydrodynamic_radius"])
+def test_format6_radius_labels_are_not_silently_treated_as_diameters(quantity):
+    es = [experiment(100), experiment(200)]
+    for e in es:
+        e["colloids"][0]["measured_properties"][0]["quantity"] = quantity
+    result = build_series(snapshot(es), 77)
+    assert not result.series
+    assert all(e["reason"] == "no_size" for e in result.exclusions)

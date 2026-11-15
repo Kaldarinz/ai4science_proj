@@ -25,11 +25,11 @@ SNAPSHOT_PATH = Path(__file__).resolve().parents[1] / "data" / "ablation_snapsho
 def _validate_snapshot(snapshot: dict) -> None:
     """Reject incompatible headers, identifiers and physical units.
 
-    This is loader validation, not the future HW2 data-contract verifier.
+    This is loader validation, not the independent data-contract verifier.
     Per-measurement numerical failures are exposed as exclusions.
     """
-    if not isinstance(snapshot, dict) or type(snapshot.get("format")) is not int or snapshot["format"] != 1:
-        raise ValueError("expected snapshot format 1")
+    if not isinstance(snapshot, dict) or type(snapshot.get("format")) is not int or snapshot["format"] != 6:
+        raise ValueError("expected snapshot format 6")
     if snapshot.get("filter") != {"sole_target_material": "gold", "completed_only": True}:
         raise ValueError("expected a completed, gold-only snapshot")
     if snapshot.get("interval_unit") != "h":

@@ -1,4 +1,4 @@
-"""HW2 contract check and gated paired sensitivity experiment: dry → smoke → full."""
+"""Current-snapshot contract check and gated sensitivity experiment: dry → smoke → full."""
 
 from __future__ import annotations
 
@@ -20,6 +20,8 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from checks.verifier.contract import (
+    SCHEMA_PATH,
+    SCHEMA_SHA256,
     SNAPSHOT_PATH,
     SNAPSHOT_SHA256,
     Violation,
@@ -35,8 +37,6 @@ from checks.verifier.resampling import (
     sweep,
 )
 
-BASELINE_COMMIT = "e9fecd3"
-
 
 def digest(path: Path) -> str:
     """Hash exact file bytes for the provenance record."""
@@ -47,10 +47,13 @@ def evaluate(path: Path = SNAPSHOT_PATH) -> dict:
     """Run the pinned-snapshot contract; return no scientific shape outputs."""
     started = time.monotonic()
     report = {"step": "dry", "status": "fail", "snapshot_sha256": digest(path),
-              "baseline_commit": BASELINE_COMMIT, "series": [], "exclusions": [], "violations": []}
+              "schema_sha256": digest(SCHEMA_PATH),
+              "series": [], "exclusions": [], "violations": []}
     errors = []
     if report["snapshot_sha256"] != SNAPSHOT_SHA256:
         errors.append(Violation("snapshot_hash_mismatch", str(path), "snapshot differs from METHOD §3"))
+    if report["schema_sha256"] != SCHEMA_SHA256:
+        errors.append(Violation("schema_hash_mismatch", str(SCHEMA_PATH), "schema differs from METHOD §3"))
     try:
         raw = load_json(path)
         errors.extend(check_snapshot(raw))
@@ -84,7 +87,7 @@ def evaluate(path: Path = SNAPSHOT_PATH) -> dict:
 def provenance() -> dict:
     """Record code hashes, actual checkout, and dependency versions, not results."""
     sources = [ROOT / p for p in ("METHOD.md", "requirements.txt", "tools/series.py", "tools/ablation_db.py",
-                                  "data/ablation_snapshot.schema.json")]
+                                  "data/ablation_snapshot.schema.json", "data/snapshot_manifest.json")]
     sources.extend(sorted((ROOT / "checks/verifier").glob("*.py")))
     return {
         "git_head": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip(),

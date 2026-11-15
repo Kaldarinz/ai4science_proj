@@ -1,6 +1,6 @@
 """Unit tests of the scientific rules on small synthetic snapshots.
 
-These are implementation tests, not the future HW2 Hypothesis verifier.
+These implementation tests are separate from the independent property verifier.
 """
 
 import math
@@ -188,9 +188,9 @@ def test_fixed_conditions_split_series(field, value):
 ])
 def test_scanning_and_ablation_conditions_are_not_dropped(field, value):
     es = [experiment(100), experiment(200)]
-    es[0]["ablation"][field] = {"beam_movement_speed": 1., "beam_movement_type": "scanner",
-                                "beam_movement_passes": 1, "liquid_layer_thickness": 1.}[field]
-    es[1]["ablation"][field] = value
+    es[0][field] = {"beam_movement_speed": 1., "beam_movement_type": "scanner",
+                    "beam_movement_passes": 1, "liquid_layer_thickness": 1.}[field]
+    es[1][field] = value
     assert not build_series(snapshot(es), 77).series
 
 
@@ -205,7 +205,7 @@ def test_shared_contents_not_ids_and_missing_equals_null():
     s["shared"]["targets"]["20"] = deepcopy(s["shared"]["targets"]["1"])
     second = s["articles"][0]["experiments"][1]
     second["laser"] = 40
-    second["ablation"]["target"] = 20
+    second["target"] = 20
     second["polarization"] = None
     second["wavelength"] = 800  # JSON integer and float encode the same condition.
     assert len(build_series(s, 77).series) == 1

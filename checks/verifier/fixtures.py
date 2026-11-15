@@ -13,7 +13,8 @@ def experiment(eid: int, *, article_id: int = 77, wavelength: int | None = 532,
     result = {
         "id": eid, "article_id": article_id, "laser": 1,
         "pulse_energy": eid * 10, "synthesis_medium": 7, "free_surf_entrance": True,
-        "ablation": {"target": 2, "ablation_batch_setup": {"volume": 10, "duration": 1}},
+        "process_type": "ablation", "target": 2, "volume": 10, "duration": 1,
+        "single_pass": False,
         "colloids": [{"id": 1000 + eid, "medium": 7, "measured_properties": [record]}],
     }
     if wavelength is not None:
@@ -28,9 +29,9 @@ def snapshot(experiments: list[dict] | None = None) -> dict:
     for e in experiments:
         articles.setdefault(e["article_id"], {"id": e["article_id"], "title": "Synthetic", "experiments": []})["experiments"].append(deepcopy(e))
     return {
-        "format": 1, "checkout_schema_change": "0095",
-        "schema_metadata_hash": "c129120a031257f6e46e3a46d0762bef",
-        "exported_at": "2026-10-27T00:00:00Z", "source": "test",
+        "format": 6, "checkout_schema_change": "0111",
+        "schema_metadata_hash": "570d0d2cc4ea7a1362323c88161a757b",
+        "exported_at": "2026-11-15T00:00:00Z", "source": "test",
         "filter": {"sole_target_material": "gold", "completed_only": True},
         "options": {"include_manufacturers": False, "include_instrument_details": False,
                     "include_settings": False, "compact_materials": True,

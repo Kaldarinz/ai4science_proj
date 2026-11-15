@@ -336,8 +336,9 @@ def _canonical(value: object, shared: dict, trail: tuple = ()) -> object:
                 if key in {"constituents", "additives", "feedstock"}:
                     normalized = sorted(
                         normalized, key=lambda item: json.dumps(item, sort_keys=True))
-                elif key in {"beam_path", "postprocessing_steps"}:
-                    ordinal = "path_order" if key == "beam_path" else "step"
+                elif key in {"beam_path", "postprocessing_steps", "layers"}:
+                    ordinal = {"beam_path": "path_order", "postprocessing_steps": "step",
+                               "layers": "layer_order"}[key]
                     normalized = sorted(normalized, key=lambda item: item[ordinal])
                 result[key] = normalized
         return result
@@ -460,6 +461,21 @@ def _is_gold(constituent: dict) -> bool:
     if base.get("formula") is not None:
         return base["formula"] == "Au"
     return base.get("material", "").casefold() in {"gold", "au"}
+
+
+def _gold_target(target: dict) -> bool:
+    """Match the export's recorded sole-material assembly, not product purity."""
+    if "stack" in target:
+        stack = target["stack"]
+        layers = stack.get("layers", [])
+        return stack.get("complete") is True and bool(layers) and all(_is_gold(c) for c in layers)
+    parts = target.get("constituents", [])
+    fraction = parts[0].get("fraction") if len(parts) == 1 else None
+    # A singleton rounds to one at six places (PostgreSQL half-up), as in
+    # the exporter's has_quantified_composition; never normalize the value.
+    return (target.get("composition_complete") is not False and len(parts) == 1
+            and type(fraction) in (int, float) and 0.9999995 <= fraction <= 1
+            and _is_gold(parts[0]))
 
 
 def _medium_class(experiments: list[dict], shared: dict) -> str:
@@ -586,12 +602,11 @@ def build_series(snapshot: dict, article_id: int) -> BuildResult:
     for eid, experiment in sorted(experiments.items()):
         if experiment["article_id"] != article_id:
             raise ValueError(f"wrong article for experiment {eid}")
-        if "ablation" not in experiment:
+        if experiment.get("process_type") != "ablation" or experiment.get("target") is None:
             diagnose("not_gold_ablation", "no ablation target", [eid])
             continue
-        target = _canonical({"target": experiment["ablation"]["target"]}, shared)["target"]
-        constituents = target.get("constituents", [])
-        if not constituents or not all(_is_gold(c) for c in constituents):
+        target = _canonical({"target": experiment["target"]}, shared)["target"]
+        if not _gold_target(target):
             diagnose("not_gold_ablation", "target is not gold only", [eid])
             continue
         found = False

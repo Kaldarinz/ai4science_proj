@@ -1,10 +1,10 @@
 {
  "$schema": "https://json-schema.org/draft/2020-12/schema",
- "title": "ablation_db snapshot, format 1",
+ "title": "ablation_db snapshot, format 6",
  "description": "A snapshot of the ablation_db catalogue. Notes are not exported: where a description says a qualifier goes to notes, that qualifier is unknown here. Each number's unit: find its object's $defs name, read its route in field_units, then resolve a parameter through parameter_quantities and a quantity through units. Intervals are in interval_unit.",
  "type": "object",
  "properties": {
-  "format": {"const": 1},
+  "format": {"const": 6},
   "checkout_schema_change": {
    "type": ["string", "null"]
   },
@@ -69,95 +69,6 @@
  "required": ["format", "checkout_schema_change", "schema_metadata_hash", "exported_at", "source", "filter", "options", "interval_unit", "units", "field_units", "parameter_quantities", "articles", "referenced_colloids", "shared"],
  "additionalProperties": false,
  "$defs": {
-  "ablation_batch_setups": {
-   "type": "object",
-   "properties": {
-    "volume": {
-     "type": "number",
-     "description": "Volume of liquid, in mL (quantity volume). For a setup circulating through a buffer volume, the total of cuvette, buffer and pipes. Must be greater than 0."
-    },
-    "duration": {
-     "type": "number",
-     "description": "Ablation duration for single run"
-    },
-    "stirring": {
-     "type": "boolean",
-     "description": "Whether liquid was stirred during ablation (e.g. by magnetic stirrer)"
-    }
-   },
-   "required": [],
-   "additionalProperties": false
-  },
-  "ablation_flow_setups": {
-   "type": "object",
-   "properties": {
-    "flow_rate": {
-     "type": "number",
-     "description": "Volumetric flow of the liquid through the ablation zone, in mL/min (quantity liquid_flow_rate). Must be greater than 0."
-    },
-    "flow_speed": {
-     "type": "number",
-     "description": "Speed of the liquid in the ablation zone, in m/s (quantity flow_speed). Must be greater than 0."
-    },
-    "duration": {
-     "type": "number",
-     "description": "Time the target was ablated while the liquid flowed through the ablation zone, if reported, e.g. \"ablated for 10 min at 5 mL/min\". The collected volume is this times flow_rate. Not the residence time of the liquid in the beam, and not pumping before or after the laser ran. Do not derive it from a collected volume and the flow. Must be greater than 0."
-    }
-   },
-   "required": [],
-   "additionalProperties": false
-  },
-  "ablations": {
-   "type": "object",
-   "properties": {
-    "target": {
-     "type": "integer",
-     "x-shared": "targets",
-     "description": "Parameters of ablation target."
-    },
-    "target_position": {"$ref": "#/$defs/target_positions"},
-    "liquid_layer_thickness": {
-     "type": "number",
-     "description": "Thickness, in mm (quantity liquid_layer_thickness), of the liquid the beam crosses before the target: the height of liquid above a target irradiated from above, or, in side irradiation, the distance from the inner face of the entrance wall to the target. Must be greater than 0."
-    },
-    "beam_movement_type": {
-     "type": "string",
-     "description": "Dominant mechanism producing relative motion between the beam and the target, e.g. target translation, galvanometer scanner, if reported. A setup combining two mechanisms records the dominant one here and the rest in notes."
-    },
-    "beam_movement_speed": {
-     "type": "number",
-     "description": "Speed, in mm/s (quantity scan_speed), of the beam spot relative to the target surface, if reported. This is the spot on the target, not the liquid -- for the liquid see ablation_flow_setups.flow_speed. For a rotating target this is the linear speed at the ablated radius; leave it null if the paper reports a rotation rate and no radius, or if a radial feed makes the radius vary during the run, and record the rate in notes -- but note that two experiments differing only in a rate recorded that way hash identically and the second is rejected as a duplicate. A beam that deliberately did not move is recorded as beam_movement_type stationary and no speed here. Must be greater than 0 and less than 10000000."
-    },
-    "beam_movement_pattern": {
-     "type": "string",
-     "description": "Path the spot traces over the target surface, e.g. snake, spiral, if reported."
-    },
-    "beam_movement_size_x": {
-     "type": "number",
-     "description": "Longer side, in mm (quantity scan_size), of the bounding box of the path traced by the spot centre, if reported. A one-dimensional scan records its length here and leaves beam_movement_size_y null; a spiral or a circle records its outer diameter in both; a helix on a rotating rod records the axial length of the ablated band here and leaves the other null. Must be greater than 0 and less than 1000."
-    },
-    "beam_movement_size_y": {
-     "type": "number",
-     "description": "Shorter side, in mm (quantity scan_size), of the bounding box of the path traced by the spot centre, if reported. Null for a one-dimensional scan or a helix. Must be greater than 0, not greater than beam_movement_size_x, and less than 1000."
-    },
-    "beam_movement_passes": {
-     "type": "integer",
-     "description": "Number of times the beam traced the whole path given by beam_movement_pattern and the two sizes, if reported: \"the area was scanned 20 times\" or \"the pattern was repeated 20 times\" is 20. One pass is the whole pattern, not one line of a raster; a line counts each one-way traverse, a helix each full axial traverse, and for a rotating target without radial feed this is the number of revolutions. Record 1 only when the article says the path was traced once. Not: replicate syntheses, sequential runs with fresh or re-irradiated liquid, passages of the liquid through a flow cell or jet, pulses per spot or in total, repeats of one line before stepping, or target positions -- record those in notes. Null for a stationary beam, a random or manual movement, repositioning between runs, and when the article does not state the count; do not derive it from a duration and a speed, which assumes the beam ran without pauses. Must be greater than 0."
-    },
-    "ablation_batch_setup": {"$ref": "#/$defs/ablation_batch_setups"},
-    "ablation_flow_setup": {"$ref": "#/$defs/ablation_flow_setups"}
-   },
-   "required": ["target"],
-   "additionalProperties": false,
-   "oneOf": [
-    {
-     "required": ["ablation_batch_setup"]
-    },
-    {
-     "required": ["ablation_flow_setup"]
-    }
-   ]
-  },
   "article": {
    "type": "object",
    "properties": {
@@ -247,7 +158,7 @@
     "objective": {
      "type": "integer",
      "x-shared": "objectives",
-     "description": "The final focusing optic -- a lens, an F-theta, a microscope objective or a focusing (concave or off-axis parabolic) mirror -- forming the spot in the sample plane, when this element is one. A cylindrical lens forming a line focus is the objective, its type saying cylindrical. A refractive axicon forming the Bessel zone at the sample may be the objective; the extraction rules say when. At most one per experiment: target_positions' distance to objective refers to it, and spot_diameter is formed by it. An unfocused beam has none. The lenses of a telescope, beam expander or spatial filter are not objectives."
+     "description": "The sample-forming focusing optic represented by this element: a lens, F-theta, microscope objective, focusing mirror or refractive axicon forming the Bessel zone at the sample. A cylindrical lens can form a line focus. At most one per experiment: target_positions distance to objective refers to it, and spot_diameter is formed by it. An unfocused beam has none. Telescope, beam-expander and spatial-filter lenses are not objectives merely because they focus within that assembly."
     },
     "aperture": {"$ref": "#/$defs/beam_path_apertures"}
    },
@@ -267,11 +178,11 @@
    "properties": {
     "rcf": {
      "type": "integer",
-     "description": "Relative centrifugal force, in whole units of g, standard gravity (quantity relative_centrifugal_force). A printed force is stored as printed, rounded to whole g, whatever radius it refers to, with a radius or qualifier printed with it in the step's notes. Only when no force is printed is one inferred from the rotor speed, at the first of: r_max (the distance from the axis to the bottom of the tube) as the article prints it; r_max from the datasheet of the named rotor, or of a named centrifuge that lists no other rotor; r_av if printed, otherwise a single unqualified radius. An r_min alone is not used. RCF = 1.118e-5 * r[cm] * rpm^2, rounded to whole g; for a printed rpm range, from its midpoint rpm, not the midpoint of the forces. The inferred record's note gives the radius as printed, its source, and any range. Must be greater than 0. NULL when no force is printed and none can be inferred; a spin printing neither force nor rotor speed leaves both rcf and rotor_speed NULL."
+     "description": "Relative centrifugal force, in whole units of g, standard gravity (quantity relative_centrifugal_force). A radius or other qualifier belongs in the step notes. Must be greater than 0; NULL when not recorded. Distinct from rotor_speed, which records revolutions per minute."
     },
     "rotor_speed": {
      "type": "integer",
-     "description": "Rotor speed, in revolutions per minute (quantity rotational_speed), as the article prints it; a printed range as its midpoint, with an inferred provenance record naming the range. Never derived from a force. Must be greater than 0. NULL when the article prints none."
+     "description": "Rotor speed, in revolutions per minute (quantity rotational_speed). Must be greater than 0; NULL when not recorded. Distinct from rcf, which records relative centrifugal force."
     },
     "duration": {
      "type": "number",
@@ -328,7 +239,7 @@
     },
     "storage_duration": {
      "type": "number",
-     "description": "How long the colloid was stored before being used or measured, if recorded. A product's duration runs from the latest of its synthesis, the end of its experiment's last post-processing step, and its move into this medium; a hold that lasts until the measurement counts from its start. It is the time since the product was last processed, not the particles' age; a step's own printed time is in its step. A stock's runs from its preparation -- the dispersion of a powder, or the receipt of a bought suspension."
+     "description": "How long the colloid was stored before being used or measured, if recorded, in whole seconds; fractional seconds are not allowed. A product's duration runs from the latest of its synthesis, the end of its experiment's last post-processing step, and its move into this medium; a hold that lasts until the measurement counts from its start. It is the time since the product was last processed, not the particles' age; a step's own printed time is in its step. A stock's runs from its preparation -- the dispersion of a powder, or the receipt of a bought suspension."
     },
     "shape": {
      "type": "string",
@@ -349,16 +260,16 @@
    "properties": {
     "procedure": {
      "type": "string",
-     "description": "What was done: an entry of postprocessing_procedures, such as dialysis, magnetic separation or coating."
+     "description": "What was done: a postprocessing_procedures entry. Use other only when no specific entry fits, and describe the action in details."
     },
     "details": {
      "type": "string",
-     "description": "How it was done, one fact per line, a separating step first naming the fraction kept, as in \"kept the retentate\", \"20 h, Serva Visking 44120 tube (pore about 2.5 nm)\", \"dialysate not stated\". NULL when the article states nothing beyond the procedure. No blank line, carriage return, tab, run of two spaces or space at either end of a line, so the same text always hashes alike."
+     "description": "How it was done, one fact per line, a separating step first naming the fraction kept, as in \"kept the retentate\", \"20 h, Serva Visking 44120 tube (pore about 2.5 nm)\", \"dialysate not stated\". Required and nonblank for other, describing the action; NULL for a specific procedure when the article states nothing more. No blank line, carriage return, tab, run of two spaces or space at either end of a line, so the same text always hashes alike."
     },
     "resulting_medium": {
      "type": "integer",
      "x-shared": "liquid_media",
-     "description": "Liquid medium this step leaves the product in: set when the article states it, a hold's stated medium included, or when the step adds a named agent to a known entering medium. NULL when the article names no medium the step leaves, which may also mean the medium did not change; a product's medium is then not proposed from its steps, and the curator settles it."
+     "description": "Liquid medium this step leaves the product in, when recorded. NULL means the resulting medium is not recorded; it does not assert that the medium changed or stayed unchanged."
     }
    },
    "required": ["procedure"],
@@ -467,8 +378,76 @@
      "type": "number",
      "description": "Laser fluence at the sample surface, in J/cm² (quantity fluence), if reported. Record the number the paper gives, and say in notes whether it is the peak or the average fluence, since for a Gaussian spot the two differ by a factor of two. Under an axicon the central lobe holds a small share of the pulse, so the whole pulse energy over the lobe's area is not the lobe's fluence; say in notes which the paper gives. Must be greater than 0."
     },
-    "ablation": {"$ref": "#/$defs/ablations"},
-    "fragmentation": {"$ref": "#/$defs/fragmentations"},
+    "process_type": {
+     "type": "string",
+     "description": "Irradiation process: ablation or fragmentation. Required; determines target/scanning applicability."
+    },
+    "volume": {
+     "type": "number",
+     "description": "Liquid amount for the run, in mL (quantity volume). Stationary setups report vessel liquid; recirculating setups report vessel/reservoir/pipe inventory, not repeated throughput. Single-pass setups report total liquid passed through the irradiation region. Unknown paths retain the reported amount and its context; single_pass = false alone establishes no inventory/throughput interpretation. Must be greater than 0."
+    },
+    "duration": {
+     "type": "number",
+     "description": "Reported irradiation run duration, not liquid residence time, dose or gas pumping before/after irradiation. Must be greater than 0; no volume, flow or duration is calculated automatically."
+    },
+    "stirring": {
+     "type": "boolean",
+     "description": "Whether the liquid was stirred during irradiation. NULL is unreported, not No."
+    },
+    "single_pass": {
+     "type": "boolean",
+     "description": "Whether the setup is recorded as single-pass: liquid passes through the irradiation region once. False means not recorded as single-pass, including historical unspecified paths; it does not imply stationary liquid or forbid directed flow. NULL leaves the choice unreported or unanswered."
+    },
+    "flow_rate": {
+     "type": "number",
+     "description": "Volumetric liquid flow through the irradiation region, in mL/min (quantity liquid_flow_rate), not gas pumping. Must be greater than 0 and may be reported for single-pass or recirculating setups."
+    },
+    "flow_speed": {
+     "type": "number",
+     "description": "Linear liquid speed through the irradiation region, in m/s (quantity flow_speed), not relative beam/target scanning speed. Must be greater than 0."
+    },
+    "target": {
+     "type": "integer",
+     "x-shared": "targets",
+     "description": "Parameters of ablation target."
+    },
+    "target_position": {
+     "type": "number",
+     "description": "Distance of the target surface from target_position_ref_type, in mm (quantity target_position). For relative references it is signed, negative closer to the focusing optic; for distance to objective it is measured from the optic or face the paper names. Recorded as reported, without inferred refraction correction. Must be greater than -1000 and less than 1000; requires a reference when supplied. Only ablation may record it."
+    },
+    "target_position_ref_type": {
+     "type": "integer",
+     "x-shared": "target_position_ref_types",
+     "description": "Controlled reference from which target_position is measured. May be recorded without a distance; required when a distance is supplied. Only ablation may record it."
+    },
+    "liquid_layer_thickness": {
+     "type": "number",
+     "description": "Thickness, in mm (quantity liquid_layer_thickness), of the liquid the beam crosses before the target: the height of liquid above a target irradiated from above, or, in side irradiation, the distance from the inner face of the entrance wall to the target. Must be greater than 0."
+    },
+    "beam_movement_type": {
+     "type": "string",
+     "description": "Dominant mechanism producing relative motion between the beam and the target, e.g. target translation, galvanometer scanner, if reported. A setup combining two mechanisms records the dominant one here and the rest in notes."
+    },
+    "beam_movement_pattern": {
+     "type": "string",
+     "description": "Path the spot traces over the target surface, e.g. snake, spiral, if reported."
+    },
+    "beam_movement_speed": {
+     "type": "number",
+     "description": "Speed, in mm/s (quantity scan_speed), of the beam spot relative to the target surface, if reported. This is the spot on the target, not the liquid -- for the liquid see ablation_flow_setups.flow_speed. For a rotating target this is the linear speed at the ablated radius; leave it null if the paper reports a rotation rate and no radius, or if a radial feed makes the radius vary during the run, and record the rate in notes -- but note that two experiments differing only in a rate recorded that way hash identically and the second is rejected as a duplicate. A beam that deliberately did not move is recorded as beam_movement_type stationary and no speed here. Must be greater than 0 and less than 10000000."
+    },
+    "beam_movement_size_x": {
+     "type": "number",
+     "description": "Longer side, in mm (quantity scan_size), of the bounding box of the path traced by the spot centre, if reported. A one-dimensional scan records its length here and leaves beam_movement_size_y null; a spiral or a circle records its outer diameter in both; a helix on a rotating rod records the axial length of the ablated band here and leaves the other null. Must be greater than 0 and less than 1000."
+    },
+    "beam_movement_size_y": {
+     "type": "number",
+     "description": "Shorter side, in mm (quantity scan_size), of the bounding box of the path traced by the spot centre, if reported. Null for a one-dimensional scan or a helix. Must be greater than 0, not greater than beam_movement_size_x, and less than 1000."
+    },
+    "beam_movement_passes": {
+     "type": "integer",
+     "description": "Number of times the beam traced the whole path given by beam_movement_pattern and the two sizes, if reported: \"the area was scanned 20 times\" or \"the pattern was repeated 20 times\" is 20. One pass is the whole pattern, not one line of a raster; a line counts each one-way traverse, a helix each full axial traverse, and for a rotating target without radial feed this is the number of revolutions. Record 1 only when the article says the path was traced once. Not: replicate syntheses, sequential runs with fresh or re-irradiated liquid, passages of the liquid through a flow cell or jet, pulses per spot or in total, repeats of one line before stepping, or target positions -- record those in notes. Null for a stationary beam, a random or manual movement, repositioning between runs, and when the article does not state the count; do not derive it from a duration and a speed, which assumes the beam ran without pauses. Must be greater than 0."
+    },
     "feedstock": {
      "type": "array",
      "items": {"$ref": "#/$defs/feedstock_colloids"}
@@ -513,16 +492,8 @@
      "description": "Whether the pumping gas was flowing during laser processing itself. False means pumping was done before processing started."
     }
    },
-   "required": ["id", "article_id", "laser", "synthesis_medium", "free_surf_entrance"],
-   "additionalProperties": false,
-   "oneOf": [
-    {
-     "required": ["ablation"]
-    },
-    {
-     "required": ["fragmentation"]
-    }
-   ]
+   "required": ["id", "article_id", "laser", "process_type", "synthesis_medium"],
+   "additionalProperties": false
   },
   "feedstock_colloids": {
    "type": "object",
@@ -534,29 +505,10 @@
     },
     "fraction": {
      "type": "number",
-     "description": "Share of the final volume in the vessel: diluted 10-fold is 0.1; 1 part colloid + 4 parts water is 0.2. If the paper names the order (water:colloid 1:4), follow it. A bare \"1:4\" is read as colloid:diluent, 0.2, and marked \"inferred\". If the paper gives a final concentration or a molar ratio instead, convert it using the stocks' concentrations, mark the value \"inferred\", and quote the paper's statement in the note. If the paper states no share at all, enter the likely value (1 for \"the colloid was irradiated\") and mark it \"assumed\"."
+     "description": "Share of the final liquid volume in the irradiation vessel contributed by this feedstock colloid. A 10-fold volume dilution gives 0.1; 1 part colloid plus 4 parts diluent gives 0.2. Required, greater than 0 and at most 1. Provenance distinguishes a reported share, a calculated share and an allowed unstated-share default."
     }
    },
    "required": ["colloid", "fraction"],
-   "additionalProperties": false
-  },
-  "fragmentations": {
-   "type": "object",
-   "properties": {
-    "volume": {
-     "type": "number",
-     "description": "Volume of liquid, in mL (quantity volume). For a setup circulating through a buffer volume, the total of cuvette, buffer and pipes. Must be greater than 0."
-    },
-    "duration": {
-     "type": "number",
-     "description": "Fragmentation duration for a single run."
-    },
-    "stirring": {
-     "type": "boolean",
-     "description": "Whether liquid was stirred during fragmentation (e.g. by magnetic stirrer)."
-    }
-   },
-   "required": [],
    "additionalProperties": false
   },
   "gases": {
@@ -599,11 +551,11 @@
     },
     "electrical_conductivity": {
      "type": "number",
-     "description": "Electrical conductivity of the medium as prepared, before ablation, in μS/cm (quantity electrical_conductivity), at 25 C unless stated. Zero is allowed for a pure nonpolar liquid."
+     "description": "Electrical conductivity of this liquid medium, in μS/cm (quantity electrical_conductivity), at the reported state. Measurement conditions belong in context notes. Zero is allowed for a pure nonpolar liquid."
     },
     "ph": {
      "type": "number",
-     "description": "pH of this liquid as prepared or set, as the paper gives it. Empty when none is given. From -2 to 16."
+     "description": "pH of this liquid medium at the reported state, whether prepared, set or measured as a colloid liquid phase. NULL when unreported. From -2 to 16."
     }
    },
    "required": [],
@@ -707,7 +659,7 @@
     },
     "component": {
      "type": "string",
-     "description": "The part of a composite particle the value describes, e.g. a core-shell's shell thickness; NULL for the whole particle or the whole sample. It must be one shape_component_registry lists for the subject's own shape, in the quantity it names (check_particle_component()). Part of the row's identity, and matched by measured_property_redundancy()."
+     "description": "The component the value describes: a part of a composite particle, e.g. a core-shell's shell thickness, or sheet for a sheet's own thickness; NULL for the whole particle or the whole sample. It must be one shape_component_registry lists for the subject's own shape, in the quantity it names, and a quantity flagged needs_component requires one (check_particle_component()). Part of the row's identity, and matched by measured_property_redundancy()."
     },
     "quantity": {
      "type": "string",
@@ -792,7 +744,7 @@
     },
     "focal_length": {
      "type": "number",
-     "description": "Nominal catalogue focal length of the focusing optic, in mm (quantity focal_length), never corrected to the laser wavelength: Thorlabs LA1608 is 75 mm, although it is about 76.5 mm at 1064 nm. For a microscope objective, the effective focal length from the manufacturer's datasheet; without one, an infinity-corrected objective is tube-lens focal length / magnification, at 200 mm for Nikon, Thorlabs, Mitutoyo and Leica, 180 mm for Olympus and 165 mm for Zeiss, inferred; a finite (160 mm) objective is 160 mm / magnification, inferred; with no maker named, 200 mm / magnification, assumed. For an F-theta lens, its nominal f. For an off-axis parabolic mirror, its reflected (effective) focal length, not the parent focal length; for a spherical concave mirror, R/2 when only the radius is given, inferred. Never the working distance. NULL for an axicon, which states its base_angle instead. Must be greater than 0 and at most 10000."
+     "description": "Nominal catalogue focal length of the focusing optic, in mm (quantity focal_length), not corrected to the laser wavelength and never its working distance. For a microscope objective, its effective focal length; for an F-theta lens, its nominal focal length; for an off-axis parabolic mirror, its reflected effective focal length rather than its parent focal length. NULL for an axicon, which records base_angle instead. Must be greater than 0 and at most 10000."
     },
     "base_angle": {
      "type": "number",
@@ -1031,7 +983,7 @@
     },
     "component": {
      "type": "string",
-     "description": "The part of a composite particle the histogram measures, e.g. the cores of core-shell particles; NULL for the whole particle. It must be one shape_component_registry lists for the subject's own shape, in the x quantity it names (check_particle_component()). Part of the row's identity."
+     "description": "The component the histogram measures: a part of a composite particle, e.g. the cores of core-shell particles, or sheet for the sheets' own thickness; NULL for the whole particle. It must be one shape_component_registry lists for the subject's own shape, in the x quantity it names, and a quantity flagged needs_component requires one (check_particle_component()). Part of the row's identity."
     },
     "x_quantity": {
      "type": "string",
@@ -1060,10 +1012,10 @@
     },
     "fraction": {
      "type": "number",
-     "description": "For any target_id all values must sum up to 1.0"
+     "description": "Reported ordinary target fraction, finite and in [0, 1], or NULL when unknown. Complete compositions require all fractions and a sum of one to six places; otherwise their known sum may not exceed one at that precision. Never normalized or filled from a residual."
     }
    },
-   "required": ["fraction"],
+   "required": [],
    "additionalProperties": false,
    "oneOf": [
     {
@@ -1073,6 +1025,30 @@
      "required": ["particle"]
     }
    ]
+  },
+  "target_layers": {
+   "type": "object",
+   "properties": {
+    "layer_order": {
+     "type": "integer",
+     "description": "Dense 1-based physical top-to-bottom order, not deposition or beam direction. In incomplete or unspecified stacks, consecutive numbers establish relative order, not proven adjacency."
+    },
+    "material": {
+     "type": "integer",
+     "x-shared": "materials",
+     "description": "The one recorded Material of this layer, required. Powder samples remain an ordinary target constituent source, not a layer alternative."
+    },
+    "thickness": {
+     "type": "number",
+     "description": "Reported layer thickness, in nm (quantity thickness), finite and positive when supplied. NULL means unreported; never inferred from fractions, masses or density."
+    },
+    "role": {
+     "type": "string",
+     "description": "One optional controlled structural role. A substrate role establishes neither contribution nor exclusion from ablation products."
+    }
+   },
+   "required": ["layer_order", "material"],
+   "additionalProperties": false
   },
   "target_position_ref_types": {
    "type": "object",
@@ -1089,20 +1065,19 @@
    "required": ["reference_type", "relative"],
    "additionalProperties": false
   },
-  "target_positions": {
+  "target_stacks": {
    "type": "object",
    "properties": {
-    "target_position_ref_type": {
-     "type": "integer",
-     "x-shared": "target_position_ref_types",
-     "description": "Method, used for measuring distance between objective and target surface"
+    "complete": {
+     "type": "boolean",
+     "description": "True explicitly enumerates the complete physical assembly; false explicitly describes an incomplete enumeration; NULL leaves completeness unspecified. Not an assertion about thickness, roles or ablated extent."
     },
-    "position": {
-     "type": "number",
-     "description": "Distance, in mm (quantity target_position), of the target surface from the reference target_position_ref_type names. For a relative reference it is signed, negative closer to the focusing optic: \"focus 2 mm inside the target, behind its surface\" is -2 relative to the geometric focus. For \"distance to objective\" it is a positive distance; under an axicon, from its tip, or from the face the paper names. Recorded as the paper states it; a refraction correction the paper made for the liquid layer goes in notes. Must be greater than -1000 and less than 1000."
+    "layers": {
+     "type": "array",
+     "items": {"$ref": "#/$defs/target_layers"}
     }
    },
-   "required": ["target_position_ref_type"],
+   "required": [],
    "additionalProperties": false
   },
   "targets": {
@@ -1114,15 +1089,29 @@
     },
     "fraction_type": {
      "type": "string",
-     "description": "Basis the constituent fractions are expressed in, e.g. mass, volume, molar."
+     "description": "Reported fraction basis for an ordinary composition, or NULL when unspecified. Must be NULL for a fraction-one singleton or a stack."
+    },
+    "composition_complete": {
+     "type": "boolean",
+     "description": "Completeness of an ordinary composition: true requires all fractions and a sum of one rounded to six places; false explicitly incomplete; NULL unspecified. Must be NULL for a stack."
     },
     "constituents": {
      "type": "array",
-     "items": {"$ref": "#/$defs/target_constituents"}
-    }
+     "items": {"$ref": "#/$defs/target_constituents"},
+     "minItems": 1
+    },
+    "stack": {"$ref": "#/$defs/target_stacks"}
    },
    "required": [],
-   "additionalProperties": false
+   "additionalProperties": false,
+   "oneOf": [
+    {
+     "required": ["constituents"]
+    },
+    {
+     "required": ["stack"]
+    }
+   ]
   }
  }
 }

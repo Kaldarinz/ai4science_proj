@@ -10,9 +10,11 @@ how sensitive their classifications are to the assumed size errors. Neither
 part verifies the extraction of textual claims or the correctness of the
 curated database values.
 
-Sections 0–10 follow the course template `METHOD_TEMPLATE.md` (week 6).
-Sections 1–7 were fixed before the first run; any subsequent curator-authorized
-revision is disclosed in §9. Sections 8–10 are filled as work goes.
+This is the current main-project contract, migrated on 2026-11-15.
+The original preregistration, submitted HW2 report, old snapshot and numerical
+results remain unchanged at tag `hw2` (commit `3abd29312aa89c7e6deb3211ecc0d66c47c61f5f`).
+This migration runs infrastructure checks only, not a new resampling experiment.
+Sections 0–10 retain the original course-template structure.
 This file names no database values except the reference article 80094,
 whose shapes `checks/results_spec.md` §7.5 already states.
 
@@ -23,8 +25,9 @@ whose shapes `checks/results_spec.md` §7.5 already states.
 | Task | check the code that groups ablation_db experiments into size-versus-fluence series and gives each series a shape (`results_spec.md` §2–§3), and measure how stable each shape is under the size errors |
 | Discipline | materials science (laser ablation in liquids) |
 | Verifier type | property tests and a data contract |
-| Method recorded | 2026-10-27, before the first run |
-| Git tag | `exp-verifier`; the submission is tagged `hw2` |
+| Original HW2 method | 2026-10-27; archived at `hw2:METHOD.md` |
+| Current snapshot adoption | 2026-11-15; export metadata in `data/snapshot_manifest.json` |
+| Historical submission | `hw2`, unchanged; HW2 has been submitted |
 
 ## 1. Idea
 
@@ -38,11 +41,8 @@ whose shapes `checks/results_spec.md` §7.5 already states.
   its shape under both error models, the share of resampled draws that
   keep that shape with a 95 % interval, and the difference from the
   no-dependence baseline (§7).
-- **Known before this file was written:** a sketch of the shape rule
-  resampled 80094-s2 (sizes as in the spec's reference case, not from the
-  snapshot) and kept `peak` (primary) in about 31 % of draws and `flat`
-  (lenient) in about 29 %; a rough grouping of a test export found about
-  9 series in 6 articles. No shape was computed from the snapshot.
+- **History:** prior exploratory estimates and HW2 outcomes belong to
+  `hw2:METHOD.md` and `hw2:results/verifier/REPORT.md`, not this snapshot.
 
 ## 2. Setup
 
@@ -58,9 +58,11 @@ whose shapes `checks/results_spec.md` §7.5 already states.
 | What | Value |
 |---|---|
 | Source | ablation_db (curated database of laser-ablation experiments), read-only account, exported with `ablation_db snapshot` |
-| Version | `data/ablation_snapshot.json`, SHA-256 `c5380620d896237ad655bfde0ce166d3f638b84a3e9b0b996cc09226f6b8303f`; format 1, schema change `0095`, metadata hash `c129120a031257f6e46e3a46d0762bef`, exported 2026-10-27T11:18:47Z from live; committed in `9db97cf` |
+| Version | `data/ablation_snapshot.json`, SHA-256 `0de0f35107c00c31adb096e4a974fdb18844bd9b505c05e3174543688879c637`; format 6, schema change `0111`, metadata hash `570d0d2cc4ea7a1362323c88161a757b`, exported 2026-11-15T09:30:40Z from live |
+| Exporter | ablation_db commit `55e09d7251739f4ee7cbe17aa539ac93256d0862` |
+| Schema | `data/ablation_snapshot.schema.json`, SHA-256 `76ecbba667009c0dc12356bb11090d998144090d46bc0fc2687cc1fddc9f0046`; adopted together with the snapshot |
 | Export options | gold as the sole target material, completed articles only; no manufacturers, instrument details, measurement settings or provenance; compact materials; nulls omitted |
-| Size | 19 articles, 118 experiments, 753 KB |
+| Size | 41 articles, 245 experiments, 2197289 bytes |
 | Split | none: every usable series is evaluated; histogram modes, when requested, are fitted locally with a lognormal distribution |
 
 ### Series key
@@ -70,7 +72,7 @@ Series are formed from experiments of individual articles. The experiments addit
 | Part | Exported fields compared |
 |---|---|
 | Laser and optics | Laser description, wavelength, pulse duration, repetition rate, output beam diameter, polarization, spatial mode and ordered beam path |
-| Ablation setup | Complete `ablation` record: target, target position, liquid-layer thickness, scanning parameters and batch/flow settings |
+| Process/setup | Flat format-6 fields: `process_type`, `target`, `target_position`, `target_position_ref_type`, `liquid_layer_thickness`, all `beam_movement_*`, `volume`, `duration`, `stirring`, `single_pass`, `flow_rate`, `flow_speed` |
 | Materials and media | Synthesis medium, feedstock colloid identities and fractions, and the selected product's liquid medium |
 | Beam entrance and gas | Entrance material, free-surface entrance flag, pumping gas, flow rate, duration and whether pumping occurs during processing |
 | Post-processing | Complete ordered protocol and its parameters |
@@ -80,7 +82,16 @@ A missing or null scalar condition or optional condition is a
 wildcard matching any stated value. Missing details inside listed records
 are wildcards too. **Absent, null or empty condition collections mean none**,
 not unknown: no feedstock does not match a nonempty feedstock list. Beam-path
-and post-processing order is significant.
+and post-processing order is significant; stack layers are compared in physical
+`layer_order`. `single_pass=false` is a stated value, not proof of stationary
+liquid. Target distance and its reference are separate compared fields.
+
+Gold-only eligibility follows the exporter: an ordinary singleton not explicitly
+incomplete, with a supplied fraction in [0, 1] rounding to one at six decimal
+places (half-up), or a nonempty explicitly complete stack whose every
+layer is gold. Particle constituents resolve through their material. Stack roles
+(including substrate) never remove a layer from this test. These are recorded
+assembly identities, not evidence of nanoparticle purity.
 
 **Data contract**, checked by `checks/verifier/contract.py` on the snapshot
 and on the series built from it. Each rule returns named violations; an
@@ -88,7 +99,7 @@ unknown violation fails the check.
 
 | Rule | How it is checked | Violation |
 |---|---|---|
-| header: format 1, the export options above | compare with constants | `header_mismatch` |
+| header: format 6, schema `0111`, metadata hash and export options above | compare with constants; snapshot and schema have exact SHA-256 guards | `header_mismatch`, `snapshot_hash_mismatch`, `schema_hash_mismatch` |
 | experiment ids unique; each experiment's `article_id` is its article's | count and compare | `duplicate_experiment`, `wrong_article` |
 | every ablation target is gold only | resolve the target in `shared` | `non_gold_target` |
 | units: fluence J/cm², pulse energy µJ, spot diameter µm, sizes nm | the snapshot's `units` table | `unit_mismatch` |
@@ -111,7 +122,7 @@ with a note, not a violation.
   `results_spec.md` §4 functions, including `get_series(id, model="primary")`
   and `list_exclusions(article_id)`. No database connection.
 - Tool implementation tests: `.venv/bin/python -m pytest tools/tests -q`.
-  These are separate from the HW2 verifier and planned resampling runs.
+  These are separate from the independent verifier and future resampling runs.
 - Verifier commands: `.venv/bin/python checks/verifier/run.py dry`, then
   `.venv/bin/python -m pytest checks/verifier -q`.
   Resampling: `.venv/bin/python checks/verifier/run.py smoke`, then
@@ -189,86 +200,52 @@ with a note, not a violation.
    or the reference case differs: stop, record it in §9, fix before
    going on.
 
-## 8. Budget
+## 8. Execution boundary
 
-- Computation: about 9 series × 2 models × 2 (data, baseline) × 5000
-  draws; seconds to a minute.
-- Agent: the course agent takes no part in this check. Code written with
-  an assistant is marked in the report's authorship table.
+The AI4Science agent performs new claim extraction, scientific calculations,
+plots, interpretation and article writing. This curator migration changes only
+inputs, the reader, contracts, tests and historical-result references. Contract
+checks may construct series to validate the API, but are not a scientific run.
+No new smoke/full resampling or claim comparison is part of this adoption.
 
-## 9. Log and caught errors
+## 9. Migration and history
 
-- Results: `results/verifier/runs.csv` (one row per step, seed, model and
-  series: shape, stability, baseline share, git commit, time);
-  `results/verifier/caught_error_before.txt` and `…_after.txt`.
-- Run notes: `diary.md`.
+On 2026-11-15 the curator authorized format-6 adoption with the same export
+selection/options. The comparison found 22 added articles and 127 added
+experiments, no removed old articles/experiments, and unchanged old colloid
+documents. The reader and independent condition-field list now use flat process
+fields and handle recorded target stacks. No error fractions, shape rules,
+distribution calculations or resampling thresholds were changed.
 
-| Date | What was wrong | Caught by | Fixed by | Before / after |
-|---|---|---|---|---|
-| 2026-11-06 | Deliberate mutation on `bug/point-order`: removed sorting from the shape function. A two-point permutation changed increasing to decreasing. This is a planted defect, not a discovered error in main. | Existing §5 property 1, unchanged from baseline `776a2fe`; Hypothesis reduced the failing input. | Compared the faulty commit `cf188ed` with the original correct parent on main. No new repair or mutation was applied to main; the bug branch remains separate. | `results/verifier/caught_error_before.txt` exits 1; `caught_error_after.txt` exits 0. Full verifier: 82 pass; regression: 267 pass. Commands, patch and source/artifact fingerprints in `caught_error.md` and `caught_error_manifest.json`. |
-| 2026-11-06 | First completed dry check reported three `out_of_range` violations from the former size upper bound, including stored axis coordinates with zero density. Short check and later steps stopped. | `checks/verifier/run.py dry` | Curator explicitly requested removing the size upper-bound check, not adding data-specific exceptions. Removed it for scalar sizes, selected representative sizes, histogram boundaries and curve axes; finite-value/positivity checks retained. Snapshot unchanged. This is a disclosed post-run revision to §3. | Original failure preserved in `results/verifier/dry_before_size_bound_removal.json`; corrected dry passes with zero violations. Short check: 65 tests pass, including the nine properties and reference. See `dry.json`, `short_check.txt` and `attempts.md` in `results/verifier/`. |
+Snapshot and schema hashes are pinned together. Tests cover flattened fixed
+conditions (including missing/false values), target-position reference contents,
+ordinary/stack gold eligibility, physical layer ordering, schema tampering and
+the existing reference case. Unsupported radius quantities are not silently
+converted to diameters; they retain the no-supported-size exclusion.
 
-Verifier implementation dependencies were installed and pinned on 2026-11-06:
-Hypothesis 6.170.15 and jsonschema 4.26.0 (plus their dependencies in
-`requirements.txt`). This realizes the planned environment in §4. The only
-post-run scientific-method revision so far is the curator-authorized removal
-of the size upper bound described above; no fallback fractions, shape rules
-or resampling acceptance thresholds have been changed. Implementation status
-and environment wording in §4–§5 now reflect the installed verifier. The
-verifier/resampling code was committed as `776a2fe` before the deliberate-error
-demonstration. The demonstration evidence/documentation was committed as
-`c50a2ff`; the curated HW2 report/package was committed as `bbd6f39`.
-The subsequent fresh-environment evidence/status updates are included in this
-submission package.
-The initial verifier regression suite passed 250 tests.
-Subsequent resampling implementation tests and execution status are recorded
-in `results/verifier/attempts.md`; the claim-comparison pipeline remains disabled.
+Old numerical artifacts have been removed from `main`, not regenerated,
+relabelled or rehashed. Their original hashes, dates, report, caught-error
+demonstration and reproduction evidence remain at `hw2:results/verifier/`.
+Read the submitted report without changing branches:
 
-Before the first implemented resampling run, the following execution
-conventions were recorded (no threshold or noise-distribution change):
+```sh
+git show hw2:results/verifier/REPORT.md
+```
 
-- Retain the original primary and lenient error arrays for every draw and
-  baseline classification; never recompute fallback errors from perturbed sizes.
-  Draw once with the original primary σ and reuse z across models and baseline.
-  Normal draws are not truncated, clipped or rejected when sizes become
-  nonpositive; their frequency is logged. The shape function accepts signed sizes.
-- Use one constant baseline centre per series, weighted by inverse original
-  primary variance. Its precise centre cannot affect the anchor-walk shape:
-  translation by a constant cancels all differences. If a future series has
-  zero primary error, stop rather than invent a baseline weighting convention.
-- For each seed, iterate series in stable ID order using one `default_rng(seed)`.
-  CIs for mean stability, baseline share and Δ are 95% t-intervals across the five
-  per-seed estimates (df = 4), intersected with the metric's legal range. They
-  quantify Monte Carlo variation under the assumed model, not experimental
-  repeat-measurement uncertainty. Smoke has no significance verdict or CI.
-- For zero between-seed variance in Δ, use the t-test limiting convention:
-  p = 0 for positive constant Δ, otherwise p = 1; retain a diagnostic flag.
-  Holm adjustment includes every series × both models, without filtering.
-- Corrected the notation in §2: a difference of two shares ranges from −1 to 1,
-  not 0 to 1. Negative Δ is retained, not clipped; the Δ ≥ 0.20 criterion is unchanged.
-  During report packaging, corrected the remaining duplicate 0–1 notation in §7.1
-  to match §2 and the existing signed implementation. This is not a threshold,
-  inference or experiment change.
+The current output directory is described in `results/verifier/README.md`.
+A new smoke/full run must produce fresh evidence for this snapshot and these
+sources; old HW2 manifests do not satisfy the gate. The historical size-upper-
+bound removal remains policy: no upper size bound, no violation allowlist.
 
-HW2 report/package checkpoint (2026-11-06): `results/verifier/REPORT.md` records
-results, a subgoal tree, attempt history, limitations and authorship. The initial
-METHOD draft was generated with DeepSeek flash 4 and edited by Anton, who
-subsequently identified the model while curating the report.
-`results/verifier/report_metrics.csv` adds sample SD across the original five
-per-seed estimates without changing the original summary or inference.
-A clean local clone of `c50a2ff` passed the verifier and dry/smoke/full sequence;
-the scientific rows and summary reproduced exactly. A separate bug worktree
-failed the existing order property. Commands, outputs and scope are recorded in
-`results/verifier/reproduction/`. The original sweep source hashes match
-`776a2fe` exactly; later documentation does not retroactively change those runs.
-That initial reproduction reused the installed pinned venv. Subsequently,
-Anton installed requirements in a new venv of a clean local clone at `bbd6f39`.
-The verifier, full regression, gated experiment and planted-error detection
-were repeated with that environment; the scientific outputs reproduced exactly.
-Evidence and package inventory: `results/verifier/fresh_environment/`.
-No method/threshold/code/data changes were made during this reproduction.
-Release identifiers are `exp-verifier` at `776a2fe` and `hw2` at the submission
-commit. Remote publication and instructor access are separate operator steps.
+Unchanged resampling conventions: retain original errors for both models and
+baseline; generate one primary-noise matrix shared across models and baseline;
+do not clip nonpositive normal draws. The baseline uses the inverse-primary-
+variance weighted mean; zero primary errors stop execution. Iterate series in
+stable ID order with one RNG per seed. Use 95% t-intervals over five seed
+estimates, intersected with legal metric ranges, not pooled draws. Constant
+positive delta has limiting p=0, other constant delta p=1, with a diagnostic.
+Holm covers every series/model; delta stays signed. These intervals measure
+Monte Carlo variation under the assumed noise model, not experimental uncertainty.
 
 ## 10. Limitations
 
@@ -303,7 +280,9 @@ commit. Remote publication and instructor access are separate operator steps.
   fitted mode or median. One colloid per point hides synthesis scatter.
 - The fallback fractions (0.10, 0.20) and the thresholds in §7 are
   choices, not measurements.
-- About 9 series: enough to test the code, too few for a strong sign test
-  in `summary.json`.
+- More articles in a snapshot do not guarantee usable or independent series.
+  No current-snapshot resampling or claim-comparison conclusion is asserted.
+- Only supported diameter quantities are used; geometric/hydrodynamic radius
+  records are not converted to diameter during this infrastructure migration.
 - The check says nothing about whether the database matches the articles,
   or whether the agent's claims are right.

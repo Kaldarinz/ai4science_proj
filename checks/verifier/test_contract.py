@@ -1,5 +1,6 @@
 """Check the checker on synthetic corruptions, plus the pinned reference case."""
 
+import json
 from copy import deepcopy
 
 import pytest
@@ -7,6 +8,7 @@ import pytest
 from checks.verifier.contract import (
     CONDITION_FIELDS,
     SCHEMA_PATH,
+    SCHEMA_SHA256,
     SNAPSHOT_PATH,
     SNAPSHOT_SHA256,
     check_series,
@@ -32,6 +34,7 @@ def codes(errors):
 
 def test_snapshot_contract_and_reference():
     assert digest(SNAPSHOT_PATH) == SNAPSHOT_SHA256
+    assert digest(SCHEMA_PATH) == SCHEMA_SHA256
     raw = load_json(SNAPSHOT_PATH)
     assert not check_snapshot(raw)
     db = SnapshotTools()
@@ -43,6 +46,28 @@ def test_snapshot_contract_and_reference():
         for r in db.list_series(a["article_id"]):
             for model in ("primary", "lenient"):
                 assert not check_series(raw, db.get_series(r["series_id"], model), model=model)
+
+
+def test_export_manifest_matches_frozen_pair():
+    raw = load_json(SNAPSHOT_PATH)
+    manifest = load_json(SNAPSHOT_PATH.with_name("snapshot_manifest.json"))
+    for key in ("format", "checkout_schema_change", "schema_metadata_hash", "exported_at",
+                "options", "filter"):
+        assert manifest[key] == raw[key]
+    assert manifest["snapshot_sha256"] == digest(SNAPSHOT_PATH) == SNAPSHOT_SHA256
+    assert manifest["schema_sha256"] == digest(SCHEMA_PATH) == SCHEMA_SHA256
+    assert manifest["snapshot_bytes"] == SNAPSHOT_PATH.stat().st_size
+    assert manifest["inventory"] == {
+        "articles": len(raw["articles"]),
+        "experiments": sum(len(a["experiments"]) for a in raw["articles"]),
+    }
+
+
+@pytest.mark.parametrize("option", ["include_settings", "include_provenance"])
+def test_measurement_settings_and_provenance_remain_excluded(option):
+    raw = snapshot()
+    raw["options"][option] = True
+    assert "header_mismatch" in codes(check_snapshot(raw))
 
 
 def test_synthetic_is_schema_valid_and_condition_list_covers_export():
@@ -166,11 +191,19 @@ def test_public_response_corruptions_are_detected(corruption, expected):
 
 
 @pytest.mark.parametrize("field,value", [("wavelength", 1064), ("repetition_rate", 2000),
-                                         ("free_surf_entrance", False), ("pulse_duration", 200)])
+                                         ("free_surf_entrance", False), ("pulse_duration", 200),
+                                         ("volume", 20), ("duration", 2), ("single_pass", True),
+                                         ("stirring", True), ("flow_rate", 3), ("flow_speed", 4),
+                                         ("target_position", 2), ("liquid_layer_thickness", 5),
+                                         ("beam_movement_type", "stationary"),
+                                         ("beam_movement_pattern", "spiral"),
+                                         ("beam_movement_speed", 6), ("beam_movement_size_x", 7),
+                                         ("beam_movement_size_y", 8), ("beam_movement_passes", 9)])
 def test_independent_profile_rejects_conflict_even_with_unchanged_serialized_key(field, value):
     raw = snapshot()
     experiments = raw["articles"][0]["experiments"]
-    experiments[0][field] = 100 if field not in ("wavelength", "free_surf_entrance") else experiments[0][field]
+    experiments[0][field] = (not value if isinstance(value, bool) else
+                             "other" if isinstance(value, str) else value + 1)
     experiments[1][field] = experiments[0][field]
     data = payload(raw)
     experiments[1][field] = value
@@ -227,10 +260,87 @@ def test_strict_threshold_and_anchor_moves_with_repeated_sign():
 
 def test_dry_hash_guard_and_cli_rejects_unknown_step(tmp_path):
     changed = tmp_path / "changed.json"
-    changed.write_text('{"format": 1}', encoding="utf-8")
+    changed.write_text('{"format": 6}', encoding="utf-8")
     assert "snapshot_hash_mismatch" in {v["code"] for v in evaluate(changed)["violations"]}
     with pytest.raises(SystemExit) as error:
         main(["unknown"])
     assert error.value.code == 2
     with pytest.raises(SystemExit):
         main(["dry", "--output", str(tmp_path / "outside.json")])
+
+
+def test_dry_rejects_changed_schema_even_if_it_remains_valid(tmp_path, monkeypatch):
+    from checks.verifier import run
+
+    schema = load_json(SCHEMA_PATH)
+    schema["title"] = "Changed schema"
+    path = tmp_path / "schema.json"
+    path.write_text(json.dumps(schema), encoding="utf-8")
+    monkeypatch.setattr(run, "SCHEMA_PATH", path)
+    assert "schema_hash_mismatch" in {v["code"] for v in run.evaluate()["violations"]}
+
+
+@pytest.mark.parametrize("target,accepted", [
+    ({"constituents": [{"material": 3, "fraction": 1}]}, True),
+    ({"constituents": [{"material": 3, "fraction": 0.9999995}]}, True),
+    ({"constituents": [{"material": 3, "fraction": 0.99999949}]}, False),
+    ({"constituents": [{"material": 3, "fraction": 1.0000001}]}, False),
+    ({"constituents": [{"material": 3}]}, False),
+    ({"constituents": [{"material": 3, "fraction": 1}], "composition_complete": False}, False),
+    ({"stack": {"complete": True, "layers": [{"layer_order": 1, "material": 3}]}}, True),
+    ({"stack": {"layers": [{"layer_order": 1, "material": 3}]}}, False),
+    ({"stack": {"complete": False, "layers": [{"layer_order": 1, "material": 3}]}}, False),
+    ({"stack": {"complete": True, "layers": []}}, False),
+])
+def test_format6_target_eligibility_checked_independently(target, accepted):
+    raw = snapshot()
+    raw["shared"]["targets"]["2"] = target
+    violations = check_snapshot(raw)
+    assert ("non_gold_target" not in codes(violations)) == accepted
+    assert not (codes(violations) - {"non_gold_target"})
+    assert bool(build_series(raw, 77).series) == accepted
+
+
+def test_format6_process_and_layer_material_are_checked():
+    raw = snapshot()
+    raw["articles"][0]["experiments"][0]["process_type"] = "fragmentation"
+    assert "non_gold_target" in codes(check_snapshot(raw))
+    raw = snapshot()
+    raw["shared"]["base_materials"]["44"] = {"material": "Silver", "formula": "Ag"}
+    raw["shared"]["materials"]["33"] = {"base_material": 44}
+    raw["shared"]["targets"]["2"] = {"stack": {"complete": True, "layers": [
+        {"layer_order": 1, "material": 3}, {"layer_order": 2, "material": 33}]}}
+    assert "non_gold_target" in codes(check_snapshot(raw))
+    assert not build_series(raw, 77).series
+
+
+def test_format6_independent_profiles_expand_references_and_order_stack_layers():
+    raw = snapshot()
+    target = {"stack": {"complete": True, "layers": [
+        {"layer_order": 1, "material": 3, "thickness": 10},
+        {"layer_order": 2, "material": 3, "thickness": 20, "role": "substrate"},
+    ]}}
+    raw["shared"]["targets"]["2"] = target
+    raw["shared"]["targets"]["22"] = deepcopy(target)
+    raw["shared"]["targets"]["22"]["stack"]["layers"].reverse()
+    es = raw["articles"][0]["experiments"]
+    es[1]["target"] = 22
+    data = payload(raw)
+    assert not check_snapshot(raw)
+    assert not check_series(raw, data)
+    layers = raw["shared"]["targets"]["22"]["stack"]["layers"]
+    layers[0]["layer_order"], layers[1]["layer_order"] = 1, 2
+    assert "key_mismatch" in codes(check_series(raw, data))
+
+    raw = snapshot()
+    raw["shared"]["target_position_ref_types"] = {
+        "60": {"reference_type": "focus", "relative": True},
+        "61": {"reference_type": "focus", "relative": True},
+    }
+    for e, ref in zip(raw["articles"][0]["experiments"], [60, 61], strict=True):
+        e["target_position"], e["target_position_ref_type"] = 0, ref
+    data = payload(raw)
+    assert not check_snapshot(raw)
+    assert not check_series(raw, data)
+    raw["shared"]["target_position_ref_types"]["61"]["reference_type"] = "objective"
+    assert "key_mismatch" in codes(check_series(raw, data))

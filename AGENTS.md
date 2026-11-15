@@ -39,7 +39,7 @@ The snapshot tools are implemented; their implementation tests run with
 The comparison/summary generation in `src/`, its tests in `tests/` and the
 comparison and summary readiness checks are not implemented/enabled yet.
 
-The curator's HW2 verifier is separate from claim extraction:
+The curator's current-snapshot verifier is separate from claim extraction:
 `.venv/bin/python checks/verifier/run.py dry` checks the pinned snapshot and
 series contract (IDs/counts only, no shapes in its output); then
 `.venv/bin/python -m pytest checks/verifier -q` checks METHOD.md §5's nine
@@ -50,11 +50,13 @@ Curator-authorized resampling runs with
 Both gate on the contract and property/reference tests. Full also requires
 matching, complete smoke evidence. Outputs stay in `results/verifier/`;
 resampling does not enable claim comparison/summary generation.
-HW2 report, subgoals, authorship and standalone checkout instructions:
-`results/verifier/REPORT.md` (ban 3). The verifier needs the committed numeric
+HW2 has been submitted. Its report, old snapshot and numerical evidence remain
+at the unchanged `hw2` tag, not as current results on main; see
+`results/verifier/README.md` (ban 3). The verifier needs the committed numeric
 snapshot/schema, not article PDFs or a live database. Its one-command verdict
-is `.venv/bin/python -m pytest checks/verifier -q`; reproduction logs distinguish
-an already-installed pinned environment from a fresh dependency installation.
+is `.venv/bin/python -m pytest checks/verifier -q`. New scientific calculations,
+resampling, plots, interpretation and article writing belong to the AI4Science
+agent; infrastructure adoption alone is not authorization to run them.
 
 A literature task is ready when `.venv/bin/python tools/graph.py --validate`
 exits with 0: it checks the three tables and that `results/` and
@@ -68,7 +70,8 @@ exits with 0: it checks the three tables and that `results/` and
   `list_series`, `get_series(series_id, model="primary")`, `list_exclusions`.
   Import them; no SQL or database credentials are needed. Scientific rules
   live in `tools/series.py`; `checks/results_spec.md` §2–§4 is the contract.
-  Series may overlap under missing-condition wildcards; shared experiments
+  Input: format-6 snapshot/schema, export metadata in `data/snapshot_manifest.json`;
+  no measurement settings or provenance. Series may overlap under missing-condition wildcards; shared experiments
   are not independent observations. Spot diameter does not restrict grouping.
 - `checks/` — the specs and the check; `checks/source_checks.csv` is the
   human's check of OpenAlex records.

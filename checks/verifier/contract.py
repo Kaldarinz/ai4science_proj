@@ -11,6 +11,7 @@ import itertools
 import json
 import math
 from dataclasses import asdict, dataclass
+from decimal import Decimal, ROUND_HALF_UP
 from pathlib import Path
 
 from jsonschema import Draft202012Validator
@@ -18,11 +19,16 @@ from jsonschema import Draft202012Validator
 ROOT = Path(__file__).resolve().parents[2]
 SCHEMA_PATH = ROOT / "data/ablation_snapshot.schema.json"
 SNAPSHOT_PATH = ROOT / "data/ablation_snapshot.json"
-SNAPSHOT_SHA256 = "c5380620d896237ad655bfde0ce166d3f638b84a3e9b0b996cc09226f6b8303f"
+SNAPSHOT_SHA256 = "0de0f35107c00c31adb096e4a974fdb18844bd9b505c05e3174543688879c637"
+SCHEMA_SHA256 = "76ecbba667009c0dc12356bb11090d998144090d46bc0fc2687cc1fddc9f0046"
 SIZE_QUANTITIES = {"geometric_diameter", "hydrodynamic_diameter", "particle_size"}
 CONDITION_FIELDS = (
     "laser", "wavelength", "pulse_duration", "repetition_rate", "beam_diameter",
-    "polarization", "spatial_mode", "beam_path", "ablation", "fragmentation",
+    "polarization", "spatial_mode", "beam_path", "process_type",
+    "volume", "duration", "stirring", "single_pass", "flow_rate", "flow_speed",
+    "target", "target_position", "target_position_ref_type", "liquid_layer_thickness",
+    "beam_movement_type", "beam_movement_pattern", "beam_movement_speed",
+    "beam_movement_size_x", "beam_movement_size_y", "beam_movement_passes",
     "feedstock", "synthesis_medium", "postprocessing_steps", "entrance_mat",
     "free_surf_entrance", "pumping_gas", "pumping_flow_rate", "pumping_duration",
     "pumping_during_processing",
@@ -87,7 +93,8 @@ def resolve(value: object, spec: dict, snapshot: dict, schema: dict, trail: tupl
         fallback = fallback if isinstance(fallback, dict) else {}
         result = {k: resolve(v, properties.get(k, fallback), snapshot, schema, trail)
                   for k, v in value.items()}
-        for field, ordinal in (("beam_path", "path_order"), ("postprocessing_steps", "step")):
+        for field, ordinal in (("beam_path", "path_order"), ("postprocessing_steps", "step"),
+                               ("layers", "layer_order")):
             if isinstance(result.get(field), list):
                 result[field].sort(key=lambda row: row[ordinal])
         return result
@@ -140,10 +147,10 @@ def check_snapshot(snapshot: dict, schema: dict | None = None) -> list[Violation
     def fail(code: str, path: str, detail: str) -> None:
         errors.append(Violation(code, path, detail))
 
-    if (snapshot["format"] != 1 or snapshot["options"] != OPTIONS
+    if (snapshot["format"] != 6 or snapshot["options"] != OPTIONS
             or snapshot["filter"] != {"sole_target_material": "gold", "completed_only": True}
-            or snapshot["checkout_schema_change"] != "0095"
-            or snapshot["schema_metadata_hash"] != "c129120a031257f6e46e3a46d0762bef"):
+            or snapshot["checkout_schema_change"] != "0111"
+            or snapshot["schema_metadata_hash"] != "570d0d2cc4ea7a1362323c88161a757b"):
         fail("header_mismatch", "snapshot", "format/options/filter/schema version differ from METHOD §3")
     expected_units = {"fluence": "J/cm²", "pulse_energy": "μJ", "spot_diameter": "μm",
                       "pulse_duration": "fs", "wavelength": "nm"} | dict.fromkeys(SIZE_QUANTITIES, "nm")
@@ -190,10 +197,19 @@ def check_snapshot(snapshot: dict, schema: dict | None = None) -> list[Violation
             for field, maximum in (("pulse_fluence", 1000), ("pulse_energy", 1e6)):
                 if e.get(field) is not None and not (finite(e[field]) and 0 < e[field] <= maximum):
                     fail("out_of_range", f"{path}.{field}", f"requires 0 < value <= {maximum}")
-            target_id = e.get("ablation", {}).get("target")
+            target_id = e.get("target")
             target = snapshot["shared"].get("targets", {}).get(str(target_id), {})
-            parts = target.get("constituents", [])
-            gold = bool(parts)
+            if "stack" in target:
+                parts = target["stack"].get("layers", [])
+                gold = target["stack"].get("complete") is True and bool(parts)
+            else:
+                parts = target.get("constituents", [])
+                fraction = parts[0].get("fraction") if len(parts) == 1 else None
+                gold = (target.get("composition_complete") is not False
+                        and len(parts) == 1 and finite(fraction) and 0 <= fraction <= 1
+                        and Decimal(str(fraction)).quantize(
+                            Decimal("0.000001"), rounding=ROUND_HALF_UP) == 1)
+            gold &= e.get("process_type") == "ablation"
             for part in parts:
                 if "material" in part:
                     material_id = part["material"]

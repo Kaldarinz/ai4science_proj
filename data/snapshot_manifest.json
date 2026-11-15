@@ -1,0 +1,44 @@
+{
+  "purpose": "Current main-project frozen input; export metadata, not measurement provenance or scientific results",
+  "snapshot": "data/ablation_snapshot.json",
+  "snapshot_sha256": "0de0f35107c00c31adb096e4a974fdb18844bd9b505c05e3174543688879c637",
+  "snapshot_bytes": 2197289,
+  "schema": "data/ablation_snapshot.schema.json",
+  "schema_sha256": "76ecbba667009c0dc12356bb11090d998144090d46bc0fc2687cc1fddc9f0046",
+  "format": 6,
+  "checkout_schema_change": "0111",
+  "schema_metadata_hash": "570d0d2cc4ea7a1362323c88161a757b",
+  "exported_at": "2026-11-15T09:30:40Z",
+  "source": "live, read-only DB_AGENT account",
+  "exporter_commit": "55e09d7251739f4ee7cbe17aa539ac93256d0862",
+  "export_command": "venv/bin/ablation_db snapshot --source live --sole-target-material gold --no-manufacturers --no-instrument-details --no-settings --no-provenance --compact-materials --omit-nulls --out /tmp/ai4science-snapshot.tcueBW/ablation_snapshot.json",
+  "options": {
+    "include_manufacturers": false,
+    "include_instrument_details": false,
+    "include_settings": false,
+    "compact_materials": true,
+    "include_provenance": false,
+    "omit_nulls": true
+  },
+  "filter": {"sole_target_material": "gold", "completed_only": true},
+  "inventory": {"articles": 41, "experiments": 245},
+  "previous_input": {
+    "tag": "hw2",
+    "tag_object": "ae687f2364766f154476cc8b73b8b1b0ac95d8cb",
+    "commit": "3abd29312aa89c7e6deb3211ecc0d66c47c61f5f",
+    "snapshot_sha256": "c5380620d896237ad655bfde0ce166d3f638b84a3e9b0b996cc09226f6b8303f",
+    "format": 1,
+    "checkout_schema_change": "0095",
+    "articles": 19,
+    "experiments": 118
+  },
+  "comparison": {
+    "added_articles": 22,
+    "added_experiments": 127,
+    "removed_articles": 0,
+    "removed_experiments": 0,
+    "old_colloid_documents_unchanged": 130,
+    "selection_and_options_unchanged": true
+  },
+  "scientific_run_status": "No new resampling or claim comparison; historical HW2 results remain at the unchanged hw2 tag"
+}

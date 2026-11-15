@@ -99,7 +99,7 @@ def test_bad_material_and_model(snapshot_path):
 
 
 @pytest.mark.parametrize("header, value", [
-    ("format", 2), ("format", True), ("interval_unit", "s"),
+    ("format", 1), ("format", 2), ("format", True), ("interval_unit", "s"),
     ("filter", {"sole_target_material": "silver", "completed_only": True}),
 ])
 def test_incompatible_snapshot_header(snapshot_path, header, value):
@@ -190,8 +190,8 @@ def test_real_snapshot_reference_80094():
 
 def test_real_snapshot_all_articles_are_json_ready_and_ids_deterministic():
     tools = SnapshotTools(ROOT / "data" / "ablation_snapshot.json")
-    assert len(tools.find_articles()) == 19
-    assert sum(a["n_experiments"] for a in tools.find_articles()) == 118
+    assert len(tools.find_articles()) == 41
+    assert sum(a["n_experiments"] for a in tools.find_articles()) == 245
     original = deepcopy(tools._snapshot)
     for article in tools.find_articles():
         aid = article["article_id"]
