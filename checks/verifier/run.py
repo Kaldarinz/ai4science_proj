@@ -43,7 +43,7 @@ def digest(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def evaluate(path: Path = SNAPSHOT_PATH) -> dict:
+def evaluate(path: Path = SNAPSHOT_PATH, *, article: int | None = None) -> dict:
     """Run the pinned-snapshot contract; return no scientific shape outputs."""
     started = time.monotonic()
     report = {"step": "dry", "status": "fail", "snapshot_sha256": digest(path),
@@ -56,24 +56,29 @@ def evaluate(path: Path = SNAPSHOT_PATH) -> dict:
         errors.append(Violation("schema_hash_mismatch", str(SCHEMA_PATH), "schema differs from METHOD §3"))
     try:
         raw = load_json(path)
-        errors.extend(check_snapshot(raw))
-    except (ValueError, OSError) as error:
+        schema = load_json(SCHEMA_PATH)
+        if article is not None:
+            from tools.snapshot_scope import article_snapshot
+            raw = article_snapshot(raw, schema, article)
+            report["scope"] = {"article_id": article}
+        errors.extend(check_snapshot(raw, schema))
+    except (ValueError, OSError, KeyError, TypeError) as error:
         errors.append(Violation("invalid_json", str(path), str(error)))
     if not errors:
         # Import the system under verification only after independent raw checks.
         from tools.ablation_db import SnapshotTools
 
         try:
-            db = SnapshotTools(path)
-            for article in db.find_articles():
-                aid = article["article_id"]
+            db = SnapshotTools(path) if article is None else SnapshotTools.from_data(raw)
+            for entry in db.find_articles():
+                aid = entry["article_id"]
                 for row in db.list_series(aid):
                     for model in ("primary", "lenient"):
-                        errors.extend(check_series(raw, db.get_series(row["series_id"], model), model=model))
+                        errors.extend(check_series(raw, db.get_series(row["series_id"], model), schema, model=model))
                     report["series"].append({k: row[k] for k in ("series_id", "article_id", "n_points", "x_quantity")})
                 report["exclusions"].extend(db.list_exclusions(aid))
             reference = [r for r in report["series"] if r["article_id"] == 80094]
-            if [(r["series_id"], r["n_points"], r["x_quantity"]) for r in reference] != [
+            if article in (None, 80094) and [(r["series_id"], r["n_points"], r["x_quantity"]) for r in reference] != [
                     ("80094-s1", 6, "pulse_energy"), ("80094-s2", 6, "pulse_energy")]:
                 errors.append(Violation("reference_mismatch", "80094", "expected two six-point energy series"))
         except (ValueError, KeyError, TypeError, OverflowError) as error:
@@ -87,7 +92,7 @@ def evaluate(path: Path = SNAPSHOT_PATH) -> dict:
 def provenance() -> dict:
     """Record code hashes, actual checkout, and dependency versions, not results."""
     sources = [ROOT / p for p in ("METHOD.md", "requirements.txt", "tools/series.py", "tools/ablation_db.py",
-                                  "data/ablation_snapshot.schema.json", "data/snapshot_manifest.json")]
+                                  "tools/snapshot_scope.py", "data/ablation_snapshot.schema.json", "data/snapshot_manifest.json")]
     sources.extend(sorted((ROOT / "checks/verifier").glob("*.py")))
     return {
         "git_head": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip(),
@@ -175,15 +180,19 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("step", choices=["dry", "smoke", "full"])
     parser.add_argument("--output", type=Path, help="dry JSON only, within results/verifier/")
+    parser.add_argument("--article", type=int, help="dry verification of just this article")
     args = parser.parse_args(argv)
     directory = ROOT / "results/verifier"
     if args.output is not None and args.step != "dry":
         parser.error("--output is only supported for dry")
-    output = (args.output or directory / f"{args.step}.json").resolve()
+    if args.article is not None and (args.article <= 0 or args.step != "dry"):
+        parser.error("--article must be positive and is only supported for dry")
+    default = directory / f"{args.step}.json" if args.article is None else directory / "articles" / str(args.article) / "dry.json"
+    output = (args.output or default).resolve()
     if not output.is_relative_to(directory.resolve()):
         parser.error("--output must be inside results/verifier/")
     started = time.monotonic()
-    report = evaluate()
+    report = evaluate(article=args.article) if args.article is not None else evaluate()
     report["step"] = args.step
     report["started_at_utc"] = datetime.now(timezone.utc).isoformat()
     report["provenance"] = provenance()

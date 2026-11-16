@@ -15,6 +15,21 @@ IDs, point counts, exclusion diagnostics and provenance, not shapes. It
 constructs series only to validate the API; it does not resample, compare
 claims or generate a scientific conclusion. There is no violation allowlist.
 
+During article-by-article work, after that article's blind extraction, use:
+
+```sh
+.venv/bin/python checks/verifier/run.py dry --article 80094
+.venv/bin/python -m pytest checks/verifier -q
+```
+
+The scoped dry command validates/builds only that article's schema-guided
+snapshot view and writes `results/verifier/articles/80094/dry.json`; it does
+not report other articles' diagnostics. Its whole frozen-snapshot/schema digest
+guards remain intact, separate from comparison checkpoint bindings. The 80094
+reference guard applies to full dry and to article 80094, not other article
+preflights. `--article` is not supported for smoke/full; those still require
+explicit curator authorization. Do not read preflight output during extraction.
+
 ## Independent evidence
 
 | Claim | Evidence |

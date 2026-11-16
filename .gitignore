@@ -6,6 +6,10 @@ __pycache__/
 .DS_Store
 .ipynb_checkpoints/
 
+# Runtime comparison lock and interrupted staging files, not scientific outputs.
+results/.comparison.lock
+results/**/.*.tmp
+
 # Publisher PDFs are not redistributed; data/files.csv identifies them by SHA-256.
 data/articles/*/*.pdf
 

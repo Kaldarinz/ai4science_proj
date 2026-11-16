@@ -22,7 +22,7 @@ GROUP=aiproj
 PROJ=/srv/ai4science_proj
 OLD=/home/$OWNER/dev/shad/ai4science_proj      # becomes a symlink to $PROJ
 STORE=/home/$OWNER/dev/ablation_db/data/files/open
-WRITABLE=(results src tests memory)            # plus diary.md
+WRITABLE=(results memory)                      # plus diary.md; supplied code is read-only
 PY_PKGS=(numpy scipy pandas pytest pypdf pyyaml)
 
 [[ $EUID -eq 0 ]] || { echo "Run with sudo." >&2; exit 1; }
@@ -98,6 +98,10 @@ check "reads article PDFs: yes"       "cat $PROJ/data/articles/*/*.pdf"         
 check "reads README.md: no"           "cat $PROJ/README.md"                      no
 check "writes results/: yes"          "touch $PROJ/results/.iso && rm $PROJ/results/.iso" yes
 check "writes diary.md: yes"          "test -w $PROJ/diary.md"                   yes
+check "writes src/: no"               "test -w $PROJ/src"                        no
+check "writes tests/: no"             "test -w $PROJ/tests"                      no
+check "writes comparison code: no"    "test -w $PROJ/src/comparison/__init__.py"  no
+check "writes checker code: no"       "test -w $PROJ/checks/check.py"            no
 check "writes checks/: no"            "touch $PROJ/checks/.iso"                  no
 check "writes data/: no"              "touch $PROJ/data/.iso"                    no
 check "writes notes/: no"             "touch $PROJ/notes/.iso"                   no

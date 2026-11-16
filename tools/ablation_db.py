@@ -103,6 +103,16 @@ class SnapshotTools:
         _validate_snapshot(self._snapshot)
         self._built: dict[int, BuildResult] = {}
 
+    @classmethod
+    def from_data(cls, snapshot: dict) -> SnapshotTools:
+        """Use an already scoped snapshot without temporary files or a server."""
+        view = cls.__new__(cls)
+        view.path = None
+        view._snapshot = deepcopy(snapshot)
+        _validate_snapshot(view._snapshot)
+        view._built = {}
+        return view
+
     def _article(self, article_id: int) -> BuildResult:
         """Build once per article in this explicitly fixed snapshot view."""
         if type(article_id) is not int or article_id <= 0:

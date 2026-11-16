@@ -10,7 +10,7 @@ set -uo pipefail
 
 GROUP=aiproj
 PROJ=/srv/ai4science_proj
-WRITABLE=(results src tests memory)            # plus diary.md
+WRITABLE=(results memory)                      # plus diary.md; supplied code is read-only
 cd "$PROJ" || exit 1
 q() { "$@" 2>/dev/null; }
 
@@ -23,6 +23,8 @@ for d in "${WRITABLE[@]}"; do
 done
 q chmod g+w diary.md
 q chmod 600 README.md                          # for the human only
-q find data -type d -exec setfacl -m d:u::rwX,d:g::r-X,d:o::--- {} +
+for d in data checks tools src tests; do
+  q find "$d" -type d -exec setfacl -m d:u::rwX,d:g::r-X,d:o::--- {} +
+done
 q chmod -R g+rwX .git                          # the agent commits
 echo "perms: agent permissions restored"

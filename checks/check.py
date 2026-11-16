@@ -32,6 +32,7 @@ ROOT: Final[Path] = Path(__file__).resolve().parent.parent
 # Both direct-script execution and imports in protected tests use this module.
 sys.path.insert(0, str(ROOT))
 from checks import analysis  # noqa: E402
+
 DATA: Final[Path] = ROOT / "data"
 RESULTS: Final[Path] = ROOT / "results"
 ONTOLOGY: Final[Path] = ROOT / "ontology.yaml"
@@ -463,6 +464,8 @@ def check_data(
 
     ids: set[int] = set()
     for row in corpus:
+        if article is not None and row["article_id"] != str(article):
+            continue
         aid = as_int(row["article_id"], 1)
         if aid is None or aid in ids:
             report.fail(
@@ -480,6 +483,8 @@ def check_data(
 
     roles: dict[FileKey, str] = {}
     for row in files:
+        if article is not None and row["article_id"] != str(article):
+            continue
         aid = as_int(row["article_id"], 1)
         if aid is None or aid not in ids:
             report.fail(
@@ -684,6 +689,7 @@ def check_no_claims(
     ids: set[int],
     roles: dict[FileKey, str],
     claims: list[Row],
+    article: int | None = None,
 ) -> None:
     """Check every article has claims or one no-claims row (claims_spec §8).
 
@@ -707,6 +713,8 @@ def check_no_claims(
     explained: Counter[int] = Counter()
 
     for row in rows:
+        if article is not None and row["article_id"] != str(article):
+            continue
         aid = as_int(row["article_id"])
         if aid is not None and aid not in ids:
             continue
@@ -827,7 +835,7 @@ def load_tools(report: Report) -> AblationTools | None:
     return cast(AblationTools, module)
 
 
-def check_committed(report: Report) -> None:
+def check_committed(report: Report, article: int | None = None) -> None:
     """Check the agent's folders have no uncommitted changes.
 
     Only the folders the agent writes are checked, so the human's
@@ -838,7 +846,11 @@ def check_committed(report: Report) -> None:
     report : Report
         Receives the failure.
     """
-    folders = ("results/", "memory/", "src/", "tests/")
+    folders = ("results/", "memory/", "src/", "tests/") if article is None else (
+        "results/claims.csv", "results/no_claims.csv", "results/extraction_status.csv",
+        f"results/articles/{article}/", f"results/verifier/articles/{article}/",
+        f"memory/{article}.md", "memory/lessons.md", "src/", "tests/",
+    )
     status = subprocess.run(
         ["git", "status", "--porcelain", "--", *folders],
         cwd=ROOT, capture_output=True, text=True, check=False,
@@ -869,17 +881,19 @@ def main() -> int:
         description="Readiness check for the project specs.")
     parser.add_argument(
         "--article", type=int,
-        help="check only this article's claims",
+        help="scope extraction or a draft comparison checkpoint to this article",
     )
     parser.add_argument(
         "--analysis", choices=("draft", "final"),
-        help="also validate the full-corpus audit, comparison and summary; "
-             "final requires a curator-owned matching review",
+        help="validate comparison outputs; draft accepts --article, "
+             "final is corpus-wide and requires curator matching approval",
     )
     args = parser.parse_args()
     article = cast(int | None, args.article)
-    if args.analysis and article is not None:
-        parser.error("--analysis is full-corpus only; cannot combine with --article")
+    if article is not None and article <= 0:
+        parser.error("--article must be positive")
+    if args.analysis == "final" and article is not None:
+        parser.error("final analysis is corpus-wide; use --analysis draft --article for a checkpoint")
 
     report = Report()
     check_vocabulary(report)
@@ -890,7 +904,10 @@ def main() -> int:
         statuses = analysis.check_coverage(ROOT, report, ids, claims, article)
     complete_ids = ids if statuses is None else {
         int(aid) for aid, status in statuses.items() if status == "complete"}
-    check_no_claims(report, complete_ids, roles, claims)
+    if article is None:
+        check_no_claims(report, complete_ids, roles, claims)
+    else:
+        check_no_claims(report, complete_ids, roles, claims, article)
     if article is not None and statuses is not None and statuses.get(str(article)) != "complete":
         report.fail("claims §9", f"article {article}: extraction is not complete")
     if not args.analysis and statuses is not None and "pending" in statuses.values():
@@ -899,11 +916,14 @@ def main() -> int:
     if args.analysis and not report.failures:
         tools = load_tools(report)
         if tools is not None:
-            analysis.check_analysis(ROOT, report, ids, claims, statuses, tools, args.analysis)
+            analysis.check_analysis(ROOT, report, ids, claims, statuses, tools, args.analysis, article=article)
 
     # Last, so that the agent commits only work that passed every rule.
     if not report.failures:
-        check_committed(report)
+        if article is None:
+            check_committed(report)
+        else:
+            check_committed(report, article)
 
     verdict = "FAILED" if report.failures else "PASSED"
     print(f"\n{verdict}: {report.failures} failure(s)")

@@ -474,8 +474,8 @@ def test_huge_number_cannot_crash_or_match_fraction():
     assert a.differences(0.5, 10**400)
 
 
-def test_analysis_and_article_are_mutually_exclusive(monkeypatch):
-    monkeypatch.setattr(check.sys, "argv", ["check.py", "--article", "1", "--analysis", "draft"])
+def test_final_analysis_and_article_are_mutually_exclusive(monkeypatch):
+    monkeypatch.setattr(check.sys, "argv", ["check.py", "--article", "1", "--analysis", "final"])
     with pytest.raises(SystemExit) as error:
         check.main()
     assert error.value.code == 2

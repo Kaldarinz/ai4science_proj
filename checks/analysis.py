@@ -80,7 +80,7 @@ def read_json(root, relative, report):
         value = json.loads((root / relative).read_text(encoding="utf-8"),
                            object_pairs_hook=unique, parse_constant=nonfinite)
         if not isinstance(value, dict):
-            raise ValueError("root must be a JSON object")
+            raise ValueError("root must be a JSON object")  # noqa: TRY004 -- malformed document, not an API argument
         return value
     except (OSError, UnicodeError, ValueError) as error:
         report.fail("analysis input", f"{relative}: {error}")
@@ -143,13 +143,53 @@ def check_coverage(root, report, ids, claims, article=None):
     return statuses
 
 
-def fingerprints(root, report):
+def output_path(relative, article=None):
+    return relative if article is None else f"results/articles/{article}/{Path(relative).name}"
+
+
+def canonical_bytes(value):
+    return json.dumps(value, ensure_ascii=True, sort_keys=True, separators=(",", ":"), allow_nan=False).encode()
+
+
+def projected_snapshot(root, report, article):
+    # Shared low-level reference traversal, not the generator or its tally logic.
+    from tools.snapshot_scope import article_snapshot
+    snapshot = read_json(root, "data/ablation_snapshot.json", report)
+    schema = read_json(root, "data/ablation_snapshot.schema.json", report)
+    try:
+        return article_snapshot(snapshot, schema, article)
+    except (KeyError, TypeError, ValueError) as error:
+        report.fail("results §6", f"article {article}: cannot project numerical inputs: {error}")
+        return None
+
+
+def fingerprints(root, report, article=None, snapshot=None):
     result = {}
-    for relative in INPUT_PATHS:
+    tables = {"data/corpus.csv", "data/files.csv", "results/claims.csv",
+              "results/no_claims.csv", "results/extraction_status.csv"}
+    paths = (*INPUT_PATHS, "tools/snapshot_scope.py") if article is not None else INPUT_PATHS
+    for relative in paths:
+        target = output_path(relative, article) if relative in {
+            "results/matching_audit.csv", "results/comparison.csv"} else relative
         try:
-            result[relative] = hashlib.sha256((root / relative).read_bytes()).hexdigest()
-        except OSError as error:
-            report.fail("results §6", f"cannot fingerprint {relative}: {error}")
+            raw = (root / target).read_bytes()
+            if article is not None and relative in tables:
+                with (root / relative).open(encoding="utf-8", newline="") as stream:
+                    reader = csv.DictReader(stream, strict=True)
+                    if not reader.fieldnames or len(set(reader.fieldnames)) != len(reader.fieldnames):
+                        raise ValueError("missing/duplicate CSV header")
+                    records = list(reader)
+                if any(None in row or None in row.values() or "article_id" not in row for row in records):
+                    raise ValueError("invalid scoped CSV rows")
+                raw = canonical_bytes(sorted((r for r in records if r["article_id"] == str(article)),
+                                             key=canonical_bytes))
+            elif article is not None and relative == "data/ablation_snapshot.json":
+                if snapshot is None:
+                    raise ValueError("no article snapshot projection")
+                raw = canonical_bytes({key: value for key, value in snapshot.items() if key != "exported_at"})
+            result[target] = hashlib.sha256(raw).hexdigest()
+        except (OSError, UnicodeError, csv.Error, ValueError) as error:
+            report.fail("results §6", f"cannot fingerprint {target}: {error}")
     return result
 
 
@@ -325,12 +365,58 @@ def check_review(root, report, inputs):
         report.fail("results §6", message)
 
 
-def check_analysis(root, report, ids, claims, statuses, tools, stage):
-    """Verify drafts/finals. Never write results or make scientific judgments."""
+def check_checkpoint_merge(root, report, ids, claims, statuses, tools, audit):
+    """Independently verify current local checkpoints and the derived corpus audit."""
+    complete = sorted(aid for aid in ids if statuses.get(str(aid)) == "complete")
+    context_path = root / "results/matching_candidates.json"
+    context = read_json(root, "results/matching_candidates.json", report) if context_path.exists() else {}
+    if context is None:
+        return
+    if "checkpoints" not in context and not any(
+            (root / output_path("results/matching_audit.csv", aid)).exists() for aid in complete):
+        return  # Existing corpus-only workflow remains readable.
+    bindings, merged = {}, []
+    for aid in complete:
+        part_claims = [c for c in claims if c["article_id"] == str(aid)]
+        check_analysis(root, report, {aid}, part_claims, {str(aid): "complete"}, tools, "draft", article=aid)
+        part_audit = rows(root, output_path("results/matching_audit.csv", aid), AUDIT_COLUMNS, report)
+        if part_audit is not None:
+            merged.extend(part_audit)
+        for name in ("matching_candidates.json", "matching_audit.csv", "comparison.csv", "summary.json"):
+            relative = f"results/articles/{aid}/{name}"
+            try:
+                bindings[relative] = hashlib.sha256((root / relative).read_bytes()).hexdigest()
+            except OSError as error:
+                report.fail("results §6", f"missing article checkpoint {relative}: {error}")
+    if context.get("checkpoints") != bindings:
+        report.fail("results §6", "article checkpoint bindings changed/missing; rerun aggregate and obtain new approval")
+    if Counter(tuple(row[key] for key in AUDIT_COLUMNS) for row in audit) != Counter(
+            tuple(row[key] for key in AUDIT_COLUMNS) for row in merged):
+        report.fail("results §6", "corpus audit differs from current article checkpoints; rerun aggregate")
+
+
+def check_analysis(root, report, ids, claims, statuses, tools, stage, article=None):
+    """Verify a scoped checkpoint or corpus result, without generating either."""
     before = report.failures
-    audit = rows(root, "results/matching_audit.csv", AUDIT_COLUMNS, report)
-    comparison = rows(root, "results/comparison.csv", COMPARISON_COLUMNS, report)
-    stored = read_json(root, "results/summary.json", report)
+    snapshot = None
+    if article is not None:
+        if stage != "draft" or ids != {article} or statuses != {str(article): "complete"}:
+            report.fail("results §6", "article comparison requires one complete article and stage=draft")
+            return
+        claims = [c for c in claims if c["article_id"] == str(article)]
+        snapshot = projected_snapshot(root, report, article)
+        if snapshot is None:
+            return
+        factory = getattr(tools, "SnapshotTools", type(tools))
+        if hasattr(factory, "from_data"):
+            try:
+                tools = factory.from_data(snapshot)
+            except Exception as error:  # noqa: BLE001 -- any tool failure is a failed check
+                report.fail("results §4", f"article snapshot tools failed: {error}")
+                return
+    audit = rows(root, output_path("results/matching_audit.csv", article), AUDIT_COLUMNS, report)
+    comparison = rows(root, output_path("results/comparison.csv", article), COMPARISON_COLUMNS, report)
+    stored = read_json(root, output_path("results/summary.json", article), report)
     if audit is None or comparison is None or stored is None:
         return
     series = {}
@@ -341,13 +427,15 @@ def check_analysis(root, report, ids, claims, statuses, tools, stage):
                 if sid in series or s["article_id"] != aid or any(s[f"shape_{m}"] not in SHAPES for m in MODELS):
                     raise ValueError(f"invalid/duplicate series {sid}")
                 series[sid] = s
-    except Exception as error:  # report a tool failure, never a success fallback
+    except Exception as error:  # noqa: BLE001 -- report any tool failure, never a success fallback
         report.fail("results §4", f"series tools failed: {error}")
         return
     own = [c for c in claims if c["basis"] == "own_data" and statuses.get(c["article_id"]) == "complete"]
     check_audit(report, audit, candidates(own, series))
     check_comparisons(report, comparison, audit, own, series)
-    inputs = fingerprints(root, report)
+    inputs = fingerprints(root, report, article, snapshot)
+    if article is None:
+        check_checkpoint_merge(root, report, ids, claims, statuses, tools, audit)
     if stage == "final":
         if "pending" in statuses.values():
             report.fail("results §6", "final analysis cannot contain pending articles")
@@ -355,6 +443,19 @@ def check_analysis(root, report, ids, claims, statuses, tools, stage):
     if report.failures != before:
         return
     expected = expected_summary(claims, statuses, audit, comparison, series, inputs, stage)
+    if article is not None:
+        expected["scope"] = {"article_id": article, "binding": "article-v1"}
+        context = read_json(root, output_path("results/matching_candidates.json", article), report)
+        base = {key: value for key, value in inputs.items() if key not in {
+            output_path("results/matching_audit.csv", article), output_path("results/comparison.csv", article)}}
+        context_expected = {
+            "format": 1, "inputs": base, "scope": expected["scope"],
+            "candidates": [{"claim": c, "series": ({k: v for k, v in series[sid].items()
+                if k not in {"shape_primary", "shape_lenient", "spearman_rho"}} if sid else None)}
+                for cid, sid in sorted(candidates(own, series)) for c in own if c["claim_id"] == cid],
+        }
+        for message in differences(context_expected, context, "article context"):
+            report.fail("results §6", message)
     for message in differences(expected, stored):
         report.fail("results §6", message)
     if report.failures == before:

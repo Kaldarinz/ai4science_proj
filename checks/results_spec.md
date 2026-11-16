@@ -192,11 +192,13 @@ This is a provisional, curator-adopted contract, not a scientific result.
 A later change must be disclosed in `diary.md`, increment the contract
 version and regenerate affected outputs and matching approval. Never
 reinterpret old outputs under new rules without rerunning the pipeline.
-The AI4Science agent implements the generator in `src/` and its tests in
-`tests/`. The protected checker independently verifies records and tallies;
-it cannot judge a scientific exclusion, a caveat or whether reading was thorough.
+The generator in `src/comparison/` and its tests in `tests/` are supplied
+infrastructure. AI4Science runs the code and supplies scientific matching
+decisions, evidence and caveats; it does not write or modify the pipeline.
+The protected checker independently verifies records and tallies; it cannot
+judge a scientific exclusion, a caveat or whether reading was thorough.
 The generator must not import/call the checker or reuse its tally oracle as
-its own test oracle: implement the pipeline and its tests from this specification.
+its own test oracle: its implementation and tests follow this specification.
 
 ### 5.1 Candidates and `results/matching_audit.csv`
 
@@ -213,7 +215,7 @@ Include candidates by default. The agent may exclude a pair for a
 substantive, evidence-backed reason, but must audit **every** candidate,
 including inclusions, without seeing agreement as a selection criterion.
 Explain scientific judgments, cited text/conditions, assumptions and
-limitations in the audit; Anton reviews them before final aggregation.
+limitations in the audit; the human curator reviews them before final aggregation.
 
 Header (exact order):
 `claim_id,series_id,decision,assessment,reason,caveats`.
@@ -295,6 +297,116 @@ remaining fully assessable differences → `model_dependent`. Graph notes retain
 both model outcomes and the number of qualified pairs. No comparison file →
 no verdict. Graph labels do not replace the full audit or curator gate.
 
+### 5.4 Article-sized steps and checkpoints
+
+Complete one article's blind extraction, comparison and checks before moving
+to the next. Do not wait for the other articles to be extracted:
+
+```sh
+.venv/bin/python -m src.comparison prepare --article <id>
+# AI4Science writes results/articles/<id>/matching_audit.csv.
+.venv/bin/python -m src.comparison build --article <id> --stage draft
+# Commit the records, then:
+.venv/bin/python checks/check.py --article <id> --analysis draft
+```
+
+Only this article must have a current `complete` reading attestation and
+claims XOR one no-claims record. Other articles need not have ledger rows
+yet. Candidate, audit and comparison rules remain §§5.1–5.3. Every complete
+article needs a checkpoint, including no-claim articles, cited/general-only
+articles, and articles without usable numerical series. Empty audit and
+comparison CSVs still have their exact headers.
+
+The isolated directory `results/articles/<id>/` contains:
+
+- `matching_candidates.json`: `format=1`, `scope`, `inputs` and `candidates`.
+  Each candidate holds the full extracted `claim` and candidate `series`
+  metadata (`null` if none). Shapes and Spearman correlation are omitted.
+- `matching_audit.csv`: the agent's scientific decisions, exactly §5.1.
+- `comparison.csv`: generated included pairs, exactly §5.2.
+- `summary.json`: the §6.2 counting rules applied to this article only,
+  plus `"scope":{"article_id":<id>,"binding":"article-v1"}`.
+  Stage is always `draft`; `n_corpus=n_complete=1`; secondary series
+  diagnostics cover only this article. This is not a corpus result or approval.
+
+The scope marker is identical in candidates and summary. `prepare` invents
+no decisions, assessments, evidence, reading attestations or approval.
+Do not edit generated context. Build recomputes it and requires it unchanged.
+If this article's preparation inputs change while its audit exists, archive
+only that audit, prepare again, and re-review the matching decisions. Do not
+merely rebind old decisions. Other articles' checkpoints remain usable.
+
+### 5.5 Article input binding (article-v1)
+
+The scientific contract remains v1; this execution binding is separate from
+the corpus raw-byte approval map in §6.2. Article checkpoints use the same
+input paths except audit/comparison are located under `results/articles/<id>/`,
+and additionally bind raw `tools/snapshot_scope.py` bytes.
+
+For `data/corpus.csv`, `data/files.csv`, `results/claims.csv`,
+`results/no_claims.csv` and `results/extraction_status.csv`, bind only rows
+whose `article_id` is exactly the selected decimal ID. Sort full row objects
+by their canonical JSON bytes, serialize the list canonically and SHA-256 it.
+Row values remain strings. Unrelated rows, row order and CSV whitespace do
+not stale this article; all shared CSV files must still be well formed.
+
+For the snapshot, keep the selected article and the transitive closure of
+shared records (`x-shared`) and referenced colloids (`x-document`) reached
+through its JSON Schema. Stocks can reside in another article or in
+`referenced_colloids`; include their own dependencies. Retain interpretation
+headers and omit unrelated articles and unused shared records. Exclude only
+`exported_at` from the binding, not from the schema-valid numerical view.
+Canonical JSON means UTF-8, `ensure_ascii=True`, sorted object keys,
+`separators=(",", ":")`, no nonfinite numbers. This projection is a read-only
+view; it never changes the frozen snapshot or fabricates its provenance.
+
+All other inputs, including schema, ontology, scientific specs and checker/
+numerical code, retain raw-byte hashes. The two local audit/comparison files
+are raw-byte hashed. Preparation excludes those two paths; summary includes
+them. Relevant data, PDF inventory, attestation or shared rules/code changes
+stale the checkpoint; unrelated article work does not. Numerical construction
+and the checker use only the selected article's view, not all-corpus series.
+
+### 5.6 Corpus assembly and failure recovery
+
+After article work, run:
+
+```sh
+.venv/bin/python -m src.comparison aggregate
+# Commit the derived corpus records, then:
+.venv/bin/python checks/check.py --analysis draft
+```
+
+Aggregation requires an explicit status for every corpus article and a
+current, generated checkpoint for every `complete` article. It rejects
+missing, stale or edited contexts/comparisons/summaries; pending/unreadable
+articles remain explicitly unassessed, never invented negatives. It merges
+article audits without changing decisions, then generates the corpus audit,
+comparison and §6.2 summary. Full-corpus numerical diagnostics run here, not
+during article tasks. The corpus candidate context also records
+`checkpoints`: raw SHA-256 bindings to the four files of every complete
+article. The generator and independent checker validate these bindings and
+the merged audit; changing a checkpoint requires re-aggregation. Article
+outputs and curator approval are never overwritten by aggregation.
+
+`build --stage final` is corpus-wide only. It requires the existing unchanged
+generated corpus draft, current source checkpoints, no pending articles and
+the exact curator approval in §6.3. Draft/final comparison bytes are identical;
+only summary stage changes. An article checkpoint is not curator acceptance.
+Corpus schema and approval input paths in §6.2 remain unchanged. Legacy
+corpus-only preparation/build remains readable, but is not the agent's
+article-by-article workflow.
+
+All commands validate before publication and never change claims or reading
+attestations. `build` never writes an audit or approval. Only `aggregate`
+replaces the derived corpus audit. Rerunning unchanged operations leaves
+bytes and timestamps unchanged. Input changes during an operation fail closed;
+a local lock serializes pipeline commands. Each file is replaced atomically,
+summary last. Publication errors trigger rollback; if rollback fails, original
+backups are retained and reported. A process/machine crash is not a multi-file
+transaction: fingerprints and fresh checking expose mixed generations.
+Resume the failed article/step; do not reset successful articles.
+
 ## 6. `results/summary.json` and curator gate
 
 ### 6.1 Article-level frequency
@@ -317,6 +429,7 @@ article can appear in several cells, but at most once in any cell.
 
 ### 6.2 Exact summary schema, version 1
 
+This is the corpus schema; article checkpoints use the scoped variant in §5.4.
 All keys below are required, no extra keys. Counts are nonnegative JSON
 integers (not booleans), fractions/p-values are finite numbers or null.
 Every enum-indexed object includes all allowed values, including zeros.
@@ -390,17 +503,19 @@ or the contract invalidate approval and require regenerated outputs.
 
 ### 6.3 Draft → review → final
 
-1. AI4Science writes the complete audit, comparison and **draft** summary;
-   `checks/check.py --analysis draft` checks completeness, duplicate/missing
-   pairs, copied shapes, boolean consistency, fingerprints and tallies.
-2. Anton reviews every inclusion/exclusion, reason and caveat. Corrections
+1. AI4Science completes article checkpoints, then runs
+   `.venv/bin/python -m src.comparison aggregate` to assemble the corpus draft.
+   After records are committed, `checks/check.py --analysis draft` checks
+   completeness, duplicate/missing pairs, shapes, booleans, fingerprints and tallies.
+2. The human curator reviews every inclusion/exclusion, reason and caveat. Corrections
    require a new draft; no selecting only agreeing series.
 3. Only the curator writes protected `checks/matching_review.json`:
    exactly `{"decision":"accepted","reviewer":"<name>",
    "date":"YYYY-MM-DD","inputs":{...}}`, using the checked draft's inputs map.
    An agent cannot grant itself approval.
-4. The agent regenerates the summary with stage=final after approval;
-   `checks/check.py --analysis final` additionally requires no pending
+4. The agent runs `.venv/bin/python -m src.comparison build --stage final`
+   after approval, commits the generated records and runs
+   `checks/check.py --analysis final`, which additionally requires no pending
    articles and an exact matching approval. Unreadable articles stay explicitly
    outside the prevalence denominator. An accepted draft is not a final result.
 
@@ -420,7 +535,11 @@ run resampling or produce comparison/summary files.
    Claim-only checks never load numerical tools or analysis outputs.
 4. In analysis mode, summary keys, fingerprints, denominators and all tallies
    follow §6. Final mode also requires the curator's matching approval.
-   `--analysis` cannot be combined with `--article`. Claim-only checks retain
+   `--analysis draft --article <id>` checks only that complete article's
+   checkpoint, including its projected input binding; no other article's
+   attestation or numerical comparison is required. Final is corpus-wide only.
+   Corpus checks also verify any source article checkpoints and their merge.
+   Claim-only checks retain
    legacy behavior if no extraction ledger exists; this does not certify
    complete reading or analysis readiness. Once present, the ledger is checked.
 5. Reference article 80094 (series reference verified separately in
