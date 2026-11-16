@@ -25,9 +25,11 @@ changes to clear a check failure; report that blocker instead.
 
 ### Claim extraction
 
-Follow `checks/claims_spec.md`. Read the main text and all supplied SI with
-`pdf_read`, two pages per call; copy quotes from its output. Only after review,
-record claims or one no-claim row and the reading attestation (§§8–9).
+Follow `checks/claims_spec.md`. Read the main text and all supplied SI in manageable,
+page-labelled chunks. Check for missing, unreadable or truncated text. Copy quotations
+from the extracted output and retain the source file and page. Complete extraction
+before inspecting numerical data. Only after review, record claims or one no-claim
+row and the reading attestation (§§8–9).
 A new or changed PDF invalidates the old attestation and requires re-reading.
 
 ```sh
