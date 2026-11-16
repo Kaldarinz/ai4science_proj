@@ -163,8 +163,7 @@ Keep outputs in `results/verifier/`; do not read them during claim extraction.
   it as the implementation's expected-output generator. Keep verification
   independent. Commit before and after each task.
 - The specs change only by the human, with a `diary.md` entry giving the
-  reason. No entry names which articles are hand-labelled or their gold
-  set (results_spec §7.6).
+  reason.
 
 ## 6. Memory
 

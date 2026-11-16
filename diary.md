@@ -1,5 +1,9 @@
 # Project journal
 
+Dated entries describe historical workflows. The 2026-11-16 decision below
+supersedes the earlier extraction-benchmark and hidden-label rules; current
+instructions are in `AGENTS.md` and the specifications.
+
 ## ГГГГ-ММ-ДД — <короткое название задачи>
 - Запрос агенту:
 - Что сделал агент:
@@ -144,3 +148,10 @@ Run in /home/aiagent/week2, outside this project; not project data.
 * Kept claim-only checks independent of numerical tools and analysis outputs, and extended extraction blindness to the audit, summary and matching review. Legacy claim checks without a reading ledger remain available but do not certify analysis readiness. Updated graph projection so within-model mixed evidence is not called model-dependent; notes preserve qualifications. Regenerated only the two affected class notes, not scientific result notes. New protected code/tests are group-readable and not agent-writable.
 * No changes to data/, results/, src/, tests/ or extraction memory; no AI4Science run, new claim extraction/comparison, resampling, database access, commit, tag movement or push. Scientific generator and outputs remain agent work; no curator approval file exists yet.
 * Validation: 419 full-suite tests pass (including 103 new synthetic analysis/coverage/CLI/graph tests); graph consistency, vocabulary, whitespace and protected-file permissions pass. The scoped legacy reference claim check passes without loading numerical tools. Full claim readiness still fails on exactly the 38 unprocessed articles; --analysis draft fails closed on the missing reading ledger before loading numerical tools. Both hw2 tag object and peeled commit are unchanged. Changes remain uncommitted for Anton's review.
+
+## 2026-11-16 - retire extraction benchmarking
+* The human curator requested removing the golden-set concept: the corpus is final at 41 articles, all will be analysed, and the curator will review the agent's results when ready.
+* Removed the development/test article split, reference-label CSVs and `checks/check.py --gold` scoring. Updated AGENTS.md, README.md and results_spec §7.6 to describe human review of extraction, including missed claims and no-claim judgments. Automated structural checks do not establish extraction quality.
+* This changes the extraction-evaluation workflow, not the scientific comparison contract in results_spec §§5–6: output schemas, numerical rules, reading coverage and matching approval remain unchanged. Kept `checks/claim_checks.csv`, curator-review graph notes and numerical reference tests. Earlier dated benchmark entries remain historical, not active instructions.
+* Added CLI regression tests for rejecting the retired option and retaining the supported check modes. Validation: 311 tools/checker tests pass; CLI help, graph consistency and whitespace checks pass. The full suite could not collect verifier tests because the local environment lacks `jsonschema` and `hypothesis`; no dependencies were installed.
+* No extraction, comparison generation, resampling, curator verdict or matching approval was produced. No data, existing scientific outputs, numerical implementation, commits, tags or remote repositories were changed.

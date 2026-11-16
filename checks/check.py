@@ -4,14 +4,12 @@ Usage::
 
     .venv/bin/python checks/check.py                  # everything
     .venv/bin/python checks/check.py --article 80094  # one article
-    .venv/bin/python checks/check.py --gold           # + gold scores (human)
     .venv/bin/python checks/check.py --analysis draft # full-corpus draft
     .venv/bin/python checks/check.py --analysis final # curator-approved inputs
 
 Exits with 0 when every rule holds and 1 otherwise; each failure is
-printed with the spec section it breaks. With --gold, hits against
-checks/claims_gold.csv are printed per gold set (dev, test) and never
-fail the check (results_spec.md §7.6); the agent never passes --gold.
+printed with the spec section it breaks. These checks validate structural
+consistency; the human curator reviews extraction quality.
 """
 
 import argparse
@@ -36,10 +34,7 @@ sys.path.insert(0, str(ROOT))
 from checks import analysis  # noqa: E402
 DATA: Final[Path] = ROOT / "data"
 RESULTS: Final[Path] = ROOT / "results"
-GOLD: Final[Path] = ROOT / "checks" / "claims_gold.csv"
 ONTOLOGY: Final[Path] = ROOT / "ontology.yaml"
-GOLD_ARTICLES: Final[Path] = ROOT / "checks" / "gold_articles.csv"
-GOLD_SETS: Final[tuple[str, ...]] = ("dev", "test")
 
 # Font warnings for some PDFs run to ~90 lines per read and would flood
 # the agent's context; text extraction works without fontTools.
@@ -59,10 +54,6 @@ CLAIMS_COLUMNS: Final[tuple[str, ...]] = (
 NO_CLAIMS_COLUMNS: Final[tuple[str, ...]] = (
     "article_id", "file", "page", "quote", "reason",
 )
-GOLD_KEY: Final[tuple[str, ...]] = (
-    "article_id", "variable", "direction", "basis", "medium_class",
-)
-
 ROLES: Final[frozenset[str]] = frozenset({"main", "supplement"})
 
 
@@ -809,57 +800,6 @@ def check_duplicates(report: Report, claims: list[Row]) -> None:
             )
 
 
-def report_gold(claims: list[Row], article: int | None) -> None:
-    """Print hits against the hand labels, per gold set.
-
-    Never fails: results_spec §7.6. An article is labelled when it has a
-    row in checks/gold_articles.csv, even with no gold claim; its `set`
-    is `dev` (the specs were tuned on it) or `test` (labelled before any
-    agent run, scored on its first run).
-
-    Parameters
-    ----------
-    claims : list[Row]
-        Claims that passed the row checks.
-    article : int | None
-        Compare only this article, or None for all labelled ones.
-    """
-    if not GOLD.exists() or not GOLD_ARTICLES.exists():
-        print("info no checks/claims_gold.csv or checks/gold_articles.csv: "
-              "gold hits not computed")
-        return
-    with GOLD_ARTICLES.open(newline="", encoding="utf-8") as f:
-        sets = {
-            row["article_id"]: row.get("set", "")
-            for row in csv.DictReader(f)
-            if article is None or as_int(row["article_id"]) == article
-        }
-    for aid, name in sorted(sets.items()):
-        if name not in GOLD_SETS:
-            print(f"info gold: article {aid} has set {name!r}, expected "
-                  f"one of {', '.join(GOLD_SETS)}; not scored")
-    with GOLD.open(newline="", encoding="utf-8") as f:
-        gold = list(csv.DictReader(f))
-    for name in GOLD_SETS:
-        labelled = {aid for aid, s in sets.items() if s == name}
-        if not labelled:
-            continue
-        expected = Counter(
-            tuple(row[k] for k in GOLD_KEY)
-            for row in gold if row["article_id"] in labelled
-        )
-        found = Counter(
-            tuple(c[k] for k in GOLD_KEY)
-            for c in claims if c["article_id"] in labelled
-        )
-        hits = sum((expected & found).values())
-        print(
-            f"info gold {name}: {len(labelled)} article(s); precision "
-            f"{hits}/{sum(found.values())}, recall "
-            f"{hits}/{sum(expected.values())}"
-        )
-
-
 def load_tools(report: Report) -> AblationTools | None:
     """Import tools/ablation_db.py.
 
@@ -932,11 +872,6 @@ def main() -> int:
         help="check only this article's claims",
     )
     parser.add_argument(
-        "--gold", action="store_true",
-        help="also print precision and recall against the hand labels; "
-             "for the human only, never for the agent",
-    )
-    parser.add_argument(
         "--analysis", choices=("draft", "final"),
         help="also validate the full-corpus audit, comparison and summary; "
              "final requires a curator-owned matching review",
@@ -960,9 +895,6 @@ def main() -> int:
         report.fail("claims §9", f"article {article}: extraction is not complete")
     if not args.analysis and statuses is not None and "pending" in statuses.values():
         report.fail("claims §9", "claim readiness cannot contain pending articles")
-    if args.gold:
-        report_gold(claims, article)
-
     # Claim-only runs never load numerical tools or inspect analysis outputs.
     if args.analysis and not report.failures:
         tools = load_tools(report)
