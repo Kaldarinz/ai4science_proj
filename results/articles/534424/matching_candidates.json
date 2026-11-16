@@ -1,0 +1,94 @@
+{
+  "candidates": [
+    {
+      "claim": {
+        "article_id": "534424",
+        "basis": "own_data",
+        "claim_id": "534424-c1",
+        "conditions": "GA-AuNPs in 20 mg GA / 10 mL DI water; Q-switched Nd:YAG, 1064 nm; low-energy region 50-100 mJ",
+        "direction": "increase",
+        "file": "10.1038_s41598-022-14339-y.pdf",
+        "material": "Au",
+        "medium_class": "aqueous",
+        "page": "6",
+        "quote": "At these low energies, the laser power is absorbed in the solution resulting in material removal by reactive sputtering more than the direct laser ablation. So only a few amounts of the light reaching to the target. The plasma formation in the solution creates a cavitation bubble that expands and then collapses, driving highly energetic species into the target. In other words, the nanoparticles in the solution grow by attracting the small fragments. In this region, the average size of gold nanoparticles begins to increase 55.",
+        "variable": "energy",
+        "variable_written": "laser energy"
+      },
+      "series": {
+        "article_id": 534424,
+        "medium_class": "aqueous",
+        "n_points": 2,
+        "notes": "",
+        "pulse_duration_class": null,
+        "pulse_duration_fs": null,
+        "series_id": "534424-s1",
+        "size_component": null,
+        "size_quantity": "geometric_diameter",
+        "size_source": "histogram",
+        "size_statistic": "mean",
+        "size_technique": "tem",
+        "size_weighting": "particle_count",
+        "storage_duration_h": null,
+        "wavelength_nm": 1064.0,
+        "x_quantity": "pulse_energy"
+      }
+    },
+    {
+      "claim": {
+        "article_id": "534424",
+        "basis": "own_data",
+        "claim_id": "534424-c2",
+        "conditions": "GA-AuNPs in 20 mg GA / 10 mL DI water; Q-switched Nd:YAG, 1064 nm; high-energy region 200-1000 mJ",
+        "direction": "decrease",
+        "file": "10.1038_s41598-022-14339-y.pdf",
+        "material": "Au",
+        "medium_class": "aqueous",
+        "page": "6",
+        "quote": "So, for high energies, as the energy increase, the size of the gold nanoparticles decreases only slightly.",
+        "variable": "energy",
+        "variable_written": "laser energy"
+      },
+      "series": {
+        "article_id": 534424,
+        "medium_class": "aqueous",
+        "n_points": 2,
+        "notes": "",
+        "pulse_duration_class": null,
+        "pulse_duration_fs": null,
+        "series_id": "534424-s1",
+        "size_component": null,
+        "size_quantity": "geometric_diameter",
+        "size_source": "histogram",
+        "size_statistic": "mean",
+        "size_technique": "tem",
+        "size_weighting": "particle_count",
+        "storage_duration_h": null,
+        "wavelength_nm": 1064.0,
+        "x_quantity": "pulse_energy"
+      }
+    }
+  ],
+  "format": 1,
+  "inputs": {
+    "checks/analysis.py": "e6b1d05f0bf350a28bccb56d74b0395a9b6ead3a502bf71ed72bc02af0143de1",
+    "checks/check.py": "a3dd19d120241cff91151150d3192ddde679a52cad4cfa23ecf9886cfd985ff7",
+    "checks/claims_spec.md": "0075adf951f4bd13093ffdc9ea6a7f9bf27d293fc1dcc3ddd55953ba259a1d92",
+    "checks/results_spec.md": "f7cb03de913ea6c7372d8cffead2ef91b854408042b4438a0a0e483ba266c361",
+    "data/ablation_snapshot.json": "ba714bdeab724a0dad2a28625b60b1bc3d74e3bd624d46deea1f4a076843c4ab",
+    "data/ablation_snapshot.schema.json": "76ecbba667009c0dc12356bb11090d998144090d46bc0fc2687cc1fddc9f0046",
+    "data/corpus.csv": "b46122191f0ca96717ef3020ea44eaa701e9a5cc0ebe634f67b5e38b69bd8a3e",
+    "data/files.csv": "baa4d811848bbe90e93b89b86c44270ad3be68fb8cd67312023a5e9233fbab50",
+    "ontology.yaml": "5d3e93ba0d96e1718b12a7bf6576deea084e5823b5ec76f016e5268e817265b2",
+    "results/claims.csv": "44496aee8fd30d9a257d5692f470355ef079c1bbd6131aa2d37f409e2568f8c9",
+    "results/extraction_status.csv": "0bb5e086a1a24808059885ff183d060b5afc642649baecac891d588ac8a02c4d",
+    "results/no_claims.csv": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "tools/ablation_db.py": "8a5be3bbf946bbda12ded47affb0eb08e29aeb57bac319eaee63db7d50402cda",
+    "tools/series.py": "76ca4864f9951e7e460c9543c5415e2d31834c592dd563383cc67dd69bc23352",
+    "tools/snapshot_scope.py": "06f9a5dcacd959fa6c6482d0a538dccb4bf97df1fcc00bd98a6227b84f73806f"
+  },
+  "scope": {
+    "article_id": 534424,
+    "binding": "article-v1"
+  }
+}
