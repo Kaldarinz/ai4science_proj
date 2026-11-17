@@ -1,0 +1,52 @@
+{
+  "step": "dry",
+  "status": "pass",
+  "snapshot_sha256": "0de0f35107c00c31adb096e4a974fdb18844bd9b505c05e3174543688879c637",
+  "schema_sha256": "76ecbba667009c0dc12356bb11090d998144090d46bc0fc2687cc1fddc9f0046",
+  "series": [],
+  "exclusions": [
+    {
+      "article_id": 545936,
+      "experiment_ids": [
+        546063
+      ],
+      "reason": "short_series",
+      "detail": "SizeKind(quantity='geometric_diameter', technique='sem', weighting='particle_count', component=None)/mean: fewer than two points"
+    }
+  ],
+  "violations": [],
+  "scope": {
+    "article_id": 545936
+  },
+  "elapsed_seconds": 0.037249,
+  "started_at_utc": "2026-11-17T10:13:46.747705+00:00",
+  "provenance": {
+    "git_head": "64ac4a5df1bb01810caac3090bc01c743019c54b",
+    "git_status": [],
+    "python": "3.14.4",
+    "packages": {
+      "numpy": "2.5.3",
+      "scipy": "1.18.1",
+      "pytest": "9.1.1",
+      "hypothesis": "6.170.15",
+      "jsonschema": "4.26.0"
+    },
+    "source_sha256": {
+      "METHOD.md": "fad3a23a38e43c3ca2ab8da56680f70651aceb030290e4cc6c53ce4669c4d3fa",
+      "requirements.txt": "cebd6f618ab0e38da4f35cdd9790961efb8b556266bac0b1df3ed929c0e0e8dd",
+      "tools/series.py": "76ca4864f9951e7e460c9543c5415e2d31834c592dd563383cc67dd69bc23352",
+      "tools/ablation_db.py": "8a5be3bbf946bbda12ded47affb0eb08e29aeb57bac319eaee63db7d50402cda",
+      "tools/snapshot_scope.py": "06f9a5dcacd959fa6c6482d0a538dccb4bf97df1fcc00bd98a6227b84f73806f",
+      "data/ablation_snapshot.schema.json": "76ecbba667009c0dc12356bb11090d998144090d46bc0fc2687cc1fddc9f0046",
+      "data/snapshot_manifest.json": "447e5c8f8d4fee27904506b6083bd82f9b9c3906b6b976a66035b6d2bfe9364e",
+      "checks/verifier/contract.py": "b103263a2d3d7bba0e7d2a1e2c16534c5f18921d7d140111d2b547b8c54082e6",
+      "checks/verifier/fixtures.py": "d1c378c6891b544e24fb7f10e70dbe1ca6598df5a2c24875fa76743ae35148f9",
+      "checks/verifier/resampling.py": "9e52b71e9c6711a859b91c8363c8e3294a365214863548e3a4bd52dfe9686233",
+      "checks/verifier/run.py": "48338107384696810822aa0ab521e0028b7be1c7940c0a02e57ab8914f7180b7",
+      "checks/verifier/test_article_run.py": "3644ca062e726ac57bc3bc682e1965255949fd7bc4aa1ee25859568d33bc5ce9",
+      "checks/verifier/test_contract.py": "92fcaad6ead47470a168f7cb0da06b3c1fd6c7d6006299f60917175787d77b7b",
+      "checks/verifier/test_properties.py": "a9fd622b101173bc060e32324281332a354ba55568dfb90b60e8925d2ed397c0",
+      "checks/verifier/test_resampling.py": "8a2385889f555a1924f3ab480a7a19367d231274b918faf4aa52c0fabc8b12c4"
+    }
+  }
+}
