@@ -1,0 +1,94 @@
+{
+  "candidates": [
+    {
+      "claim": {
+        "article_id": "80094",
+        "basis": "own_data",
+        "claim_id": "80094-c1",
+        "conditions": "fs pulses",
+        "direction": "increase",
+        "file": "10.1117_12.2217777.pdf",
+        "material": "Au",
+        "medium_class": "water",
+        "page": "3",
+        "quote": "Indeed, the mean size of nanoparticles increased from 8-10 to 30 nm under the increase of laser energy from 50 to 175 \u00b5J/pulse",
+        "variable": "energy",
+        "variable_written": "laser energy"
+      },
+      "series": {
+        "article_id": 80094,
+        "medium_class": "water",
+        "n_points": 6,
+        "notes": "",
+        "pulse_duration_class": "fs",
+        "pulse_duration_fs": 110.0,
+        "series_id": "80094-s1",
+        "size_component": null,
+        "size_quantity": "geometric_diameter",
+        "size_source": "scalar",
+        "size_statistic": "mean",
+        "size_technique": "tem",
+        "size_weighting": "particle_count",
+        "storage_duration_h": null,
+        "wavelength_nm": 800.0,
+        "x_quantity": "pulse_energy"
+      }
+    },
+    {
+      "claim": {
+        "article_id": "80094",
+        "basis": "own_data",
+        "claim_id": "80094-c2",
+        "conditions": "fs pulses",
+        "direction": "no_effect",
+        "file": "10.1117_12.2217777.pdf",
+        "material": "AuSi",
+        "medium_class": "colloid",
+        "page": "3",
+        "quote": "In contrast, the increase of laser energy did not affect the size of nanoparticles under the ablation in solutions of Si nanoparticles, as the mean size and size dispersion were always around 5-8 nm and 3-5 nm FWHM, respectively (Fig. 1c,d).",
+        "variable": "energy",
+        "variable_written": "laser energy"
+      },
+      "series": {
+        "article_id": 80094,
+        "medium_class": "colloid",
+        "n_points": 6,
+        "notes": "",
+        "pulse_duration_class": "fs",
+        "pulse_duration_fs": 110.0,
+        "series_id": "80094-s2",
+        "size_component": null,
+        "size_quantity": "geometric_diameter",
+        "size_source": "scalar",
+        "size_statistic": "mean",
+        "size_technique": "tem",
+        "size_weighting": "particle_count",
+        "storage_duration_h": null,
+        "wavelength_nm": 800.0,
+        "x_quantity": "pulse_energy"
+      }
+    }
+  ],
+  "format": 1,
+  "inputs": {
+    "checks/analysis.py": "e6b1d05f0bf350a28bccb56d74b0395a9b6ead3a502bf71ed72bc02af0143de1",
+    "checks/check.py": "a3dd19d120241cff91151150d3192ddde679a52cad4cfa23ecf9886cfd985ff7",
+    "checks/claims_spec.md": "0075adf951f4bd13093ffdc9ea6a7f9bf27d293fc1dcc3ddd55953ba259a1d92",
+    "checks/results_spec.md": "f7cb03de913ea6c7372d8cffead2ef91b854408042b4438a0a0e483ba266c361",
+    "data/ablation_snapshot.json": "7870184acb344581e1df30de1642eafae3f7381e6f7b77e27cf706623790d865",
+    "data/ablation_snapshot.schema.json": "76ecbba667009c0dc12356bb11090d998144090d46bc0fc2687cc1fddc9f0046",
+    "data/corpus.csv": "a4949f25d142194233cf784132518c3addbd0a4340ec919b86eb223f735bd01d",
+    "data/files.csv": "241b67acccf45cdbf059e8b27fbcf28f6678673ea7e65ea9c1b4f327abbde519",
+    "ontology.yaml": "5d3e93ba0d96e1718b12a7bf6576deea084e5823b5ec76f016e5268e817265b2",
+    "results/claims.csv": "90104a65b4a8185c0aec11ff3830e4d396d6da721fdcf501ae2b30c196a6df54",
+    "results/extraction_status.csv": "dad785e3a580efc628258c91a3eb52b140081274dff8ae0749e0107228669f13",
+    "results/no_claims.csv": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "tools/ablation_db.py": "8a5be3bbf946bbda12ded47affb0eb08e29aeb57bac319eaee63db7d50402cda",
+    "tools/series.py": "76ca4864f9951e7e460c9543c5415e2d31834c592dd563383cc67dd69bc23352",
+    "tools/snapshot_scope.py": "06f9a5dcacd959fa6c6482d0a538dccb4bf97df1fcc00bd98a6227b84f73806f"
+  },
+  "scope": {
+    "article_id": 80094,
+    "binding": "article-v1"
+  }
+}
