@@ -1,0 +1,25 @@
+{
+  "candidates": [],
+  "format": 1,
+  "inputs": {
+    "checks/analysis.py": "e6b1d05f0bf350a28bccb56d74b0395a9b6ead3a502bf71ed72bc02af0143de1",
+    "checks/check.py": "a3dd19d120241cff91151150d3192ddde679a52cad4cfa23ecf9886cfd985ff7",
+    "checks/claims_spec.md": "0075adf951f4bd13093ffdc9ea6a7f9bf27d293fc1dcc3ddd55953ba259a1d92",
+    "checks/results_spec.md": "f7cb03de913ea6c7372d8cffead2ef91b854408042b4438a0a0e483ba266c361",
+    "data/ablation_snapshot.json": "c32370e2dceaaa64bca24df7e688fa0845c1110ae2fa5c0ae7442ae105aaf076",
+    "data/ablation_snapshot.schema.json": "76ecbba667009c0dc12356bb11090d998144090d46bc0fc2687cc1fddc9f0046",
+    "data/corpus.csv": "600c836d6da4e76bcadcd46ebeadba51c9d9a326b0db87648e15a4ba62a3ce24",
+    "data/files.csv": "95b5dbbacca38a868f258a8dfbaf4d0912d949544bcf4894bab7a3524abc241e",
+    "ontology.yaml": "5d3e93ba0d96e1718b12a7bf6576deea084e5823b5ec76f016e5268e817265b2",
+    "results/claims.csv": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "results/extraction_status.csv": "fc5f8f5fe12d29ef1e3ab07375a1fa0f18dcd67b4115f7f052855493b24042ba",
+    "results/no_claims.csv": "8f1bb42bbc4cdee8f0c42eff09bf000de621059e7943862b08e75d924e9a7ba7",
+    "tools/ablation_db.py": "8a5be3bbf946bbda12ded47affb0eb08e29aeb57bac319eaee63db7d50402cda",
+    "tools/series.py": "76ca4864f9951e7e460c9543c5415e2d31834c592dd563383cc67dd69bc23352",
+    "tools/snapshot_scope.py": "06f9a5dcacd959fa6c6482d0a538dccb4bf97df1fcc00bd98a6227b84f73806f"
+  },
+  "scope": {
+    "article_id": 539370,
+    "binding": "article-v1"
+  }
+}
