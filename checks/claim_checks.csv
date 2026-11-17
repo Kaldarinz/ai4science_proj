@@ -1,3 +1,25 @@
 claim_id,reason,outcome,wrong_fields,note,curator,date
 80094-c1,review,correct,,diary.md 2026-10-04: checked against the article text,Anton,2026-10-04
 80094-c2,review,correct,,diary.md 2026-10-04: checked against the article text,Anton,2026-10-04
+534424-c1,review,correct,,Human curator Anton approved the retained extracted claim; diary.md 2026-11-17 extraction curation. Not matching approval.,Anton,2026-11-17
+534424-c2,review,correct,,Human curator Anton approved the retained extracted claim; diary.md 2026-11-17 extraction curation. Not matching approval.,Anton,2026-11-17
+534494-c1,review,correct,,Human curator Anton approved the retained extracted claim; diary.md 2026-11-17 extraction curation. Not matching approval.,Anton,2026-11-17
+80079-c1,review,correct,,Retained decrease classification under human-curator approval; source describes fine-particle formation at high fluence; diary.md 2026-11-17 extraction curation.,Anton,2026-11-17
+80110-c1,review,correct,,Human curator Anton approved the retained extracted claim; diary.md 2026-11-17 extraction curation. Not matching approval.,Anton,2026-11-17
+535841-c1,review,correct,,Human curator Anton approved the retained extracted claim; diary.md 2026-11-17 extraction curation. Not matching approval.,Anton,2026-11-17
+537774-c1,review,correct,,Human curator Anton approved the retained extracted claim; diary.md 2026-11-17 extraction curation. Not matching approval.,Anton,2026-11-17
+537967-c1,review,correct,,Human curator Anton approved the retained extracted claim; diary.md 2026-11-17 extraction curation. Not matching approval.,Anton,2026-11-17
+537995-c1,review,correct,,Human curator Anton approved the retained extracted claim; diary.md 2026-11-17 extraction curation. Not matching approval.,Anton,2026-11-17
+537995-c2,review,correct,,Human curator Anton approved the retained extracted claim; diary.md 2026-11-17 extraction curation. Not matching approval.,Anton,2026-11-17
+538022-c1,review,correct,,Human curator Anton approved the retained extracted claim; diary.md 2026-11-17 extraction curation. Not matching approval.,Anton,2026-11-17
+538366-c1,review,correct,,Human curator Anton approved the retained extracted claim; diary.md 2026-11-17 extraction curation. Not matching approval.,Anton,2026-11-17
+538366-c2,review,correct,,Human curator Anton approved the retained extracted claim; diary.md 2026-11-17 extraction curation. Not matching approval.,Anton,2026-11-17
+538366-c3,review,correct,,Human curator Anton approved the retained extracted claim; diary.md 2026-11-17 extraction curation. Not matching approval.,Anton,2026-11-17
+538366-c4,review,correct,,Human curator Anton approved the retained extracted claim; diary.md 2026-11-17 extraction curation. Not matching approval.,Anton,2026-11-17
+538459-c1,review,correct,,Accepted after human-curator correction: variable unspecified -> fluence; literal quote and variable_written unchanged; diary.md 2026-11-17 extraction curation.,Anton,2026-11-17
+538459-c2,review,correct,,Retained under explicit human-curator approval; caption-only provenance in SI p.3 Fig. S2 was previously flagged; no general caption-rule change; diary.md 2026-11-17 extraction curation.,Anton,2026-11-17
+538459-c3,review,correct,,Human curator Anton approved the retained extracted claim; diary.md 2026-11-17 extraction curation. Not matching approval.,Anton,2026-11-17
+538584-c1,review,correct,,Human curator Anton approved the retained extracted claim; diary.md 2026-11-17 extraction curation. Not matching approval.,Anton,2026-11-17
+539228-c1,review,correct,,Human curator Anton approved the retained extracted claim; diary.md 2026-11-17 extraction curation. Not matching approval.,Anton,2026-11-17
+544838-c1,review,correct,,Human curator Anton approved the retained extracted claim; diary.md 2026-11-17 extraction curation. Not matching approval.,Anton,2026-11-17
+547156-c1,review,correct,,Human curator Anton approved the retained extracted claim; diary.md 2026-11-17 extraction curation. Not matching approval.,Anton,2026-11-17

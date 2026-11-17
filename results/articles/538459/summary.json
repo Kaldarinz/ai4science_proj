@@ -21,7 +21,7 @@
         "non_monotonic": 0
       },
       "own_data": {
-        "affects": 0,
+        "affects": 1,
         "decrease": 1,
         "increase": 0,
         "no_effect": 0,
@@ -39,7 +39,7 @@
     "n_corpus": 1,
     "n_pending": 0,
     "n_unreadable": 0,
-    "n_with_unspecified_claim": 1,
+    "n_with_unspecified_claim": 0,
     "prevalence": {
       "denominator": 1,
       "fraction": 1.0,
@@ -165,8 +165,8 @@
     "ontology.yaml": "5d3e93ba0d96e1718b12a7bf6576deea084e5823b5ec76f016e5268e817265b2",
     "results/articles/538459/comparison.csv": "f95c3839b6f0ea0a74e15faec571c3908bedb36f99fca956c4e78589188a3c54",
     "results/articles/538459/matching_audit.csv": "f9cad52aed3e4e81a325ca53a843d4749bf1782871ea6063e9a710effce61000",
-    "results/claims.csv": "fdb0c2d654bb5ac6c699ddd48634f6183681ede1ab59150f090173dd63012892",
-    "results/extraction_status.csv": "098446b817cd0ebb1146b7945580fc83cd20d356f0428ca2b7dc190242dac0c7",
+    "results/claims.csv": "de6ca2e463767294d122d4298222177f55a7ce29ebab87b462a2f24544ad9c7c",
+    "results/extraction_status.csv": "b66628a0818750fd1641001dd2751eae597fa1ffd0707d915044e750650b9838",
     "results/no_claims.csv": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
     "tools/ablation_db.py": "8a5be3bbf946bbda12ded47affb0eb08e29aeb57bac319eaee63db7d50402cda",
     "tools/series.py": "76ca4864f9951e7e460c9543c5415e2d31834c592dd563383cc67dd69bc23352",
