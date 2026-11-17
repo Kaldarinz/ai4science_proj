@@ -1,0 +1,199 @@
+{
+  "articles": {
+    "by_basis": {
+      "cited": 0,
+      "general": 0,
+      "own_data": 1
+    },
+    "by_basis_and_direction": {
+      "cited": {
+        "affects": 0,
+        "decrease": 0,
+        "increase": 0,
+        "no_effect": 0,
+        "non_monotonic": 0
+      },
+      "general": {
+        "affects": 0,
+        "decrease": 0,
+        "increase": 0,
+        "no_effect": 0,
+        "non_monotonic": 0
+      },
+      "own_data": {
+        "affects": 1,
+        "decrease": 0,
+        "increase": 0,
+        "no_effect": 0,
+        "non_monotonic": 0
+      }
+    },
+    "by_direction": {
+      "affects": 1,
+      "decrease": 0,
+      "increase": 0,
+      "no_effect": 0,
+      "non_monotonic": 0
+    },
+    "n_complete": 1,
+    "n_corpus": 1,
+    "n_pending": 0,
+    "n_unreadable": 0,
+    "n_with_unspecified_claim": 0,
+    "prevalence": {
+      "denominator": 1,
+      "fraction": 1.0,
+      "numerator": 1
+    }
+  },
+  "comparison": {
+    "by_model": {
+      "lenient": {
+        "claims": {
+          "all_agree": 0,
+          "all_disagree": 0,
+          "denominator": 1,
+          "mixed": 0,
+          "unassessable": 1
+        },
+        "pairs": {
+          "agree": 0,
+          "disagree": 0,
+          "n_assessable": 0,
+          "n_included": 1,
+          "unassessable": 1
+        },
+        "pairs_by_assessment": {
+          "direct": {
+            "agree": 0,
+            "disagree": 0,
+            "n_assessable": 0,
+            "n_included": 0,
+            "unassessable": 0
+          },
+          "qualified": {
+            "agree": 0,
+            "disagree": 0,
+            "n_assessable": 0,
+            "n_included": 0,
+            "unassessable": 0
+          },
+          "unassessable": {
+            "agree": 0,
+            "disagree": 0,
+            "n_assessable": 0,
+            "n_included": 1,
+            "unassessable": 1
+          }
+        }
+      },
+      "primary": {
+        "claims": {
+          "all_agree": 0,
+          "all_disagree": 0,
+          "denominator": 1,
+          "mixed": 0,
+          "unassessable": 1
+        },
+        "pairs": {
+          "agree": 0,
+          "disagree": 0,
+          "n_assessable": 0,
+          "n_included": 1,
+          "unassessable": 1
+        },
+        "pairs_by_assessment": {
+          "direct": {
+            "agree": 0,
+            "disagree": 0,
+            "n_assessable": 0,
+            "n_included": 0,
+            "unassessable": 0
+          },
+          "qualified": {
+            "agree": 0,
+            "disagree": 0,
+            "n_assessable": 0,
+            "n_included": 0,
+            "unassessable": 0
+          },
+          "unassessable": {
+            "agree": 0,
+            "disagree": 0,
+            "n_assessable": 0,
+            "n_included": 1,
+            "unassessable": 1
+          }
+        }
+      }
+    },
+    "claim_outcomes": {
+      "539228-c1": {
+        "lenient": "unassessable",
+        "n_included": 1,
+        "n_qualified": 0,
+        "n_unassessable": 1,
+        "primary": "unassessable"
+      }
+    },
+    "n_all_candidates_excluded": 0,
+    "n_candidate_pairs": 1,
+    "n_excluded_pairs": 0,
+    "n_included_pairs": 1,
+    "n_own_data_claims": 1,
+    "n_with_candidates": 1,
+    "n_with_included_series": 1,
+    "n_without_candidates": 0
+  },
+  "contract_version": 1,
+  "inputs": {
+    "checks/analysis.py": "e6b1d05f0bf350a28bccb56d74b0395a9b6ead3a502bf71ed72bc02af0143de1",
+    "checks/check.py": "a3dd19d120241cff91151150d3192ddde679a52cad4cfa23ecf9886cfd985ff7",
+    "checks/claims_spec.md": "0075adf951f4bd13093ffdc9ea6a7f9bf27d293fc1dcc3ddd55953ba259a1d92",
+    "checks/results_spec.md": "f7cb03de913ea6c7372d8cffead2ef91b854408042b4438a0a0e483ba266c361",
+    "data/ablation_snapshot.json": "358ece5478fc5e8d773d1617463aa045810641d5bc767084904442fc4d838a76",
+    "data/ablation_snapshot.schema.json": "76ecbba667009c0dc12356bb11090d998144090d46bc0fc2687cc1fddc9f0046",
+    "data/corpus.csv": "8eb9dc3c1b84341e5e620fa394a4655f46089aa0b7d4a467734fc4fccc567c57",
+    "data/files.csv": "764e9e95b57653019f0de215afff4036a3794a488761bc8b57b675a469d4e1d0",
+    "ontology.yaml": "5d3e93ba0d96e1718b12a7bf6576deea084e5823b5ec76f016e5268e817265b2",
+    "results/articles/539228/comparison.csv": "139b5f0d0254491b6254556adf7188be0f9351ba283b6ed0269794aa6732dc23",
+    "results/articles/539228/matching_audit.csv": "72e29390d4a199b94870808ad11f8ca5d14be20723fff2edcd38ecdc9aac52a7",
+    "results/claims.csv": "e37e09a2d9713549e6005d40cc99241a8766bdfedae610f08c05568eb248d6b9",
+    "results/extraction_status.csv": "0c74761a08c378616347cfd3bee1f18bce3616aab47524a6e93919dbc67afd92",
+    "results/no_claims.csv": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "tools/ablation_db.py": "8a5be3bbf946bbda12ded47affb0eb08e29aeb57bac319eaee63db7d50402cda",
+    "tools/series.py": "76ca4864f9951e7e460c9543c5415e2d31834c592dd563383cc67dd69bc23352",
+    "tools/snapshot_scope.py": "06f9a5dcacd959fa6c6482d0a538dccb4bf97df1fcc00bd98a6227b84f73806f"
+  },
+  "scope": {
+    "article_id": 539228,
+    "binding": "article-v1"
+  },
+  "series": {
+    "lenient": {
+      "counts": {
+        "decreasing": 0,
+        "flat": 1,
+        "increasing": 0,
+        "irregular": 0,
+        "peak": 0,
+        "valley": 0
+      },
+      "n_test": 0,
+      "p_value": null
+    },
+    "primary": {
+      "counts": {
+        "decreasing": 0,
+        "flat": 1,
+        "increasing": 0,
+        "irregular": 0,
+        "peak": 0,
+        "valley": 0
+      },
+      "n_test": 0,
+      "p_value": null
+    }
+  },
+  "stage": "draft"
+}
