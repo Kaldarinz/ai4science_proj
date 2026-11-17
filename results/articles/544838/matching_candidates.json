@@ -1,0 +1,43 @@
+{
+  "candidates": [
+    {
+      "claim": {
+        "article_id": "544838",
+        "basis": "own_data",
+        "claim_id": "544838-c1",
+        "conditions": "ns pulses (4 ns, 1 kHz), 1064 nm; 2 mL AuNPs(II) nanochain colloid in deionized water; 8 min irradiation; pulse energy 4 uJ-1.5 mJ (12 mJ/cm2-4.9 J/cm2); fragmentation threshold 321 mJ/cm2 (0.1 mJ)",
+        "direction": "non_monotonic",
+        "file": "10.3390_nano16020079.pdf",
+        "material": "Au",
+        "medium_class": "colloid",
+        "page": "9",
+        "quote": "It was found that irradiation of colloids of elongated gold nanoparticles AuNPs(II) in the pulse energy range from 4\u00b5J (12 mJ/cm2) to 57\u00b5J (181 mJ/cm2) leads to an increase in the plasmon resonance amplitude, a shift in the maximum position toward longer wavelengths and a decrease in absorption in the red region of the spectrum, which corresponds to the process of remelting elongated nanoparticles with each other and the formation of spherical particles larger than in the original AuNPs(I) colloid. With a further increase in the pulse energy from 76\u00b5J (242 mJ/cm2) to 1.5 mJ (4.9 J/cm2), a further increase in the plasmon resonance amplitude and a decrease in absorption in the long-wavelength region of the spectrum are observed. However, the absorption maximum begins to shift toward shorter wavelengths, i.e., laser fragmentation of gold nanoparticles and a decrease in the size of the nanoparticles occur.",
+        "variable": "energy",
+        "variable_written": "pulse energy"
+      },
+      "series": null
+    }
+  ],
+  "format": 1,
+  "inputs": {
+    "checks/analysis.py": "e6b1d05f0bf350a28bccb56d74b0395a9b6ead3a502bf71ed72bc02af0143de1",
+    "checks/check.py": "a3dd19d120241cff91151150d3192ddde679a52cad4cfa23ecf9886cfd985ff7",
+    "checks/claims_spec.md": "0075adf951f4bd13093ffdc9ea6a7f9bf27d293fc1dcc3ddd55953ba259a1d92",
+    "checks/results_spec.md": "f7cb03de913ea6c7372d8cffead2ef91b854408042b4438a0a0e483ba266c361",
+    "data/ablation_snapshot.json": "0506b5b519e2cbc707a1f7fc454541e661b7153205966b8885b13a81edd77dbf",
+    "data/ablation_snapshot.schema.json": "76ecbba667009c0dc12356bb11090d998144090d46bc0fc2687cc1fddc9f0046",
+    "data/corpus.csv": "40ce8ce60b49145a66571ebee52b21f284672aeb2160904e9d2766fa3b500943",
+    "data/files.csv": "a607be4b318ddf69d04ada7fa4858cb6fd8501e97343f181c5cbc75a716f2158",
+    "ontology.yaml": "5d3e93ba0d96e1718b12a7bf6576deea084e5823b5ec76f016e5268e817265b2",
+    "results/claims.csv": "7659827f9c1c7e2a4ee96f41549b0ebfd7657b5c2e6971bdbdd2b8c364b9a367",
+    "results/extraction_status.csv": "e2ba7357daf5abf97fa4ef52843bba9bc35867fa6ba5937458a7223e408a2b51",
+    "results/no_claims.csv": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "tools/ablation_db.py": "8a5be3bbf946bbda12ded47affb0eb08e29aeb57bac319eaee63db7d50402cda",
+    "tools/series.py": "76ca4864f9951e7e460c9543c5415e2d31834c592dd563383cc67dd69bc23352",
+    "tools/snapshot_scope.py": "06f9a5dcacd959fa6c6482d0a538dccb4bf97df1fcc00bd98a6227b84f73806f"
+  },
+  "scope": {
+    "article_id": 544838,
+    "binding": "article-v1"
+  }
+}
