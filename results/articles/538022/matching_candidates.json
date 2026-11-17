@@ -1,0 +1,43 @@
+{
+  "candidates": [
+    {
+      "claim": {
+        "article_id": "538022",
+        "basis": "own_data",
+        "claim_id": "538022-c1",
+        "conditions": "ns pulses (10 ns), 10 Hz, 532 nm; ablation fluence 10-250 J/cm2; TEM comparison 95 -> 160 J/cm2",
+        "direction": "decrease",
+        "file": "10.1016_j.apsusc.2005.07.150.pdf",
+        "material": "Au",
+        "medium_class": "water",
+        "page": "4",
+        "quote": "The average diameter was observed to be decreased to 5\u201310 nm and the size distribution to be narrowed as the laser fluence was increased up to 160 J/cm 2.",
+        "variable": "fluence",
+        "variable_written": "laser fluence"
+      },
+      "series": null
+    }
+  ],
+  "format": 1,
+  "inputs": {
+    "checks/analysis.py": "e6b1d05f0bf350a28bccb56d74b0395a9b6ead3a502bf71ed72bc02af0143de1",
+    "checks/check.py": "a3dd19d120241cff91151150d3192ddde679a52cad4cfa23ecf9886cfd985ff7",
+    "checks/claims_spec.md": "0075adf951f4bd13093ffdc9ea6a7f9bf27d293fc1dcc3ddd55953ba259a1d92",
+    "checks/results_spec.md": "f7cb03de913ea6c7372d8cffead2ef91b854408042b4438a0a0e483ba266c361",
+    "data/ablation_snapshot.json": "9c193571b62a29e2d53b440c884b3c5721d06384984231c8b9d4024d4310138c",
+    "data/ablation_snapshot.schema.json": "76ecbba667009c0dc12356bb11090d998144090d46bc0fc2687cc1fddc9f0046",
+    "data/corpus.csv": "31a3adfe4e37493a27e7c96a530195125a5ed44e97adef5fb43f81d3ca4dc34a",
+    "data/files.csv": "042408cdc3be1e5d350c853a2184d203ba7850b691f162814308f302ddb1df0c",
+    "ontology.yaml": "5d3e93ba0d96e1718b12a7bf6576deea084e5823b5ec76f016e5268e817265b2",
+    "results/claims.csv": "f301a9d3d65a4fc925b2025c7b8e66fa35ed5180d4569c3d665db431e7db62e3",
+    "results/extraction_status.csv": "a010ee0f1b50c215181e245861a757c914ff4053c842e8dfb4035f37ef463565",
+    "results/no_claims.csv": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "tools/ablation_db.py": "8a5be3bbf946bbda12ded47affb0eb08e29aeb57bac319eaee63db7d50402cda",
+    "tools/series.py": "76ca4864f9951e7e460c9543c5415e2d31834c592dd563383cc67dd69bc23352",
+    "tools/snapshot_scope.py": "06f9a5dcacd959fa6c6482d0a538dccb4bf97df1fcc00bd98a6227b84f73806f"
+  },
+  "scope": {
+    "article_id": 538022,
+    "binding": "article-v1"
+  }
+}
