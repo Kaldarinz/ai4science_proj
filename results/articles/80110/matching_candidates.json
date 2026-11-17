@@ -1,0 +1,43 @@
+{
+  "candidates": [
+    {
+      "claim": {
+        "article_id": "80110",
+        "basis": "own_data",
+        "claim_id": "80110-c1",
+        "conditions": "fs laser fragmentation of preliminarily prepared Au colloids in deionized water; Yb:KGW, 1025 nm, 480 fs, 1 kHz",
+        "direction": "affects",
+        "file": "10.1117_12.2513970.pdf",
+        "material": "Au",
+        "medium_class": "colloid",
+        "page": "3",
+        "quote": "One can see that the nanoparticle had a spherical shape, while variation of laser pulse energy leads to a change of mean nanoparticle size .",
+        "variable": "energy",
+        "variable_written": "laser pulse energy"
+      },
+      "series": null
+    }
+  ],
+  "format": 1,
+  "inputs": {
+    "checks/analysis.py": "e6b1d05f0bf350a28bccb56d74b0395a9b6ead3a502bf71ed72bc02af0143de1",
+    "checks/check.py": "a3dd19d120241cff91151150d3192ddde679a52cad4cfa23ecf9886cfd985ff7",
+    "checks/claims_spec.md": "0075adf951f4bd13093ffdc9ea6a7f9bf27d293fc1dcc3ddd55953ba259a1d92",
+    "checks/results_spec.md": "f7cb03de913ea6c7372d8cffead2ef91b854408042b4438a0a0e483ba266c361",
+    "data/ablation_snapshot.json": "80e98b4f6ca8bc4d0a0977b326a46a9bdcbabd24df2d64ac278ec224c2dda185",
+    "data/ablation_snapshot.schema.json": "76ecbba667009c0dc12356bb11090d998144090d46bc0fc2687cc1fddc9f0046",
+    "data/corpus.csv": "0cebf18c891f509570afb2ef97ff409aa469ea3dc214d0dc00bde528407298a8",
+    "data/files.csv": "448c709baa1ea44c6c8e5e2fc5872f8d7e209838366fbe3d5aebb582239041b1",
+    "ontology.yaml": "5d3e93ba0d96e1718b12a7bf6576deea084e5823b5ec76f016e5268e817265b2",
+    "results/claims.csv": "2cfbf16e285865a5f05d870760389c6e9ac411ce307ee28065990362a95f7cb6",
+    "results/extraction_status.csv": "9ee92510acba3e01bd12cbc5987000c2d69fbc0d6101f2585c8c8e57215d7d60",
+    "results/no_claims.csv": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "tools/ablation_db.py": "8a5be3bbf946bbda12ded47affb0eb08e29aeb57bac319eaee63db7d50402cda",
+    "tools/series.py": "76ca4864f9951e7e460c9543c5415e2d31834c592dd563383cc67dd69bc23352",
+    "tools/snapshot_scope.py": "06f9a5dcacd959fa6c6482d0a538dccb4bf97df1fcc00bd98a6227b84f73806f"
+  },
+  "scope": {
+    "article_id": 80110,
+    "binding": "article-v1"
+  }
+}
