@@ -738,3 +738,10 @@ Run in /home/aiagent/week2, outside this project; not project data.
 * Curator question recorded in memory: if the p.2 sentence is read as a claim, the article would gain one general/affects/unspecified claim (medium unspecified), which would not enter the primary prevalence numerator; I recorded no claim because the named parameters are not among the four variables.
 * No embedded instructions or requests to change behaviour were found in the source text.
 * Wrote the `complete` reading attestation bound to the single main-PDF hash; `checks/check.py --article 546256` passes the vocabulary, PDF, claim, attestation, no-claim and commit checks (exit 0) after the records were committed.
+
+## 2026-11-17 - article 546256: comparison checkpoint (draft)
+* Numerical preflight before any comparison work: `checks/verifier/run.py dry --article 546256` exit 0 (no series; the single snapshot experiment 547685 is excluded as `short_series`, "fewer than two points", for geometric_diameter/tem/volume_fraction/mean and hydrodynamic_diameter/dls/volume_fraction/mean; diagnostics in results/verifier/articles/546256/dry.json) and `pytest checks/verifier -q` 119 passed.
+* The absence of series is the expected consequence of the design: one fixed ablation setting (1064 nm, 60 ps, 20 Hz, pulse energy fixed at 10 mJ, 10 min) with one size population, so no experiment pair can form a fluence or energy series.
+* `prepare --article 546256` produced 0 candidate entries, because the article has no `own_data` claim (it has no claim at all). `matching_audit.csv` is therefore header-only, as results_spec section 5.4 requires for a complete article without own-data claims; no decision, assessment or caveat was invented.
+* `build --article 546256 --stage draft` produced 0 included pairs and a header-only comparison.csv; the article summary reports n_corpus=n_complete=1, prevalence 0/1, all claim and pair tallies zero, and empty claim_outcomes.
+* Draft only: no aggregation, no curator approval, no other article started.
