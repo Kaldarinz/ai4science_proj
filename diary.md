@@ -797,3 +797,10 @@ Run in /home/aiagent/week2, outside this project; not project data.
 * Curator question recorded in memory: whether the abstract sentence should be read as an `own_data` claim with `variable=unspecified`, `direction=affects` (p.2 introduces it with "Our experiments showed"), rather than as a no-claim general statement; recorded as no claim following the 532516 precedent.
 * No embedded instructions or requests to change behaviour were found in the source text.
 * Wrote the `complete` reading attestation bound to the single main-PDF hash (3ff0d3c7...).
+
+## 2026-11-17 - article 547362: comparison checkpoint (draft)
+* Numerical preflight before any comparison work: `checks/verifier/run.py dry --article 547362` exit 0 and `pytest checks/verifier -q` 119 passed.
+* The dry preflight reports no series and one exclusion: `short_series` ("fewer than two points") for experiment_id 547719 on geometric_diameter/tem/particle_count/mean; diagnostics in results/verifier/articles/547362/dry.json. A single experiment with one size measurement cannot form a fluence or energy series, which is consistent with the text's single fixed laser setting.
+* `prepare --article 547362` produced 0 candidate entries, because the article has no `own_data` claim (it has no claim at all). `matching_audit.csv` is therefore header-only, as results_spec section 5.4 requires for a complete article without own-data claims; no decision, assessment or caveat was invented.
+* `build --article 547362 --stage draft` produced 0 included pairs and a header-only comparison.csv; the article summary reports n_corpus=n_complete=1, prevalence 0/1, all claim and pair tallies zero, empty claim_outcomes and empty series shape counts.
+* Draft only: no aggregation, no curator approval, no other article started.
