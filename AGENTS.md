@@ -109,8 +109,13 @@ and the cited source PDFs are the evidence, not previous agent summaries.
   introduce a new analysis. Trace each substantive claim to its artifact.
 - Write in academic English, following `WRITING.md`. Use the supplied class
   with `[english]` and without `final`. Mark human-written, generated and sourced
-  text, and fill the AI-use table with what was actually checked. For references,
-  use local evidence and curator-supplied verification; ask rather than invent.
+  text, and fill the AI-use table with what was actually checked.
+- For literature review and reference verification, use local sources, Paper
+  Search MCP, or built-in web search, fetch and PDF download. Send only public
+  search terms and bibliographic identifiers; do not upload project materials.
+  Record the evidence and its location in `lit/lit.md`. External sources may
+  support the introduction and discussion but do not change the finalized corpus
+  or its results. Ask rather than invent.
 - Target 4–8 LaTeX pages of main text, excluding references and AI-use disclosure.
   From `paper/`, create `build/` and run twice:
 
@@ -174,8 +179,8 @@ without an explicit curator instruction.
 5. No live database connections; numerical tools read the frozen local snapshot.
    `[window]`
 6. No `git push` or `sudo`; `aiagent` has no keys/tokens or sudo membership. `[env]`
-7. No network tools, URL reads or research calls (`openalex_*`, `wikidata_*`).
-   `[call]` / `[window]`. Network and Lean are not needed.
+7. During claim extraction, do not use network tools, read URLs, or call
+   external research tools. `[call]` / `[window]`.
 8. Never invent curator acceptance/rejection. Report automatic checks as command
    outcomes, not scientific acceptance. `[window]`
 
