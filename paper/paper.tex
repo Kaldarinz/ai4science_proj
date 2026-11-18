@@ -14,10 +14,93 @@
 \begin{document}
 
 \section*{Introduction}
-\PaperTODO{State the research question, corpus scope, and comparison criterion.}
+\generated[revised from the first draft against WRITING.md and research/problem.md]{}
+
+Pulsed laser ablation in liquids (LAL) produces colloidal nanoparticles by
+focusing laser pulses on a solid target immersed in a liquid. The target, the
+liquid and its solutes, the wavelength, pulse duration, pulse energy,
+repetition rate and focusing geometry can each be varied, and the combinations
+have been used to prepare nanomaterials from much of the periodic
+table~\cite{zhang2017}. The freedom is bounded: monomodal, monodisperse
+colloids remain difficult to obtain by varying the laser parameters alone, and
+the parameters act together, their mutual cross-effects making a general
+concept difficult to develop~\cite{zhang2017}.
+
+The process passes through a plasma plume, a shock wave and a cavitation bubble
+within nanoseconds, at temperatures of thousands of kelvins and under steep
+temperature and pressure gradients~\cite{alkattan2018,ivanov2024}. The
+extreme-conditions label applies to the initial plasma and the final collapse,
+whereas the particles spend most of their time in the comparatively cold
+bubble~\cite{zhang2017}. Models of this process exist and are being developed,
+with bounded scope. A molecular-dynamics two-temperature model reproduces the
+qualitative form of the measured size distribution and the effect of
+pulse-overlap-induced porosity, but could not follow nanoparticle parameters on
+the microsecond time scale and did not separate the two energy-dissipation
+regimes into a rule of thumb~\cite{ivanov2024}. No model yet correlates
+material and liquid properties with the primary particle diameter, and the
+theoretical link between the first 100~ns and the cavitation stage is
+missing~\cite{zhang2017}.
+
+Gold is a well-studied case. Particle size and pulse fluence or pulse energy
+are basic quantities, so a straightforward trend seems plausible: more energy
+per pulse should give larger particles, or smaller ones once fragmentation
+dominates. In the fixed corpus examined here, the reported directions do not
+reduce to one trend. Articles report increases, decreases, non-monotonic
+behaviour and no detectable effect, and no single direction describes the
+eligible numerical series, as we report in Results. We therefore contrast the reported trends
+first and then ask whether a single claim agrees with the data that its own
+article supplies.
+
+Here, we compare what articles say about the dependence of gold particle size
+on pulse fluence or pulse energy with what their data show, counting directions
+at the article level, including articles that state none. Agreement means
+concordance under a stated trend rule, not physical confirmation.
+
+Because the corpus is a selection rather than a representative sample, and
+because pulse durations, wavelengths, fluence ranges and size measurements
+differ, this heterogeneity is evidence about this corpus, not evidence that no
+universal physical relationship exists or that current mechanisms fail.
 
 \section{Related Work}
-\PaperTODO{Explain how this work differs from the verified sources in lit/lit.md.}
+\generated[condensed from the first draft; selected evidence for the Introduction argument]{}
+
+\subsection{Reported directions for gold.}
+
+The primary studies cited here disagree on the direction. For femtosecond pulses at
+800~nm the size increases with fluence over 60--1000~J/cm$^2$: a thermal-free
+regime below about 400~J/cm$^2$ gives 3--10~nm quasi-monodisperse colloids,
+whereas plasma-induced heating at higher fluence gives larger particles and a
+broad distribution~\cite{kabashin2003}. For nanosecond pulses at 532~nm the
+average diameter instead decreases to 5--10~nm as fluence rises to
+160~J/cm$^2$~\cite{tarasenko2006}. Within one nanosecond experiment at
+1064~nm, the average size decreases up to a critical fluence near
+35~J/cm$^2$ and then increases, and the critical value shifts with the
+medium~\cite{elsayed2013}; in another, the size is practically independent of
+fluence at the fundamental wavelength and increases strongly at the second
+harmonic~\cite{nikolov2011}. With pulse energy as the variable, the size grows
+up to a fragmentation threshold, beyond which fragmentation
+dominates~\cite{baimler2026}.
+
+The review that records both directions in a single paragraph attributes the
+contradiction to in situ fragmentation by subsequent pulses, which cannot be
+excluded in batch LAL, and concludes that single-pulse fluence studies are
+needed; for LAL it claims that fluence raises productivity rather than primary
+particle size~\cite{zhang2017}.
+
+\subsection{Comparability of reported sizes.}
+
+Five analytical methods applied to the same gold colloids give
+sphere-equivalent, hydrodynamic, Feret or gyration radii with different
+weightings, so that reported shifts of the primary-particle mode around 10~nm
+require a significance test tied to the method~\cite{letzel2018}.
+
+\subsection{Difference from the sources.}
+
+The five primary studies cited above are single-setup experiments, and the two
+reviews report no claim-level counts and no test of a claim against the same
+article's series. Neither kind of source can say how often a direction is
+stated in a corpus or whether a stated direction survives comparison with the
+data of the article that states it.
 
 \section{Methods}
 \PaperTODO{Describe claim extraction, series construction, and matching rules.}
@@ -39,11 +122,90 @@
 
 % Mark passages with \written{...}, \generated[model]{...}, or \sourced{...}.
 \begin{aiusage}
-  \PaperTODO{Name the passage} & \generated{} &
-    \PaperTODO{Name the tool or model} & \PaperTODO{Describe the check} \\
+  Introduction & \generated{} &
+    open-weight LLM via Yandex AI Studio &
+    Cut from 569 to 413 words with the documented count script; the order of
+    the narrative points compared with research/problem.md; each of the three
+    citation keys (zhang2017, alkattan2018, ivanov2024) matched to its
+    registry row in lit/lit.md, with DOIs not re-queried in this pass;
+    quoted numbers carried over unchanged from the earlier draft and not
+    re-read in this pass. \\
+  Related Work & \generated{} &
+    open-weight LLM via Yandex AI Studio &
+    Cut from 920 to 285 words; every sentence checked against its lit/lit.md
+    page record; three quoted values re-searched in the PDFs
+    (kabashin2003: 400~J/cm$^2$, 3--10~nm; elsayed2013: 7--35~J/cm$^2$;
+    tarasenko2006: 5--10~nm at 160~J/cm$^2$); no claim-level count written
+    into prose. \\
 \end{aiusage}
 
-\section*{References}
-\PaperTODO{Replace this section with the thebibliography environment.}
+\begin{thebibliography}{9}
+
+\bibitem{zhang2017}
+D.~Zhang, B.~G\"okce, S.~Barcikowski,
+Laser synthesis and processing of colloids: fundamentals and applications,
+\emph{Chemical Reviews} 117 (2017) 3990--4103.
+doi:10.1021/acs.chemrev.6b00468.
+
+\bibitem{alkattan2018}
+A.~Al-Kattan, V.~P.~Nirwan, A.~Popov, Y.~V.~Ryabchikov, G.~Tselikov, M.~Sentis,
+et al.,
+Recent advances in laser-ablative synthesis of bare Au and Si nanoparticles and
+assessment of their prospects for tissue engineering applications,
+\emph{International Journal of Molecular Sciences} 19 (2018) 1563.
+doi:10.3390/ijms19061563.
+
+\bibitem{kabashin2003}
+A.~V.~Kabashin, M.~Meunier,
+Synthesis of colloidal nanoparticles during femtosecond laser ablation of gold
+in water,
+\emph{Journal of Applied Physics} 94 (2003) 7941--7943.
+doi:10.1063/1.1626793.
+
+\bibitem{tarasenko2006}
+N.~V.~Tarasenko, A.~V.~Butsen, E.~A.~Nevar, N.~A.~Savastenko,
+Synthesis of nanosized particles during laser ablation of gold in water,
+\emph{Applied Surface Science} 252 (2006) 4439--4444.
+doi:10.1016/j.apsusc.2005.07.150.
+
+\bibitem{elsayed2013}
+K.~A.~Elsayed, H.~Imam, M.~A.~Ahmed, R.~Ramadan,
+Effect of focusing conditions and laser parameters on the fabrication of gold
+nanoparticles via laser ablation in liquid,
+\emph{Optics \& Laser Technology} 45 (2013) 495--502.
+doi:10.1016/j.optlastec.2012.06.004.
+
+\bibitem{nikolov2011}
+A.~S.~Nikolov, N.~N.~Nedyalkov, R.~G.~Nikov, P.~A.~Atanasov, M.~T.~Alexandrov,
+Characterization of Ag and Au nanoparticles created by nanosecond pulsed laser
+ablation in double distilled water,
+\emph{Applied Surface Science} 257 (2011) 5278--5282.
+doi:10.1016/j.apsusc.2010.10.146.
+
+\bibitem{baimler2026}
+I.~V.~Baimler, I.~A.~Popov, A.~V.~Simakin, S.~V.~Gudkov,
+A simple three-step method for the synthesis of submicron gold particles: the
+influence of laser irradiation duration, pulse energy, laser pulse duration,
+and initial concentration of nanoparticles in the colloid,
+\emph{Nanomaterials} 16 (2026) 79.
+doi:10.3390/nano16020079.
+
+\bibitem{ivanov2024}
+D.~S.~Ivanov, P.~Shakhov, G.~Tikhonowsky, A.~A.~Popov, A.~N.~Mayorov,
+I.~N.~Zavestovskaya, et al.,
+Ultrafast laser ablation of gold in liquids: effect of laser pulse
+overlap-induced surface porosity on size distribution of formed nanoparticles,
+\emph{Applied Surface Science} 643 (2024) 158662.
+doi:10.1016/j.apsusc.2023.158662.
+
+\bibitem{letzel2018}
+A.~Letzel, B.~G\"okce, A.~Menzel, A.~Plech, S.~Barcikowski,
+Primary particle diameter differentiation and bimodality identification by
+five analytical methods using gold nanoparticle size distributions synthesized
+by pulsed laser ablation in liquids,
+\emph{Applied Surface Science} 435 (2018) 743--751.
+doi:10.1016/j.apsusc.2017.11.130.
+
+\end{thebibliography}
 
 \end{document}
