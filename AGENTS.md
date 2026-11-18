@@ -6,7 +6,9 @@ A common claim in laser-ablative synthesis of colloidal nanomaterials is that na
 with increase of "power" of laser pulses. The project compares, for gold, what articles **say**
 about this dependence with what their **data** show.
 
-Tasks: **Claim extraction** and **Comparison**.
+Tasks: **Claim extraction**, **Comparison**, and **Paper writing**. The corpus
+analysis was finalized at `8e23b26`. Use those results to write the paper;
+do not reopen the experiment unless the curator explicitly asks.
 
 Outputs:
 - `results/claims.csv`, `results/no_claims.csv` — extracted claims or evidence-backed absence;
@@ -17,11 +19,11 @@ Outputs:
 
 ## 1. Workflow and checks
 
-Finish extraction and comparison for one article before starting the next.
+For extraction and comparison, finish one article before starting the next.
 Start the next article's extraction in a fresh context without earlier numerical outputs.
-Commit only your scientific records before readiness checks; require exit code 0
-before reporting completion. Never commit supplied code or the human curator's
-changes to clear a check failure; report that blocker instead.
+Commit only your scientific records before analysis readiness checks; require
+exit code 0 before reporting completion. Never commit supplied code or the human
+curator's changes to clear a check failure; report that blocker instead.
 
 ### Claim extraction
 
@@ -90,6 +92,36 @@ Changed article checkpoints require re-aggregation. Approval must match the
 current corpus inputs; final cannot contain pending articles. Automatic checks
 and tests do not replace scientific review.
 
+### Paper writing
+
+Only on an explicit writing task, read `STATUS.md`, `research/problem.md`,
+`WRITING.md`, `GLOSSARY.md` and `lit/lit.md`. Check the approved evidence before
+using it: `.venv/bin/python checks/check.py --analysis final` must exit 0.
+`results/summary.json`, `results/comparison.csv`, `results/matching_audit.csv`
+and the cited source PDFs are the evidence, not previous agent summaries.
+
+- Write an exploratory audit of the fixed corpus, not a general claim about
+  laser ablation. Separate article-level claim frequency, claim-level outcomes
+  and pair-level assessments. Keep unassessable claims and qualified matches
+  visible; identical model totals do not imply identical outcomes.
+- Write limitations before the results section. Generate tables and numerical
+  macros from saved final results; do not copy counts into prose by hand or
+  introduce a new analysis. Trace each substantive claim to its artifact.
+- Write in academic English, following `WRITING.md`. Use the supplied class
+  with `[english]` and without `final`. Mark human-written, generated and sourced
+  text, and fill the AI-use table with what was actually checked. For references,
+  use local evidence and curator-supplied verification; ask rather than invent.
+- Target 4–8 LaTeX pages of main text, excluding references and AI-use disclosure.
+  From `paper/`, create `build/` and run twice:
+
+  ```sh
+  pdflatex -no-shell-escape -interaction=nonstopmode -halt-on-error -output-directory=build paper.tex
+  ```
+
+  Run `.venv/bin/python checks/check_paper.py` from the project root.
+  This is a student self-check; the author verifies length, claims, disclosure and
+  anonymity before submission. Do not submit anything or create a submission tag.
+
 ### Optional robustness experiment
 
 Only on explicit human-curator request, run in order:
@@ -108,14 +140,23 @@ smoke evidence for the same inputs and code. Outputs stay in `results/verifier/`
 - `src/comparison/` — supplied pipeline; operational details in its README.
 - `tools/ablation_db.py` — local snapshot API; numerical rules in `tools/series.py`
   and `checks/results_spec.md` §§2–4. Export metadata: `data/snapshot_manifest.json`.
-- `checks/` — specifications and independent checkers.
+- `checks/` — specifications, independent checkers and paper self-check.
 - `ontology.yaml` — graph schema; `ontology/` and `notes/` — read-only graph notes.
+- `paper/` — manuscript and submission build; `research/problem.md` — paper scope;
+  `lit/lit.md` — paper references and their provenance.
 
 ## 3. Environment
 
 Run from `/srv/ai4science_proj` as `aiagent`, using `.venv/bin/python`.
-Write only scientific records in `results/`, `memory/` and `diary.md`.
-Run supplied commands, not new code or additional AI4Science instances.
+For extraction and comparison, write only scientific records in `results/`,
+`memory/` and `diary.md`; run supplied commands, not new code.
+For paper writing, edit only `paper/paper.tex`, manuscript-specific generated
+macros/tables/figures and build files under `paper/`, `GLOSSARY.md`, `lit/lit.md`
+and `diary.md`. The only new code allowed is presentation-only generation under
+`paper/` from saved evidence; never modify scientific data, results, checks,
+class file, specs, infrastructure or curator approval. Do not run additional
+AI4Science instances. Never commit LaTeX intermediates or a submission PDF
+without an explicit curator instruction.
 
 ## 4. Bans
 

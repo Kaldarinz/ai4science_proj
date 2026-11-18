@@ -1,0 +1,49 @@
+% Anonymous English manuscript skeleton; do not add the final option.
+% Replace each \PaperTODO with reviewed content. The paper self-check rejects TODOs.
+\documentclass[english]{ai4science_ysda}
+
+\newcommand{\PaperTODO}[1]{\textbf{[Draft: #1]}}
+\TITLE{Gold Nanoparticle Size in Pulsed Laser Ablation in Liquids: Claims and Data}
+\ShortTITLE{Gold Nanoparticle Size: Claims and Data}
+\Abstract{\PaperTODO{State the question, method, main finding, and its limits.}}
+\KEYWORDS{pulsed laser ablation in liquids, gold nanoparticles, fluence, pulse energy}
+
+% Generate results.tex from the finalized result files before writing results.
+\InputIfFileExists{results.tex}{}{}
+
+\begin{document}
+
+\section*{Introduction}
+\PaperTODO{State the research question, corpus scope, and comparison criterion.}
+
+\section{Related Work}
+\PaperTODO{Explain how this work differs from the verified sources in lit/lit.md.}
+
+\section{Methods}
+\PaperTODO{Describe claim extraction, series construction, and matching rules.}
+
+\section{Verification}
+\PaperTODO{Explain what the checks cover and what they do not establish.}
+
+\section{Limitations}
+\PaperTODO{Describe the conditions that limit the conclusions.}
+
+\section{Results}
+\PaperTODO{Present the main table with explicit denominators and illustrative cases.}
+
+\section{Reproducibility}
+\PaperTODO{Identify the data and code versions, environment, and run commands without revealing author identities.}
+
+\section*{Conclusion}
+\PaperTODO{State the descriptive conclusion within the scope of the corpus.}
+
+% Mark passages with \written{...}, \generated[model]{...}, or \sourced{...}.
+\begin{aiusage}
+  \PaperTODO{Name the passage} & \generated{} &
+    \PaperTODO{Name the tool or model} & \PaperTODO{Describe the check} \\
+\end{aiusage}
+
+\section*{References}
+\PaperTODO{Replace this section with the thebibliography environment.}
+
+\end{document}

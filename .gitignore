@@ -13,6 +13,18 @@ results/**/.*.tmp
 # Publisher PDFs are not redistributed; data/files.csv identifies them by SHA-256.
 data/articles/*/*.pdf
 
+# LaTeX build intermediates; keep manuscript sources and figures visible.
+/paper/build/
+/paper/*.aux
+/paper/*.bbl
+/paper/*.blg
+/paper/*.log
+/paper/*.out
+/paper/*.synctex.gz
+/paper/*.toc
+/paper/*.fls
+/paper/*.fdb_latexmk
+
 # Obsidian: only the vault settings the graph view needs
 .obsidian/*
 !.obsidian/app.json

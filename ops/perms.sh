@@ -22,6 +22,12 @@ for d in "${WRITABLE[@]}"; do
   q find "$d" -type d -exec setfacl -m d:u::rwX,d:g::rwX,d:o::--- {} +
 done
 q chmod g+w diary.md
+# Narrow writing workspace. The sticky bit protects Anton-owned entries
+# (e.g. the class) from removal/replacement by aiagent. Edit the shared
+# manuscript in place; create generated fragments and builds under paper/.
+q chmod g+w,+t paper
+q chmod g+w paper/paper.tex GLOSSARY.md lit/lit.md
+q find paper lit research -type d -exec setfacl -m d:u::rwX,d:g::r-X,d:o::--- {} +
 q chmod 600 README.md                          # for the human only
 for d in data checks tools src tests; do
   q find "$d" -type d -exec setfacl -m d:u::rwX,d:g::r-X,d:o::--- {} +
