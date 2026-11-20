@@ -82,13 +82,95 @@ remains incomplete. The properties of the resulting particles depend in complex
 ways on many experimental parameters.}
 
 \section{Methods}
-\PaperTODO{Describe claim extraction, series construction, and matching rules.}
+
+\generated[Yandex AI Studio]{
+The articles came from a curated database of scientific literature on the
+laser-ablative synthesis of colloidal nanomaterials (\texttt{ablation\_db}).
+Of the 408 articles that reported gold (Au) as the sole stock material for
+synthesis, 41 were selected at random for analysis.
+
+The main text and all supplied supplements were examined for statements about
+how the size of gold varied with pulse fluence,
+pulse energy, power or intensity. Each distinct combination of material, liquid
+medium class, laser variable, direction and basis (the authors' own data, a
+cited source or a general statement) counted as one claim. Claim extraction
+preceded inspection of the numerical data.
+
+Each eligible series in \texttt{ablation\_db} comprised experiments from a
+single article in which only the laser variable $x$ (energy or fluence) varied.
+Eligibility required at least two distinct values of $x$
+and compatible conditions, including the measurement technique and the
+statistic used to summarize particle size (mean, median or mode).
+
+The sequence of rises and falls in particle size $d$ with increasing $x$
+determined the numerical data trend: rises alone indicated an increasing trend, falls alone
+a decreasing trend, and no detectable change a flat trend. A single reversal
+from rising to falling marked a peak; the reverse marked a valley. Multiple
+reversals indicated an irregular trend. Two error models were used to account for
+uncertainties in the reported sizes: primary model used 10\% of $d_i$ as error, while 
+lanient model estimated error to be 20\$ of $d_i$. Under both error models, the first
+point served as the initial anchor $a$. A change counted, and point $i$ became
+the new anchor, only if $|d_i-d_a|>\sqrt{e_i^2+e_a^2}$. The lenient model's
+larger fallback error could thus mask a rise or fall counted under the primary
+model.
+
+For each textual claim based on the authors' own data, we also compared it with 
+the trend diraction from the actual numerical data, reported in the article.
+Comparisons were direct, qualified if they relied on an
+explicit $x$ variable, or unassessable if the direction could not be judged. Under
+each error model, a stated increase or decrease agreed with the corresponding
+numerical trend, and a claim of no effect agreed with a flat trend. A
+non-monotonic claim agreed with a peak, valley or irregular trend; a claim of
+an effect without a stated direction agreed with any non-flat trend.
+
+Claim frequency was calculated across all reviewed articles, including those
+with no claim. Cited and general claims contributed to this frequency but not
+to the numerical comparison. Claim agreement with numerical data were assessed separately under
+each error model across all claims based on the authors' own data, including
+unmatched claims. Agreement or disagreement required at least one included
+series and the same judgment for every included series. A claim had a mixed
+outcome if at least one series agreed and another disagreed; all remaining
+claims were unassessable.}
 
 \section{Verification}
-\PaperTODO{Explain what the checks cover and what they do not establish.}
+
+\generated[Yandex AI Studio]{The automated checks and the curator's review
+verified different parts of the work. The record checker verified that the records
+parsed, matched the specified columns and were internally consistent: every
+retained quotation was found on its recorded page, and the summary's
+denominators and tallies followed the specification. An independent verifier
+checked the snapshot and its series against a data contract and nine properties.
+These checks establish that the supplied code implements the stated rules on the
+database snapshot.
+
+The curator examined the claims, approving, rejecting or correcting them,
+then reviewed every candidate pair (textual claim - numerical data trend), including exclusions
+and claims without candidates, and recorded acceptance.
+That approval covers the matching decisions for this corpus, not the
+completeness of the extraction or the physical correctness of the comparisons.}
 
 \section{Limitations}
-\PaperTODO{Describe the conditions that limit the conclusions.}
+
+\generated[Yandex AI Studio]{The textual claim records are one reading of the text; the
+curator's review checked the claims recorded, not the ones missed, so it is not
+an independent estimate of extraction accuracy or recall.
+
+The snapshot has no measurement provenance: a scalar $z$-average and a missing
+statistic were treated as a mean, and every size curve as an ordinary density,
+so a different treatment of a light scattering curve could move a series across
+a shape boundary. The eror models are hoices, not measured
+uncertainties, so a series close to the combined error can change shape between
+the rules and take a matched claim's outcome with it.
+
+Missing condition details were wildcards, so a series can combine experiments
+with differing unrecorded settings, and a qualified pair compares a claim with a
+proxy (e.g. fluence for energy). A claim is tested only against its own article's
+series, so an article without exported measurements leaves it untested.
+
+Series may share experiments and articles may contribute several series and
+claims, so pair counts overstate the independent evidence. Agreement means
+concordance under the stated trend rule, not physical confirmation: a two-point
+series can support a direction and say nothing about curvature.}
 
 \section{Results}
 \PaperTODO{Present the main table with explicit denominators and illustrative cases.}
@@ -102,10 +184,24 @@ ways on many experimental parameters.}
 % Mark passages with \written{...}, \generated[model]{...}, or \sourced{...}.
 \begin{aiusage}
   Introduction (including literature discussion) & \written{} &
-    Yandex AI Studio (draft); OpenAI assistant (revision) &
+    AI4Science (initial draft, via Yandex AI Studio) &
+    The author rewrote the Introduction, retaining little of the initial
+    wording, and integrated the literature discussion into the argument.
     Compared the scientific statements with the cited PDF passages and the
     literature notes. Checked the trend examples against the articles and
     the scope of the comparison against the final corpus records. \\
+  Methods, Verification, Limitations & \generated{} &
+    Yandex AI Studio &
+    Compressed the three sections from 2,095 to 1,018 words (Methods 549,
+    Verification 171, Limitations 298) and re-read every retained rule
+    against \texttt{checks/claims\_spec.md}~\S2 and
+    \texttt{checks/results\_spec.md}~\S\S2--3, 5. Traced the corpus size to
+    \texttt{results/summary.json} and the verifier properties to
+    \texttt{METHOD.md}~\S5 and \texttt{checks/verifier/}. Checked the
+    curator's rejection, variable correction and approval against the
+    \texttt{diary.md} entries of 2026-11-17/18 and
+    \texttt{checks/matching\_review.json}. No new analysis; no count in these
+    sections comes from outside the saved records. \\
 \end{aiusage}
 
 \begin{thebibliography}{9}

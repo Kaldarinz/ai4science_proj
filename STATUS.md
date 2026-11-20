@@ -10,8 +10,12 @@ baseline. The paper is an exploratory audit of the fixed corpus.
 - **Current draft:** Anton rewrote the Introduction and integrated the
   literature discussion into it. Use this version as the style reference for
   the rest of the paper; leave it unchanged unless Anton requests edits.
-- **Next:** draft Methods, Verification and Limitations using the finalized
-  evidence. Then generate the main table and write the remaining sections.
+- **Shortened, pending Anton's review:** Methods, Verification and Limitations
+  now fit the 1,050-word cap. The rebuilt PDF is five pages (main text ends on
+  page four). Results is still a placeholder.
+- **Next:** curate those sections and clarify how the corpus was selected;
+  the current project records do not document a random draw. Then generate the
+  main results table and draft Results, Reproducibility, Conclusion and Abstract.
 - **Finish:** build the anonymous PDF, check 4–8 pages of LaTeX main text,
   run the paper self-check and have Anton review. Submission is separate.
 
