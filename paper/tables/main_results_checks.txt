@@ -1,0 +1,93 @@
+Main Results table -- verification against approved final outputs
+========================================================================
+ok   own-data claims (denominator): table=19 summary=19
+ok   included pairs: table=29 summary=29
+ok   claims/primary/all_agree: table=10 summary=10
+ok   claims/primary/all_disagree: table=1 summary=1
+ok   claims/primary/mixed: table=0 summary=0
+ok   claims/primary/unassessable: table=8 summary=8
+ok   claims/primary/denominator: table=19 summary=19
+ok   pairs/primary/agree: table=21 summary=21
+ok   pairs/primary/disagree: table=1 summary=1
+ok   pairs/primary/unassessable: table=7 summary=7
+ok   pairs/primary/n_included: table=29 summary=29
+ok   pairs/primary/direct/n_included: table=20 summary=20
+ok   pairs/primary/direct/agree: table=19 summary=19
+ok   pairs/primary/direct/disagree: table=1 summary=1
+ok   pairs/primary/direct/unassessable: table=0 summary=0
+ok   pairs/primary/qualified/n_included: table=2 summary=2
+ok   pairs/primary/qualified/agree: table=2 summary=2
+ok   pairs/primary/qualified/disagree: table=0 summary=0
+ok   pairs/primary/qualified/unassessable: table=0 summary=0
+ok   pairs/primary/unassessable/n_included: table=7 summary=7
+ok   pairs/primary/unassessable/agree: table=0 summary=0
+ok   pairs/primary/unassessable/disagree: table=0 summary=0
+ok   pairs/primary/unassessable/unassessable: table=7 summary=7
+ok   claims/lenient/all_agree: table=10 summary=10
+ok   claims/lenient/all_disagree: table=1 summary=1
+ok   claims/lenient/mixed: table=0 summary=0
+ok   claims/lenient/unassessable: table=8 summary=8
+ok   claims/lenient/denominator: table=19 summary=19
+ok   pairs/lenient/agree: table=21 summary=21
+ok   pairs/lenient/disagree: table=1 summary=1
+ok   pairs/lenient/unassessable: table=7 summary=7
+ok   pairs/lenient/n_included: table=29 summary=29
+ok   pairs/lenient/direct/n_included: table=20 summary=20
+ok   pairs/lenient/direct/agree: table=19 summary=19
+ok   pairs/lenient/direct/disagree: table=1 summary=1
+ok   pairs/lenient/direct/unassessable: table=0 summary=0
+ok   pairs/lenient/qualified/n_included: table=2 summary=2
+ok   pairs/lenient/qualified/agree: table=2 summary=2
+ok   pairs/lenient/qualified/disagree: table=0 summary=0
+ok   pairs/lenient/qualified/unassessable: table=0 summary=0
+ok   pairs/lenient/unassessable/n_included: table=7 summary=7
+ok   pairs/lenient/unassessable/agree: table=0 summary=0
+ok   pairs/lenient/unassessable/disagree: table=0 summary=0
+ok   pairs/lenient/unassessable/unassessable: table=7 summary=7
+ok   claim_outcome/534424-c1/primary: table=unassessable summary=unassessable
+ok   claim_outcome/534424-c1/lenient: table=unassessable summary=unassessable
+ok   claim_outcome/534424-c2/primary: table=all_agree summary=all_agree
+ok   claim_outcome/534424-c2/lenient: table=all_agree summary=all_agree
+ok   claim_outcome/534494-c1/primary: table=all_agree summary=all_agree
+ok   claim_outcome/534494-c1/lenient: table=all_agree summary=all_agree
+ok   claim_outcome/535841-c1/primary: table=all_agree summary=all_agree
+ok   claim_outcome/535841-c1/lenient: table=all_agree summary=all_agree
+ok   claim_outcome/537995-c1/primary: table=all_agree summary=all_agree
+ok   claim_outcome/537995-c1/lenient: table=all_agree summary=all_agree
+ok   claim_outcome/537995-c2/primary: table=all_agree summary=all_agree
+ok   claim_outcome/537995-c2/lenient: table=all_agree summary=all_agree
+ok   claim_outcome/538022-c1/primary: table=unassessable summary=unassessable
+ok   claim_outcome/538022-c1/lenient: table=unassessable summary=unassessable
+ok   claim_outcome/538366-c1/primary: table=unassessable summary=unassessable
+ok   claim_outcome/538366-c1/lenient: table=unassessable summary=unassessable
+ok   claim_outcome/538366-c2/primary: table=unassessable summary=unassessable
+ok   claim_outcome/538366-c2/lenient: table=unassessable summary=unassessable
+ok   claim_outcome/538366-c3/primary: table=unassessable summary=unassessable
+ok   claim_outcome/538366-c3/lenient: table=unassessable summary=unassessable
+ok   claim_outcome/538366-c4/primary: table=all_agree summary=all_agree
+ok   claim_outcome/538366-c4/lenient: table=all_disagree summary=all_disagree
+ok   claim_outcome/538459-c1/primary: table=all_agree summary=all_agree
+ok   claim_outcome/538459-c1/lenient: table=all_agree summary=all_agree
+ok   claim_outcome/538459-c2/primary: table=all_agree summary=all_agree
+ok   claim_outcome/538459-c2/lenient: table=all_agree summary=all_agree
+ok   claim_outcome/538584-c1/primary: table=all_agree summary=all_agree
+ok   claim_outcome/538584-c1/lenient: table=all_agree summary=all_agree
+ok   claim_outcome/539228-c1/primary: table=unassessable summary=unassessable
+ok   claim_outcome/539228-c1/lenient: table=unassessable summary=unassessable
+ok   claim_outcome/544838-c1/primary: table=unassessable summary=unassessable
+ok   claim_outcome/544838-c1/lenient: table=unassessable summary=unassessable
+ok   claim_outcome/80094-c1/primary: table=all_agree summary=all_agree
+ok   claim_outcome/80094-c1/lenient: table=all_agree summary=all_agree
+ok   claim_outcome/80094-c2/primary: table=all_disagree summary=all_disagree
+ok   claim_outcome/80094-c2/lenient: table=all_agree summary=all_agree
+ok   claim_outcome/80110-c1/primary: table=unassessable summary=unassessable
+ok   claim_outcome/80110-c1/lenient: table=unassessable summary=unassessable
+
+Verdict flips between tolerances (identical aggregate counts)
+------------------------------------------------------------------------
+pair 538366-c4/538366-s2 [direct]: direction=non_monotonic shape primary=valley -> agree=true; shape lenient=decreasing -> agree=false
+pair 80094-c2/80094-s2 [direct]: direction=no_effect shape primary=peak -> agree=false; shape lenient=flat -> agree=true
+claim 80094-c2: primary=all_disagree -> lenient=all_agree
+claim 538366-c4: primary=all_agree -> lenient=all_disagree
+
+Wrote paper/tables/main_results.tex

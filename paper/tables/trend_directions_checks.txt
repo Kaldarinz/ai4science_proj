@@ -1,0 +1,52 @@
+Table 1 (trend directions) -- verification against approved final outputs
+========================================================================
+summary stage: final
+reproducibility: two consecutive runs of this generator produced byte-identical outputs (sha256sum compared)
+ok   articles/n_complete: table=41 summary=41
+ok   articles/n_corpus: table=41 summary=41
+ok   articles/prevalence/numerator: table=16 summary=16
+ok   articles/prevalence/denominator: table=41 summary=41
+ok   articles/n_with_unspecified_claim: table=0 summary=0
+ok   articles/by_direction/increase: table=6 summary=6
+ok   articles/by_direction/decrease: table=6 summary=6
+ok   articles/by_direction/non_monotonic: table=2 summary=2
+ok   articles/by_direction/no_effect: table=2 summary=2
+ok   articles/by_direction/affects: table=6 summary=6
+ok   articles/by_direction/keys: table=['affects', 'decrease', 'increase', 'no_effect', 'non_monotonic'] summary=['affects', 'decrease', 'increase', 'no_effect', 'non_monotonic']
+ok   claims/articles_all_complete: table=[] summary=[]
+ok   series/primary/increasing: table=4 summary=4
+ok   series/primary/decreasing: table=8 summary=8
+ok   series/primary/flat: table=4 summary=4
+ok   series/primary/peak: table=1 summary=1
+ok   series/primary/valley: table=1 summary=1
+ok   series/primary/irregular: table=1 summary=1
+ok   series/primary/n_series: table=19 summary=19
+ok   series/primary/n_test: table=12 summary=12
+ok   series/primary/n_articles_with_series: table=10 summary=10
+ok   series/lenient/increasing: table=4 summary=4
+ok   series/lenient/decreasing: table=9 summary=9
+ok   series/lenient/flat: table=5 summary=5
+ok   series/lenient/peak: table=0 summary=0
+ok   series/lenient/valley: table=0 summary=0
+ok   series/lenient/irregular: table=1 summary=1
+ok   series/lenient/n_series: table=19 summary=19
+ok   series/lenient/n_test: table=13 summary=13
+ok   series/lenient/n_articles_with_series: table=10 summary=10
+note comparison.csv: 29 included pair row(s) over 18 distinct series; 19 series exist in the corpus. Shape counts are taken from results/summary.json, not from this file.
+
+Panel A (articles)
+------------------------------------------------------------------------
+reviewed articles: 41
+articles with a qualifying claim: 16
+  Increase: 6
+  Decrease: 6
+  Non-monotonic: 2
+  No effect: 2
+  Effect, no stated direction: 6
+
+Panel B (series)
+------------------------------------------------------------------------
+primary: increasing=4, decreasing=8, flat=4, peak=1, valley=1, irregular=1; total=19; articles=10; n_test=12
+lenient: increasing=4, decreasing=9, flat=5, peak=0, valley=0, irregular=1; total=19; articles=10; n_test=13
+
+Wrote paper/tables/trend_directions.tex
