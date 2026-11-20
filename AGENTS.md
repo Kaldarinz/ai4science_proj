@@ -7,8 +7,9 @@ with increase of "power" of laser pulses. The project compares, for gold, what a
 about this dependence with what their **data** show.
 
 Tasks: **Claim extraction**, **Comparison**, and **Paper writing**. The corpus
-analysis was finalized at `8e23b26`. Use those results to write the paper;
-do not reopen the experiment unless the curator explicitly asks.
+analysis was originally finalized at `8e23b26`. On 2026-11-20 the curator
+adopted fixed relative tolerances. Use the revised results for writing only
+after fresh hash-bound approval and a passing final check; do not reopen extraction.
 
 Outputs:
 - `results/claims.csv`, `results/no_claims.csv` — extracted claims or evidence-backed absence;

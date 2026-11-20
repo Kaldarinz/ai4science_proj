@@ -22,7 +22,7 @@ SIZE_QUANTITIES = frozenset({
 })
 LOCATION_STATISTICS = frozenset({"mean", "median", "mode"})
 WIDTH_STATISTICS = frozenset({"standard_deviation", "standard_error", "fwhm"})
-FALLBACK = {"primary": 0.10, "lenient": 0.20}
+RELATIVE_TOLERANCE = {"primary": 0.10, "lenient": 0.20}
 # Shared references have semantic contents; colloid references retain identity.
 REFERENCES = {
     "laser": "instruments", "instrument": "instruments",
@@ -82,29 +82,22 @@ class BuiltSeries:
     def points(self, model: str = "primary") -> list[dict]:
         """Return independent, x-sorted point records for an error model."""
         validate_model(model)
-        return [
-            {
+        points = []
+        for x, m in zip(self.x, self.measurements, strict=True):
+            error, source = size_error(m.size, model)
+            points.append({
                 "experiment_id": m.experiment_id,
                 "colloid_id": m.colloid_id,
                 "x": x, "size": m.size,
-                "size_err": size_error(
-                    m.size, model, reported_se=m.reported_se, sd=m.sd,
-                    particles_counted=m.particles_counted,
-                    statistic=m.statistic,
-                )[0],
-                "err_source": size_error(
-                    m.size, model, reported_se=m.reported_se, sd=m.sd,
-                    particles_counted=m.particles_counted,
-                    statistic=m.statistic,
-                )[1],
+                "size_err": error,
+                "err_source": source,
                 "size_source": m.source,
                 "original_statistic": m.original_statistic,
                 "sd": m.sd, "particles_counted": m.particles_counted,
                 "assumptions": list(m.assumptions),
                 "fit_residual": m.fit_residual,
-            }
-            for x, m in zip(self.x, self.measurements, strict=True)
-        ]
+            })
+        return points
 
 
 @dataclass
@@ -117,7 +110,7 @@ class BuildResult:
 
 def validate_model(model: str) -> None:
     """Reject an unknown error model instead of choosing a default."""
-    if not isinstance(model, str) or model not in FALLBACK:
+    if not isinstance(model, str) or model not in RELATIVE_TOLERANCE:
         raise ValueError(f"unknown error model {model!r}")
 
 
@@ -143,11 +136,7 @@ def size_error(
     reported_se: float | None = None, sd: float | None = None,
     particles_counted: int | None = None, statistic: str = "mean",
 ) -> tuple[float, str]:
-    """Select SE, mean's SD/sqrt(N), or the explicit model fallback.
-
-    N is supplied only from a reported particle count, never digitized
-    histogram heights. A distribution width is not a mode/median SE.
-    """
+    """Fixed tolerance for trend detection; validate, but never use, dispersion metadata."""
     validate_model(model)
     size = number(size, "size", positive=True)
     for name, value in (("SE", reported_se), ("SD", sd)):
@@ -159,11 +148,7 @@ def size_error(
         or particles_counted <= 0
     ):
         raise ValueError("particles_counted must be a positive integer")
-    if reported_se is not None:
-        return float(reported_se), "reported_se"
-    if statistic == "mean" and sd is not None and particles_counted is not None:
-        return sd / math.sqrt(particles_counted), "sd_over_sqrt_n"
-    return FALLBACK[model] * size, "fallback"
+    return RELATIVE_TOLERANCE[model] * size, "fixed_relative"
 
 
 def histogram_arrays(histogram: dict) -> tuple[np.ndarray, np.ndarray]:
@@ -679,7 +664,7 @@ def build_series(snapshot: dict, article_id: int) -> BuildResult:
             "notes": "; ".join(sorted({a for m in measurements for a in m.assumptions})),
         }
         built = BuiltSeries(row, measurements, xs, key)
-        for model in FALLBACK:
+        for model in RELATIVE_TOLERANCE:
             points = built.points(model)
             row[f"shape_{model}"] = classify_shape(xs, sizes, [p["size_err"] for p in points])
         result.series.append(built)

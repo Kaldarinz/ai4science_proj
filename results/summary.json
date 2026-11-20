@@ -276,19 +276,19 @@
     "checks/analysis.py": "e6b1d05f0bf350a28bccb56d74b0395a9b6ead3a502bf71ed72bc02af0143de1",
     "checks/check.py": "a3dd19d120241cff91151150d3192ddde679a52cad4cfa23ecf9886cfd985ff7",
     "checks/claims_spec.md": "0075adf951f4bd13093ffdc9ea6a7f9bf27d293fc1dcc3ddd55953ba259a1d92",
-    "checks/results_spec.md": "f7cb03de913ea6c7372d8cffead2ef91b854408042b4438a0a0e483ba266c361",
+    "checks/results_spec.md": "b6e48b953a26ae5ad95a137b05d0f47c95d0fa07861c59bf4b4c628d0394f89a",
     "data/ablation_snapshot.json": "0de0f35107c00c31adb096e4a974fdb18844bd9b505c05e3174543688879c637",
     "data/ablation_snapshot.schema.json": "76ecbba667009c0dc12356bb11090d998144090d46bc0fc2687cc1fddc9f0046",
     "data/corpus.csv": "0879d3619b4668c000ac48b55ab217e06ea54a013a50c62a743598db59c72a53",
     "data/files.csv": "94904b3adeab9049f6a9d1422f8019a74dc40540a764a5186f165bb5f671b31c",
     "ontology.yaml": "5d3e93ba0d96e1718b12a7bf6576deea084e5823b5ec76f016e5268e817265b2",
     "results/claims.csv": "7e309158fb4750cbdf659c1e75311c077f462cc29e30a841623d8c0ed8895ee9",
-    "results/comparison.csv": "469e3bfb656df5d02d50b92ce4338fea44bb3a31671691cd5ecfb965e9c5a5fa",
+    "results/comparison.csv": "02f18827360446c412e253dac16957011827f27ef430d8d7921c3aa57572b4d9",
     "results/extraction_status.csv": "00cee96acaf91cc97d915117f6b173068f050e620631936b6b599c138fc0a4c8",
-    "results/matching_audit.csv": "dd647f130d87078bd4ebf4503646065249b39ee13d2e202e8d07f1327b9f8188",
+    "results/matching_audit.csv": "7c2b6c617d49c809eda3f82f37800ff4009765fb7e8ca4b71f02577c431ad4ec",
     "results/no_claims.csv": "11c0c61192ad3c9e652698064b53f600ea961d05155d0f4c355af15a631cec8f",
     "tools/ablation_db.py": "8a5be3bbf946bbda12ded47affb0eb08e29aeb57bac319eaee63db7d50402cda",
-    "tools/series.py": "76ca4864f9951e7e460c9543c5415e2d31834c592dd563383cc67dd69bc23352"
+    "tools/series.py": "bfa16b0a18cd866653c75f622f551fcb712929e28081cf86fe472236c84f60c5"
   },
   "series": {
     "lenient": {
@@ -316,5 +316,5 @@
       "p_value": 0.927001953125
     }
   },
-  "stage": "final"
+  "stage": "draft"
 }

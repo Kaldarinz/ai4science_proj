@@ -111,7 +111,7 @@ uncertainties in the reported sizes: primary model used 10\% of $d_i$ as error, 
 lanient model estimated error to be 20\$ of $d_i$. Under both error models, the first
 point served as the initial anchor $a$. A change counted, and point $i$ became
 the new anchor, only if $|d_i-d_a|>\sqrt{e_i^2+e_a^2}$. The lenient model's
-larger fallback error could thus mask a rise or fall counted under the primary
+larger tolerance could thus mask a rise or fall counted under the primary
 model.
 
 For each textual claim based on the authors' own data, we also compared it with 
@@ -145,9 +145,9 @@ database snapshot.
 
 The curator examined the claims, approving, rejecting or correcting them,
 then reviewed every candidate pair (textual claim - numerical data trend), including exclusions
-and claims without candidates, and recorded acceptance.
-That approval covers the matching decisions for this corpus, not the
-completeness of the extraction or the physical correctness of the comparisons.}
+and claims without candidates. The curator's review
+addressed matching, not the completeness of extraction or the physical
+correctness of the comparisons.}
 
 \section{Limitations}
 
@@ -158,7 +158,7 @@ an independent estimate of extraction accuracy or recall.
 The snapshot has no measurement provenance: a scalar $z$-average and a missing
 statistic were treated as a mean, and every size curve as an ordinary density,
 so a different treatment of a light scattering curve could move a series across
-a shape boundary. The eror models are hoices, not measured
+a shape boundary. The eror models are choices, not measured
 uncertainties, so a series close to the combined error can change shape between
 the rules and take a matched claim's outcome with it.
 
@@ -191,8 +191,8 @@ series can support a direction and say nothing about curvature.}
     literature notes. Checked the trend examples against the articles and
     the scope of the comparison against the final corpus records. \\
   Methods, Verification, Limitations & \generated{} &
-    Yandex AI Studio &
-    Compressed the three sections from 2,095 to 1,018 words (Methods 549,
+    Yandex AI Studio; OpenAI coding assistant &
+    AI4Science compressed the initial three sections from 2,095 to 1,018 words (Methods 549,
     Verification 171, Limitations 298) and re-read every retained rule
     against \texttt{checks/claims\_spec.md}~\S2 and
     \texttt{checks/results\_spec.md}~\S\S2--3, 5. Traced the corpus size to
@@ -200,8 +200,9 @@ series can support a direction and say nothing about curvature.}
     \texttt{METHOD.md}~\S5 and \texttt{checks/verifier/}. Checked the
     curator's rejection, variable correction and approval against the
     \texttt{diary.md} entries of 2026-11-17/18 and
-    \texttt{checks/matching\_review.json}. No new analysis; no count in these
-    sections comes from outside the saved records. \\
+    \texttt{checks/matching\_review.json}. The author curated Methods. The coding assistant aligned
+    the text, code and tests with the adopted tolerances and compared the
+    rebuilt draft with the original pair assessments and claim outcomes. \\
 \end{aiusage}
 
 \begin{thebibliography}{9}

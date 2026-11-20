@@ -4,6 +4,21 @@ Dated entries describe historical workflows. The 2026-11-16 decision below
 supersedes the earlier extraction-benchmark and hidden-label rules; current
 instructions are in `AGENTS.md` and the specifications.
 
+## 2026-11-20 — Fixed relative tolerances adopted after the original analysis
+
+- Anton adopted 10% (primary) and 20% (lenient) at every size. These are
+  tolerances for trend detection, not measured uncertainties. No repeat
+  extraction, article reading, matching or resampling experiment.
+- Aligned the spec, classifier, independent verifier, tests and manuscript;
+  rebuilt all 41 checkpoints. Checked candidate contexts and pair fields
+  against their predecessors and revised 23 caveats; no decision changed.
+  Nine of 71 point tolerances previously used SD/√N. Under each model all 19
+  shapes, 29 included pair verdicts and 19 own-data claim outcomes are unchanged.
+- Student self-check: dry contract passed globally and per article. The draft
+  check validated evidence, coverage and numerical outputs; the commit gate
+  remains open. The approval at `8e23b26` was not updated: curator review and
+  fresh final build/check are still required before using the revised results.
+
 ## ГГГГ-ММ-ДД — <короткое название задачи>
 - Запрос агенту:
 - Что сделал агент:

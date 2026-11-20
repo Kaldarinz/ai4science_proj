@@ -58,7 +58,8 @@ claim-outcome denominator. Keep direct and qualified pair counts distinct and
 show examples where the outcome changes with the error rule. Agreement here
 means concordance under the stated trend rule, not physical confirmation.
 
-**Acceptance.** Use the approved, final records from `8e23b26`.
+**Acceptance.** Use final records approved for the fixed-tolerance rule. The earlier
+approved run (`8e23b26`) predates this change and is a comparison baseline only.
 `.venv/bin/python checks/check.py --analysis final` must pass. Numeric tables
 and macros must regenerate from those artifacts. A human checks whether text
 and examples support the interpretation; `checks/check_paper.py` checks form,

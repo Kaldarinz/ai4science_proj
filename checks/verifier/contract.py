@@ -322,7 +322,6 @@ def check_series(snapshot: dict, data: dict, schema: dict | None = None, *, mode
         widths = [r for r in c.get("measured_properties", [])
                   if measurement_identity(r, "scalar") == identity]
         sds = [r["value"] for r in widths if r["statistic"] == "standard_deviation"]
-        ses = [r["value"] for r in widths if r["statistic"] == "standard_error"]
         sd = sds[0] if len(sds) == 1 else None
         if sd is None and len(matches) == 1 and p["size_source"] == "histogram":
             h = matches[0]
@@ -342,14 +341,9 @@ def check_series(snapshot: dict, data: dict, schema: dict | None = None, *, mode
             sd = math.sqrt(integral([(x - mean) ** 2 * y for x, y in pairs]) / area)
         if (sd is None) != (p.get("sd") is None) or (sd is not None and not math.isclose(sd, p["sd"], rel_tol=1e-12, abs_tol=1e-12)):
             fail("value_mismatch", "SD differs from stored width or independent distribution moment")
-        if row["size_statistic"] == "mean" and len(ses) == 1:
-            error, source = ses[0], "reported_se"
-        elif row["size_statistic"] == "mean" and sd is not None and expected_n is not None:
-            error, source = sd / math.sqrt(expected_n), "sd_over_sqrt_n"
-        else:
-            error, source = {"primary": .10, "lenient": .20}[model] * p["size"], "fallback"
-        if p["err_source"] != source or not math.isclose(p["size_err"], error, rel_tol=1e-12, abs_tol=1e-12):
-            fail("value_mismatch", "error value/source violates SE → mean SD/√N → fallback priority")
+        error = {"primary": .10, "lenient": .20}[model] * p["size"]
+        if p["err_source"] != "fixed_relative" or not math.isclose(p["size_err"], error, rel_tol=1e-12, abs_tol=1e-12):
+            fail("value_mismatch", "point tolerance must equal the model fraction times size")
     for a, b in itertools.combinations(conditions, 2):
         if not compatible(a, b):
             fail("key_mismatch", "conflicting stated fixed conditions or collection presence")

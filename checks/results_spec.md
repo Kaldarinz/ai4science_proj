@@ -102,15 +102,11 @@ No logarithmic integration, Jacobian or exponentiation of x is used.
 This deliberate toy-project approximation overrides the snapshot schema's
 DLS y convention; it does not change the snapshot or database.
 
-**size_err**, the first applicable: a matching stored SE (`reported_se`),
-then SD/√N for a mean (`sd_over_sqrt_n`), otherwise the model's fallback
-(§3). The current snapshot has no SE statistic; the priority is retained
-for future inputs and pure-function tests. Use a matching scalar SD, else
-the selected histogram/curve's computed SD. N must be explicitly stored
-as `particles_counted` on a matching histogram; never use the sum of
-arbitrary digitized counts as N. Do not turn FWHM into SD. SD/√N does not
-apply to a median or fitted mode. Preserve source, colloid id, original
-statistic, SD, N, error source and assumptions on every returned point.
+**size_err** is a fixed relative tolerance on every selected particle size,
+not a measured standard error: `size_err = f × size` with `err_source` =
+`fixed_relative` (§3). Reported SE, SD and particle counts do not override it.
+Preserve source, colloid id, original statistic, SD, explicitly reported N,
+error source and assumptions as metadata. Never infer N from digitized counts.
 
 **medium_class**, the first that applies: `colloid` (contains a feedstock
 colloid), `water` (one water constituent and no additives), `aqueous`
@@ -126,7 +122,7 @@ values are not imputed.
 
 ## 3. Shape
 
-Two error models differ only in the fallback error: `primary` uses
+Two tolerance models apply to every point: `primary` uses
 0.10 × `size`, `lenient` uses 0.20 × `size`. Each series gets a shape under
 each model.
 

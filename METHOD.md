@@ -10,7 +10,10 @@ how sensitive their classifications are to the assumed size errors. Neither
 part verifies the extraction of textual claims or the correctness of the
 curated database values.
 
-This is the current main-project contract, migrated on 2026-11-15.
+This contract was migrated on 2026-11-15 and amended on 2026-11-20,
+after the original results were known. For clarity and comparability, the curator
+adopted fixed relative tolerances at every point, superseding the earlier
+SE → SD/√N → fallback rule. The shape test and matching criteria did not change.
 The original preregistration, submitted HW2 report, old snapshot and numerical
 results remain unchanged at tag `hw2` (commit `3abd29312aa89c7e6deb3211ecc0d66c47c61f5f`).
 This migration runs infrastructure checks only, not a new resampling experiment.
@@ -48,7 +51,7 @@ whose shapes `checks/results_spec.md` §7.5 already states.
 
 | What | Value |
 |---|---|
-| Varied | error model: `primary` (fallback 0.10 × size) and `lenient` (0.20 × size); in resampling, the noise draw (seed) |
+| Varied | error model: `primary` (0.10 × size at every point) and `lenient` (0.20 × size); in resampling, the noise draw (seed) |
 | Fixed | the snapshot (§3), the series compatibility rules (§3 below and §2 of the spec), the anchor-walk rule (§3 of the spec), the noise model (§7.2) |
 | Measured | shape (one of six names); stability = share of draws whose shape equals the series' shape on the unperturbed data (0–1); Δ = stability − baseline share (−1 to 1) |
 | Baseline | the same series with every size replaced by the error-weighted mean of its sizes: no dependence on fluence, same x and errors |
@@ -147,7 +150,7 @@ with a note, not a violation.
   Outputs go to `results/verifier/`, already covered by ban 3 because
   they hold shapes. Tool implementation tests do not write verifier outputs.
 - **Does not check:** that the database values match the articles
-  (curation); claim extraction (`check.py` does); whether the fallback
+  (curation); claim extraction (`check.py` does); whether the chosen
   fractions 0.10 and 0.20 are right; anything the snapshot left out
   (provenance, measurement settings).
 
@@ -160,7 +163,7 @@ with a note, not a violation.
 | 5 | if `primary` gives `flat`, `lenient` gives `flat` | lenient errors are never smaller, and a flat walk never moves its anchor | `test_lenient_flat_when_primary_flat` |
 | 6 | appending a copy of the last point at a larger x does not change the shape | a copy is never farther than the error from the anchor | `test_repeated_last_point_changes_nothing` |
 | 7 | the number-weighted mean of a distribution lies within its bin edges and does not change when all counts are scaled | digitized counts have an arbitrary scale | `test_distribution_mean` |
-| 8 | the error is the matching stored SE if any, else SD/√N for a mean with explicitly reported N, else the fallback | `results_spec.md` §2 priority | `test_error_priority` |
+| 8 | each tolerance equals the model fraction times the size, regardless of SE, SD, N or statistic | `results_spec.md` §§2–3 | `test_fixed_tolerance_ignores_measurement_errors` |
 | 9 | generated series have exact article/measurement identity, pairwise-compatible fixed conditions and no repeated experiment within a series; reordering inputs preserves the groups | unknowns may overlap but never bridge conflicting stated values; grouping is not a partition | `test_series_compatibility` |
 
 ## 6. Depth steps
@@ -179,8 +182,8 @@ with a note, not a violation.
    that same shape; both unitless: stability ranges from 0 to 1 and Δ from
    −1 to 1 (notation clarified after the run; see §9).
 2. **Repeats and noise:** 5 seeds (0–4) × 1000 draws. A draw moves each
-   size by σ·z with z ~ N(0, 1), σ the size's `primary` error (stored, or
-   0.10 × size). The same z feeds both error models and the baseline, so
+   size by σ·z with z ~ N(0, 1), σ the size's `primary` tolerance
+   (0.10 × size). The same z feeds both error models and the baseline, so
    all comparisons are paired.
 3. **Comparison:** per series and model, the 5 per-seed values of Δ;
    mean, 95 % t-interval (df = 4), one-sided paired t-test of Δ > 0;
@@ -275,10 +278,9 @@ Monte Carlo variation under the assumed noise model, not experimental uncertaint
 - The noise model assumes independent normal errors. Resampling measures
   sensitivity under the assumed noise model; it does not establish
   repeat-measurement stability.
-- SD/√N is used only for means with an explicit reported particle count;
-  it counts particle-sampling error only. It is not the uncertainty of a
-  fitted mode or median. One colloid per point hides synthesis scatter.
-- The fallback fractions (0.10, 0.20) and the thresholds in §7 are
+- The fixed relative tolerances are not sampling errors or uncertainties
+  of a fitted statistic. One colloid per point hides synthesis scatter.
+- The fractions (0.10, 0.20) and the thresholds in §7 are
   choices, not measurements.
 - More articles in a snapshot do not guarantee usable or independent series.
   No current-snapshot resampling or claim-comparison conclusion is asserted.

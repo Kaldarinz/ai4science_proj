@@ -32,13 +32,11 @@ def test_statistic_normalization(statistic, expected):
 
 
 @pytest.mark.parametrize("model, fraction", [("primary", .1), ("lenient", .2)])
-def test_error_priority(model, fraction):
-    assert size_error(20., model, reported_se=.3, sd=5., particles_counted=25) == (.3, "reported_se")
-    assert size_error(20., model, sd=5., particles_counted=25) == (1., "sd_over_sqrt_n")
-    assert size_error(20., model, sd=5.) == (20. * fraction, "fallback")
-    assert size_error(20., model, sd=0., particles_counted=25) == (0., "sd_over_sqrt_n")
-    for statistic in ("mode", "median"):
-        assert size_error(20., model, sd=5., particles_counted=25, statistic=statistic) == (20. * fraction, "fallback")
+def test_fixed_tolerance_with_or_without_reported_errors(model, fraction):
+    for metadata in ({}, {"reported_se": .3, "sd": 5., "particles_counted": 25},
+                     {"sd": 0., "particles_counted": 25}, {"sd": 5.}):
+        for statistic in ("mean", "mode", "median"):
+            assert size_error(20., model, **metadata, statistic=statistic) == (20. * fraction, "fixed_relative")
 
 
 @pytest.mark.parametrize("kwargs", [
@@ -277,12 +275,14 @@ def test_scalar_precedence_sd_and_explicit_particle_count():
         c["size_distributions"] = [histogram(particles_counted=25)]
     built = build_series(snapshot(es), 77).series[0]
     assert built.row["size_source"] == "scalar"
-    for model in ["primary", "lenient"]:
-        assert built.points(model)[0]["size_err"] == 1.
-        assert built.points(model)[0]["err_source"] == "sd_over_sqrt_n"
+    for model, fraction in (("primary", .1), ("lenient", .2)):
+        point = built.points(model)[0]
+        assert (point["sd"], point["particles_counted"]) == (5., 25)
+        assert point["size_err"] == fraction * point["size"]
+        assert point["err_source"] == "fixed_relative"
     for e in es:
         del e["colloids"][0]["size_distributions"][0]["particles_counted"]
-    assert build_series(snapshot(es), 77).series[0].points()[0]["err_source"] == "fallback"
+    assert build_series(snapshot(es), 77).series[0].points()[0]["err_source"] == "fixed_relative"
 
 
 def test_multiple_statistics_have_distinct_deterministic_ids():
@@ -412,7 +412,7 @@ def test_curve_mode_requested_by_scalar_and_matching_weighting():
     built = build_series(snapshot(es), 77).series[0]
     assert built.row["size_statistic"] == "mode"
     assert built.points()[1]["size"] == 2.
-    assert built.points()[1]["err_source"] == "fallback"
+    assert built.points()[1]["err_source"] == "fixed_relative"
 
 
 def test_fwhm_is_not_a_standard_deviation_and_n_is_not_digitized_counts():
@@ -424,7 +424,7 @@ def test_fwhm_is_not_a_standard_deviation_and_n_is_not_digitized_counts():
     points = build_series(snapshot(es), 77).series[0].points()
     assert points[0]["sd"] is None
     assert points[0]["particles_counted"] is None
-    assert points[0]["err_source"] == "fallback"
+    assert points[0]["err_source"] == "fixed_relative"
 
 
 def test_distinct_product_media_can_share_experiments():

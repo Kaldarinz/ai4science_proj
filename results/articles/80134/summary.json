@@ -142,7 +142,7 @@
     "checks/analysis.py": "e6b1d05f0bf350a28bccb56d74b0395a9b6ead3a502bf71ed72bc02af0143de1",
     "checks/check.py": "a3dd19d120241cff91151150d3192ddde679a52cad4cfa23ecf9886cfd985ff7",
     "checks/claims_spec.md": "0075adf951f4bd13093ffdc9ea6a7f9bf27d293fc1dcc3ddd55953ba259a1d92",
-    "checks/results_spec.md": "f7cb03de913ea6c7372d8cffead2ef91b854408042b4438a0a0e483ba266c361",
+    "checks/results_spec.md": "b6e48b953a26ae5ad95a137b05d0f47c95d0fa07861c59bf4b4c628d0394f89a",
     "data/ablation_snapshot.json": "f83bc41fa9ddada78be7591eae71d56ab32881f4030724d90ba2fcf2ebfc6f2c",
     "data/ablation_snapshot.schema.json": "76ecbba667009c0dc12356bb11090d998144090d46bc0fc2687cc1fddc9f0046",
     "data/corpus.csv": "5e2c42384a1567953917c23ad2fcda9661219eabb7eefa69b238e27082ae93fc",
@@ -154,7 +154,7 @@
     "results/extraction_status.csv": "5d64910cbace7af9da43737eb48f037bb7cd43d59da2c23e88152c7b57f93125",
     "results/no_claims.csv": "e1110e8a55dec89fd7231645a2ebf1d8a007217b7f2d51f71b17e2a892675e66",
     "tools/ablation_db.py": "8a5be3bbf946bbda12ded47affb0eb08e29aeb57bac319eaee63db7d50402cda",
-    "tools/series.py": "76ca4864f9951e7e460c9543c5415e2d31834c592dd563383cc67dd69bc23352",
+    "tools/series.py": "bfa16b0a18cd866653c75f622f551fcb712929e28081cf86fe472236c84f60c5",
     "tools/snapshot_scope.py": "06f9a5dcacd959fa6c6482d0a538dccb4bf97df1fcc00bd98a6227b84f73806f"
   },
   "scope": {

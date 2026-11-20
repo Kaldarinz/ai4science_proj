@@ -104,17 +104,11 @@ def test_distribution_mean(bins, exponent):
 @given(st.integers(1, 1000), st.one_of(st.none(), st.integers(0, 100)),
        st.one_of(st.none(), st.integers(0, 100)), st.one_of(st.none(), st.integers(1, 10000)),
        st.sampled_from(["mean", "median", "mode"]))
-def test_error_priority(size, se, sd, n, statistic):
+def test_fixed_tolerance_ignores_measurement_errors(size, se, sd, n, statistic):
     for model, fraction in (("primary", .1), ("lenient", .2)):
         actual, source = size_error(size, model, reported_se=se, sd=sd, particles_counted=n, statistic=statistic)
-        if se is not None:
-            expected, expected_source = se, "reported_se"
-        elif statistic == "mean" and sd is not None and n is not None:
-            expected, expected_source = sd / math.sqrt(n), "sd_over_sqrt_n"
-        else:
-            expected, expected_source = fraction * size, "fallback"
-        assert actual == pytest.approx(expected)
-        assert source == expected_source
+        assert actual == pytest.approx(fraction * size)
+        assert source == "fixed_relative"
 
 
 @PROPERTY
